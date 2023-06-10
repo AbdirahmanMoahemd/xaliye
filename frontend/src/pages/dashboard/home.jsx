@@ -501,11 +501,14 @@ export function Home() {
                   : counterCustomer.todayCusPerc}
                 %
               </strong>
-              &nbsp;{counterCustomer == null
+              &nbsp;
+              {counterCustomer == null
                 ? ""
-                : counterCustomer.todayCusPerc > counterCustomer.yesterdayCusPerc
+                : counterCustomer.todayCusPerc >
+                  counterCustomer.yesterdayCusPerc
                 ? "more than yesterday"
-                : counterCustomer.todayCusPerc < counterCustomer.yesterdayCusPerc
+                : counterCustomer.todayCusPerc <
+                  counterCustomer.yesterdayCusPerc
                 ? "less than yesterday"
                 : "there are same"}
             </Typography>
@@ -564,9 +567,15 @@ export function Home() {
                 <MenuItem onClick={() => setCreate(true)}>
                   Add New Ticket
                 </MenuItem>
-                <MenuItem onClick={()=> dispatch(listTasksByThisWeek(keyword))}>Tasks of this Week</MenuItem>
+                <MenuItem
+                  onClick={() => dispatch(listTasksByThisWeek(keyword))}
+                >
+                  Tasks of this Week
+                </MenuItem>
                 <MenuItem>Tasks of this Month</MenuItem>
-                <MenuItem onClick={()=> dispatch(listTasksByRecent(keyword))}>Recent Tasks</MenuItem>
+                <MenuItem onClick={() => dispatch(listTasksByRecent(keyword))}>
+                  Recent Tasks
+                </MenuItem>
               </MenuList>
             </Menu>
           </CardHeader>
@@ -1314,20 +1323,45 @@ export function Home() {
 }
 
 export default Home;
-
+import invoice from "@/data/images/invoicebg.png";
+import { IoMdCall } from "react-icons/io";
 class ComponentToPrint extends React.Component {
   render() {
     const { text } = this.props;
     return (
       <>
         <div className="">
-          {/* <div className=" mr-14 flex items-center  justify-between">
-            <div className=" h-1 flex-1 border border-blue-500 bg-blue-500"></div>
-            <div className=" w-10"></div>
-            <div className=" flex-non">
-              <p className=" text-3xl font-medium">INVOICE</p>
+          <div className="mx-12 flex items-center">
+            <div className=" w-24">
+              <img src={invoice} />
             </div>
-          </div> */}
+            <div className="flex-1">
+              <div>
+                <p className="text-2xl  font-semibold uppercase">
+                  XALIYE COMPUTER & MOBILE REPAIR
+                </p>
+              </div>
+              <div className="flex justify-between">
+                <p className="px-1 font-normal rounded border border-blue-500 bg-blue-500 text-center uppercase  text-white">
+                  HEl xal fudud waqti gaaban
+                </p>
+                <div className="flex items-center">
+                  <span className=" rounded-full border border-blue-500">
+                    <IoMdCall
+                      color="#2196F3"
+                      className="p-[0.1rem] "
+                      size={20}
+                    />
+                  </span>
+
+                  <span className="p-1 text-blue-600" color="blue"></span>
+                  <p>0613951588</p>
+                  <p>/ 0614128728</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mx-14 border border-blue-500 bg-blue-500"></div>
 
           <div className=" mx-14 mt-4 grid grid-cols-3 gap-4">
             <div className="col-span-2">
@@ -1396,7 +1430,7 @@ class ComponentToPrint extends React.Component {
             <i>
               <AiOutlineWarning className=" text-5xl text-blue-500" />
             </i>
-            <p className=" pl-2 text-xl capitalize">
+            <p className=" pl-2 text-xl capitalize ">
               Digniin hadii aad alaabtaada aad ku qaadan wadid mudo 4 cisho ah
               shierkadda masuul kama ahan, silamid ah shaqo laqabtay lacagteeda
               labixiyay dib looma celin karo
@@ -1416,6 +1450,37 @@ class ComponentToPrint extends React.Component {
               <p className=" text-3xl font-medium">INVOICE</p>
             </div>
           </div> */}
+
+          <div className="mx-12 flex items-center">
+            <div className=" w-24">
+              <img src={invoice} />
+            </div>
+            <div className="flex-1">
+              <div>
+                <p className="text-2xl  font-semibold uppercase">
+                  XALIYE COMPUTER & MOBILE REPAIR
+                </p>
+              </div>
+              <div className="flex justify-between">
+                <p className="font-normal px-1 rounded border border-blue-500 bg-blue-500 text-center uppercase  text-white">
+                  HEl xal fudud waqti gaaban
+                </p>
+                <div className="flex items-center">
+                  <span className=" rounded-full border border-blue-500">
+                    <IoMdCall
+                      color="#2196F3"
+                      className="p-[0.1rem] "
+                      size={20}
+                    />
+                  </span>
+                  <span className="p-1 text-blue-600" color="blue"></span>
+                  <p>0613951588</p>
+                  <p>/ 0614128728</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mx-14 border border-blue-500 bg-blue-500"></div>
 
           <div className=" mx-14 mt-5 grid grid-cols-3 gap-4">
             <div className="col-span-2">
@@ -1479,21 +1544,6 @@ class ComponentToPrint extends React.Component {
             <div className="w-[35%] border border-blue-500"></div>
           </div>
           <br />
-
-          <div className="mx-14 mt-3 flex">
-            <i>
-              <AiOutlineWarning className=" text-5xl text-blue-500" />
-            </i>
-            <p className=" pl-2 text-xl">
-              Digniin hadii aad alaabtaada aad ku qaadan wadid mudo 4 cisho ah
-              shierkadda masuul kama ahan, silamid ah shaqo laqabtay lacagteeda
-              labixiyay dib looma celin karo
-            </p>
-          </div>
-          <br />
-          <p className="mx-14 border border-blue-500 bg-blue-500 text-center uppercase  text-white">
-            Waa kuma mahadsantahay latacaa mulkaaga
-          </p>
         </div>
       </>
     );
