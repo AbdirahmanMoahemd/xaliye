@@ -1432,7 +1432,7 @@ class ComponentToPrint extends React.Component {
             </i>
             <p className=" pl-2 text-xl capitalize ">
               Digniin hadii aad alaabtaada aad ku qaadan wadid mudo 4 cisho ah
-              shierkadda masuul kama ahan, silamid ah shaqo laqabtay lacagteeda
+              shirkadda masuul kama ahan, silamid ah shaqo laqabtay lacagteeda
               labixiyay dib looma celin karo
             </p>
           </div>
