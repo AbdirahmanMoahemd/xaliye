@@ -101,6 +101,9 @@ export function Home() {
   const [isPrinting, setIsPrinting] = useState(false);
   const [onPrint, setOnPrint] = useState(false);
   const [dateRange, setDateRange] = useState(false);
+  const [showTotal, setShowTotal] = useState(false);
+  const [toltalAmount, setToltalAmount]= useState("");
+
 
   let componentRef = useRef();
   let componentRef2 = useRef();
@@ -397,10 +400,21 @@ export function Home() {
       )
     );
   };
-
-  const printHandler = (e) => {
+  let toltal;
+  const getTotal = (e)=>{
     e.preventDefault();
-  };
+    const addDecimals = (num) => {
+      return (Math.round(num * 100) / 100).toFixed(2);
+    };
+    
+    let totalIncome = addDecimals(
+      (toltal = tasks.reduce((acc, item) => acc + item.amount, 0))
+    );
+    setToltalAmount(toltal)
+    setShowTotal(true)
+  }
+
+ 
 
   return (
     <div className="mt-12">
@@ -607,6 +621,9 @@ export function Home() {
                 <MenuItem>Tasks By Date Range</MenuItem>
                 <MenuItem onClick={() => dispatch(listTasksByRecent(keyword))}>
                   Recent Tasks
+                </MenuItem>
+                <MenuItem onClick={getTotal}>
+                Get Total Amount
                 </MenuItem>
               </MenuList>
             </Menu>
@@ -993,6 +1010,24 @@ export function Home() {
             </button>
           </div>
         </>
+      </Dialog>
+
+      <Dialog
+        blockScroll="false"
+        aria-expanded={showTotal ? true : false}
+        header="Tasks Total Amount"
+        visible={showTotal}
+        onHide={() => {
+          setShowTotal(false);
+          
+        }}
+        style={{ width: "40vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <div className="flex justify-center">
+          <p>Total Amount: ${toltalAmount}</p>
+        </div>
+        
       </Dialog>
 
       {/* create ticket  */}
