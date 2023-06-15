@@ -25,6 +25,7 @@ import {
   deleteCustomer,
   listCustomerDetails,
   listCustomers,
+  listMyTasks,
   updateCustomer,
 } from "@/actions/cusomerActions";
 import { Button } from "primereact/button";
@@ -41,6 +42,7 @@ export function CustomersScreen() {
   const [phone, setPhone] = useState("");
   const [id, setId] = useState("");
   const [keyword2, setKeyword2] = useState("");
+  const [custname, setCustname] = useState("");
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -78,6 +80,15 @@ export function CustomersScreen() {
     error: errorDetails,
     customer,
   } = customerDetails;
+
+  const myTasksList = useSelector((state) => state.myTasksList);
+  const {
+    loading: loadingMyTasks,
+    error: errorMyTasks,
+    tasks,
+  } = myTasksList;
+
+
 
   useEffect(() => {
     dispatch({ type: CUSTOMER_LIST_RESET });
@@ -128,8 +139,8 @@ export function CustomersScreen() {
   };
 
   const getMyTasks = (id) => {
-    setShow(true);
     dispatch(listMyTasks(id));
+    console.log(tasks);
   };
 
   const getCustomers = (e) => {
@@ -191,7 +202,7 @@ export function CustomersScreen() {
               </MenuList>
             </Menu>
           </CardHeader>
-          <CardBody className="table-wrp block max-h-[34rem] overflow-x-scroll px-0 pt-0 pb-2">
+          <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
             {loadingDelete && (
               <ProgressSpinner
                 style={{ width: "20px", height: "20px" }}
@@ -211,7 +222,7 @@ export function CustomersScreen() {
                     >
                       <Typography
                         variant="small"
-                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        className="text-[11px] font-medium uppercase text-blue-gray-600"
                       >
                         {el}
                       </Typography>
@@ -243,7 +254,7 @@ export function CustomersScreen() {
                       <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
                           {cust.name}
                         </Typography>
@@ -251,7 +262,7 @@ export function CustomersScreen() {
                       <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
                           {cust.phone}
                         </Typography>
@@ -259,13 +270,19 @@ export function CustomersScreen() {
                       <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
                           <Button
                             className="z-10 h-8"
                             label="Show"
                             icon=""
-                            onClick={() => getMyTasks(cust._id)}
+                            onClick={() => {
+                              setCustname(cust.name)
+                              setShow(true);
+                              getMyTasks(cust._id)
+    
+
+                            }}
                           />
                         </Typography>
                       </td>
@@ -288,7 +305,7 @@ export function CustomersScreen() {
                             <MenuItem
                               onClick={() => {
                                 setId("");
-                                setId(cust._id);
+                                setId(cust._id); 
                                 setEdit(true);
                               }}
                             >
@@ -309,7 +326,7 @@ export function CustomersScreen() {
         </Card>
       </div>
 
-      {/* create ticket */}
+      {/* create customers */}
       <Dialog
         blockScroll="false"
         aria-expanded={create ? true : false}
@@ -429,6 +446,168 @@ export function CustomersScreen() {
           )}
         </form>
       </Dialog>
+
+
+
+
+      {/* edit ticket */}
+      <Dialog
+        blockScroll="false"
+        aria-expanded={show ? true : false}
+        header={`Ticket For ${custname}`}
+        visible={show}
+        onHide={() => {
+          setShow(false);
+        
+        }}
+        style={{ width: "60vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <Card>
+        <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
+            {loadingDelete && (
+              <ProgressSpinner
+                style={{ width: "20px", height: "20px" }}
+                strokeWidth="6"
+                fill="var(--surface-ground)"
+                animationDuration=".5s"
+              />
+            )}
+            {errorDelete && <Message severity="error" text={errorDelete} />}
+            <table className="w-full min-w-[640px] table-auto">
+              <thead className="sticky top-0 z-40 border-b bg-white">
+                <tr>
+                  {[
+                    "ID",
+                    "NAME",
+                    "Phone",
+                    "Item",
+                    "Problem Type",
+                    "Date",
+                    "Amount",
+                    "Status",
+                  ].map((el) => (
+                    <th className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium uppercase text-blue-gray-600"
+                      >
+                        {el}
+                      </Typography>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              {loadingMyTasks ? (
+                <ProgressSpinner
+                  style={{ width: "20px", height: "20px" }}
+                  strokeWidth="6"
+                  fill="var(--surface-ground)"
+                  animationDuration=".5s"
+                />
+              ) : errorMyTasks ? (
+                <Message severity="error" text={error} />
+              ) : (
+                <tbody className="overflow-y-auto">
+                  {tasks.map((task) => (
+                    <tr id={task._id}>
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        >
+                          {task.customer ? (
+                            `XRC- ${task.customer.custID}`
+                          ) : (
+                            <p className=" text-red-700">Not Found</p>
+                          )}
+                        </Typography>
+                      </td>
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        >
+                          {task.customer ? task.customer.name : "Not Found"}
+                        </Typography>
+                      </td>
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        >
+                          {task.phone}
+                        </Typography>
+                      </td>
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        >
+                          {task.item}
+                        </Typography>
+                      </td>
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        >
+                          {task.problem}
+                        </Typography>
+                      </td>
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        >
+                          {task.date && task.date.substring(0, 10)}
+                        </Typography>
+                      </td>
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        >
+                          ${task.amount}
+                        </Typography>
+                      </td>
+
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        >
+                          {task.stage === 0 ? (
+                            <p className="cursor-pointer bg-blue-600 px-1 text-center text-white">
+                              On Process
+                            </p>
+                          ) : task.stage === 1 ? (
+                            <p className="text-whit cursor-pointer bg-yellow-300 px-1 text-center">
+                              Finished
+                            </p>
+                          ) : task.stage === 2 ? (
+                            <p className="cursor-pointer bg-green-500 px-1 text-center text-white">
+                              Delivered
+                            </p>
+                          ) : (
+                            <p className="cursor-pointer bg-red-600 px-1  text-center text-white">
+                              Unfinished
+                            </p>
+                          )}
+                        </Typography>
+                      </td>
+                    
+                    </tr>
+                  ))}
+                </tbody>
+              )}
+            </table>
+          </CardBody>
+        </Card>
+
+      </Dialog>
+
+
     </>
   );
 }

@@ -19,9 +19,6 @@ export const getTasks = expressAsync(async (req, res) => {
   var date = new Date();
   date.setUTCHours(0, 0, 0);
   // var dates = new Date(date.setDate(date.getDate() - 2));
-  console.log(date);
-  console.log(yest);
-  // console.log(dates);
 
   const tasks = await Tasks.find({
     ...keyword,
@@ -105,13 +102,11 @@ export const getTasksByPhone = expressAsync(async (req, res) => {
         }
       : {};
 
-    
-
     const tasks = await Tasks.find({
       ...keyword,
       bin: false,
     })
-      .sort({ date: -1 })
+      .sort({ createdAt: -1 })
       .populate("user")
       .populate("customer");
 
@@ -121,6 +116,31 @@ export const getTasksByPhone = expressAsync(async (req, res) => {
   }
 });
 
+export const getTasksByRange = expressAsync(async (req, res) => {
+  try {
+    const { startDate, endDate} = req.body
+    const keyword = req.query.keyword
+      ? {
+          phone: req.query.keyword,
+        }
+      : {};
+    var start = startDate.toDateString();
+    var end = endDate.toDateString();
+
+    const tasks = await Tasks.find({
+      ...keyword,
+      bin: false,
+      date:{$lte: start, $gte: end}
+    })
+      .sort({ createdAt: -1 })
+      .populate("user")
+      .populate("customer");
+
+    res.json({ tasks });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
 
 export const getTasksByRecent = expressAsync(async (req, res) => {
   try {
@@ -137,7 +157,7 @@ export const getTasksByRecent = expressAsync(async (req, res) => {
       bin: false,
       date: { $gte: start },
     })
-      .sort({ date: -1 })
+      .sort({ createdAt: -1 })
       .populate("user")
       .populate("customer");
 
@@ -164,7 +184,7 @@ export const getTasksByThisWeek = expressAsync(async (req, res) => {
       bin: false,
       date: { $gte: test },
     })
-      .sort({ date: -1 })
+      .sort({ createdAt: -1 })
       .populate("user")
       .populate("customer");
 
@@ -196,37 +216,53 @@ export const getTaskById = expressAsync(async (req, res) => {
 });
 
 export const createTask = expressAsync(async (req, res) => {
-  const { name, phone, item, problem, amount, date, userid, comment } =
-    req.body;
+  const {
+    name,
+    phone,
+    item,
+    problem,
+    amount,
+    invoiceId,
+    date,
+    userid,
+    comment,
+  } = req.body;
 
-  const excustomers = await Customers.findOne({ phone });
-  if (!excustomers) {
-    const customers = await Customers.find().sort({ createdAt: -1 });
+  const check = await Tasks.findOne({ invoiceId });
 
-    const newCustomer = new Customers({
-      custID: customers[0].custID + 1,
-      name,
-      phone,
-    });
-    const createdCustomers = await newCustomer.save();
-    if (createdCustomers) {
-      const tasks = new Tasks({
-        user: userid,
+  if (check) {
+    res.status(500).json({ message: "Please try again" });
+  } else {
+    const excustomers = await Customers.findOne({ phone });
+    if (!excustomers) {
+      const customers = await Customers.find().sort({ createdAt: -1 });
+
+      const newCustomer = new Customers({
+        custID: customers[0].custID + 1,
         name,
         phone,
-        item,
-        problem,
-        amount,
-        date,
-        comment,
-        customer: createdCustomers._id,
       });
+      const createdCustomers = await newCustomer.save();
+      if (createdCustomers) {
+        const tasks = new Tasks({
+          user: userid,
+          name,
+          phone,
+          item,
+          problem,
+          amount,
+          invoiceId,
+          date,
+          comment,
+          customer: createdCustomers._id,
+        });
 
-      const createdTasks = await tasks.save();
-      res.status(201).json(createdTasks);
+        const createdTasks = await tasks.save();
+        res.status(201).json(createdTasks);
+      }
+    } else {
+      res.status(500).json({ message: "Already exists" });
     }
-  } else {
-    res.status(500).json({ message: "Already exists" });
   }
 });
 
@@ -237,26 +273,34 @@ export const createTaskExsting = expressAsync(async (req, res) => {
     item,
     problem,
     amount,
+    invoiceId,
     date,
     userid,
     comment,
     customer,
   } = req.body;
 
-  const tasks = new Tasks({
-    user: userid,
-    name,
-    phone,
-    item,
-    problem,
-    amount,
-    date,
-    comment,
-    customer: customer,
-  });
+  const check = await Tasks.findOne({ invoiceId });
 
-  const createdTasks = await tasks.save();
-  res.status(201).json(createdTasks);
+  if (check) {
+    res.status(500).json({ message: "Please try again" });
+  } else {
+    const tasks = new Tasks({
+      user: userid,
+      name,
+      phone,
+      item,
+      problem,
+      amount,
+      invoiceId,
+      date,
+      comment,
+      customer: customer,
+    });
+
+    const createdTasks = await tasks.save();
+    res.status(201).json(createdTasks);
+  }
 });
 
 export const updateTasksStage = expressAsync(async (req, res) => {

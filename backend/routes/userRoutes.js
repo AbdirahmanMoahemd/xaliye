@@ -1,5 +1,5 @@
 import express from 'express'
-import { createUser, deletUser, getAllUser, getUserProfileById, login, updateUser } from '../controllers/userController.js'
+import { createUser, deletUser, getAllUser, getUserProfileById, login, updateUser, updateUserRole } from '../controllers/userController.js'
 import { admin, protect } from '../middlewares/authMiddleware.js'
 
 const router = express.Router()
@@ -8,7 +8,7 @@ router.route('/').get(protect, admin, getAllUser).post(protect, admin, createUse
 router.route('/:id').put(updateUser).delete(deletUser)
 router.route('/login').post(login)
 router.route('/profile/:id').post(getUserProfileById)
-
+router.route('/role/:id').put(protect,admin, updateUserRole)
 
 
 export default router;

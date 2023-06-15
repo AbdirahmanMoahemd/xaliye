@@ -82,6 +82,18 @@ export const updateUser = expressAsync(async (req, res) => {
   }
 });
 
+export const updateUserRole = expressAsync(async (req, res) => {
+  const { role } = req.body;
+  const user = await User.findById(req.params.id);
+  if (user) {
+    user.role = role;
+  }
+
+  const updatedUser = user.save();
+
+  res.status(200).json(updatedUser);
+});
+
 export const deletUser = expressAsync(async (req, res) => {
   try {
     const { id } = req.params;

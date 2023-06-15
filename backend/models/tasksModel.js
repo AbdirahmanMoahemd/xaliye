@@ -43,6 +43,10 @@ const tasksSchema = mongoose.Schema(
       type: Number,
       require: true,
     },
+    invoiceId: {
+      type: Number,
+      unique:true
+    },
     stage: {
       type: Number,
       require: true,

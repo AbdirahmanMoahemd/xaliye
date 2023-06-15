@@ -14,14 +14,18 @@ import {
   userUpdateReducer,
   userUpdReducer,
   userUpdatePasswordReducer,
+  userUpdateRoleReducer,
 } from "./reducers/userReducers";
 
 import {createTaskReducer, taskDeleteReducer, tasksBinReducer, tasksDetailsReducer, tasksListInBinReducer, tasksListReducer, tasksListReducer2, tasksUnBinReducer, tasksUpdateReducer, tasksUpdateStageReducer, totalTasksReducerCount} from './reducers/tasksReducers'
 import { createStoreItemReducer, storeItemDeleteReducer, storeItemDetailsReducer, storeItemListReducer, storeItemUpdateReducer } from "./reducers/storeReducers";
 import { createIncomeItemReducer, incomeItemDeleteReducer, incomeItemDetailsReducer, incomeItemListReducer, incomeItemUpdateReducer, totalTasksIncomeReducerCount } from "./reducers/incomeReducers";
 import { blanceReducerCount, createExpenseItemReducer, expenseItemDeleteReducer, expenseItemDetailsReducer, expenseItemListReducer, expenseItemUpdateReducer } from "./reducers/expenseReducers";
-import { createCustomerReducer, customerDeleteReducer, customerDetailsReducer, customerUpdateReducer, customersListReducer, totalCustomerReducerCount } from "./reducers/customerReducer";
+import { createCustomerReducer, customerDeleteReducer, customerDetailsReducer, customerUpdateReducer, customersListReducer, myTasksListReducer, totalCustomerReducerCount } from "./reducers/customerReducer";
 import { createSalesReducer, salesDeleteReducer, salesDetailsReducer, salesListReducer, salesRecentListReducer, salesUpdateBillingReducer, salesUpdateReducer } from "./reducers/salesReducers";
+import { accountDeleteReducer, accountDetailsReducer, accountUpdateReducer, accountsListReducer, createAccountReducer } from "./reducers/accountReducers";
+import { createSubAccountReducer, subAccountDeleteReducer, subAccountDetailsReducer, subAccountUpdateReducer, subAccountsListReducer } from "./reducers/subaccountReducers";
+import { createTransactionReducer, transactionDeleteReducer, transactionDetailsReducer, transactionUpdateReducer, transactionsListReducer } from "./reducers/transactionReducers";
 
 
 const reducer = combineReducers({
@@ -35,6 +39,7 @@ const reducer = combineReducers({
   userUpd: userUpdReducer,
   userCount: userReducerCount,
   userUpdatePassword: userUpdatePasswordReducer,
+  userUpdateRole:userUpdateRoleReducer,
 
 
   createTask: createTaskReducer,
@@ -48,6 +53,7 @@ const reducer = combineReducers({
   tasksListInBin:tasksListInBinReducer,
   tasksUnBin:tasksUnBinReducer,
   totalTasks:totalTasksReducerCount,
+  myTasksList:myTasksListReducer,
 
 
   createStoreItem:createStoreItemReducer,
@@ -88,7 +94,36 @@ const reducer = combineReducers({
   salesUpdate:salesUpdateReducer,
   salesDelete:salesDeleteReducer,
   salesUpdateBilling:salesUpdateBillingReducer,
-  salesRecentList:salesRecentListReducer
+  salesRecentList:salesRecentListReducer,
+
+
+
+  createAccount:createAccountReducer,
+  accountsList:accountsListReducer,
+  accountDetails:accountDetailsReducer,
+  accountUpdate:accountUpdateReducer,
+  accountDelete:accountDeleteReducer,
+
+
+
+  createSubAccount:createSubAccountReducer,
+  subaccountsList:subAccountsListReducer,
+  subaccountDetails:subAccountDetailsReducer,
+  subaccountUpdate:subAccountUpdateReducer,
+  subaccountDelete:subAccountDeleteReducer,
+
+
+
+  createTransaction:createTransactionReducer,
+  transactionsList:transactionsListReducer,
+  transactionDetails:transactionDetailsReducer,
+  transactionUpdate:transactionUpdateReducer,
+  transactionDelete:transactionDeleteReducer
+
+
+
+
+
 
 
 

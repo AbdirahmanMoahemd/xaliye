@@ -7,10 +7,12 @@ import { FcSalesPerformance } from "react-icons/fc";
 import { MdAccountBalanceWallet } from "react-icons/md";
 import { BiTask, BiHistory, BiTransfer } from "react-icons/bi";
 import { AiTwotoneAppstore } from "react-icons/ai";
+import { HiUserGroup } from "react-icons/hi";
 import { SignIn, SignUp } from "./pages/auth";
+import UsersScreen from "./pages/dashboard/usersScreen";
 
 
-const icon = {
+const icon = { 
   className: "w-5 h-5 text-inherit ",
 };
 
@@ -53,6 +55,12 @@ export const routes = [
         name: "Customers",
         path: "/customers",
         element: <CustomersScreen />,
+      },
+      {
+        icon: <HiUserGroup {...icon} />,
+        name: "Users",
+        path: "/users",
+        element: <UsersScreen />,
       },
       {
         icon: <MdAccountBalanceWallet {...icon} />,

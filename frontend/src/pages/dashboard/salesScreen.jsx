@@ -219,7 +219,7 @@ export function SalesScreen() {
           )}
           {errorDelete && <Message severity="error" text={errorDelete} />}
 
-          <CardBody className="table-wrp block max-h-[34rem] overflow-x-scroll px-0 pt-0 pb-2">
+          <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
             <table className="w-full min-w-[640px] table-auto">
               <thead className="sticky top-0 z-40 border-b bg-white">
                 <tr>
@@ -237,7 +237,7 @@ export function SalesScreen() {
                     >
                       <Typography
                         variant="small"
-                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        className="text-[11px] font-medium uppercase text-blue-gray-600"
                       >
                         {el}
                       </Typography>
@@ -258,11 +258,11 @@ export function SalesScreen() {
                 <>
                   <tbody className="overflow-y-auto">
                     {sales.map((item) => (
-                      <tr>
+                      <tr key={item._id}>
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Typography
                             variant="small"
-                            className="text-[11px] font-medium uppercase text-blue-gray-400"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
                             {item.item ? item.item.name : item.itemName}
                           </Typography>
@@ -270,7 +270,7 @@ export function SalesScreen() {
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Typography
                             variant="small"
-                            className="text-[11px] font-medium uppercase text-blue-gray-400"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
                             {item.customer}
                           </Typography>
@@ -278,7 +278,7 @@ export function SalesScreen() {
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Typography
                             variant="small"
-                            className="text-[11px] font-medium uppercase text-blue-gray-400"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
                             ${item.quantity}
                           </Typography>
@@ -286,7 +286,7 @@ export function SalesScreen() {
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Typography
                             variant="small"
-                            className="text-[11px] font-medium uppercase text-blue-gray-400"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
                             ${item.price}
                           </Typography>
@@ -294,7 +294,7 @@ export function SalesScreen() {
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Typography
                             variant="small"
-                            className="text-[11px] font-medium uppercase text-blue-gray-400"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
                             {item.date && item.date.substring(0, 10)}
                           </Typography>
@@ -302,7 +302,7 @@ export function SalesScreen() {
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Typography
                             variant="small"
-                            className="text-[11px] font-medium uppercase text-blue-gray-400"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
                             {item.isPaid ? (
                               <i
@@ -388,9 +388,8 @@ export function SalesScreen() {
           <div className="mx-auto space-y-4 p-4">
             <AutoComplete
               placeholder="item name"
-              inputStyle={{ width: "35vw" }}
-              className=" border-black"
-              breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+              inputClassName="w-full"
+              className=" w-full"
               field="name"
               value={item}
               suggestions={items}

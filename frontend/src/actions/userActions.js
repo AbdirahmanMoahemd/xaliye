@@ -30,8 +30,10 @@ import {
   USER_PASSWORD_UPDATE_REQUEST,
   USER_PASSWORD_UPDATE_SUCCESS,
   USER_PASSWORD_UPDATE_FAIL,
+  USER_ROLE_UPDATE_REQUEST,
+  USER_ROLE_UPDATE_SUCCESS,
+  USER_ROLE_UPDATE_FAIL,
 } from "../constants/userConstants";
-
 
 export const login = (email, password) => async (dispatch) => {
   try {
@@ -46,7 +48,7 @@ export const login = (email, password) => async (dispatch) => {
     };
 
     const { data } = await axios.post(
-      '/api/users/login',
+      "/api/users/login",
       { email, password },
       config
     );
@@ -55,7 +57,6 @@ export const login = (email, password) => async (dispatch) => {
       type: USER_LOGIN_SUCCESS,
       payload: data,
     });
-
   } catch (error) {
     dispatch({
       type: USER_LOGIN_FAIL,
@@ -68,32 +69,32 @@ export const login = (email, password) => async (dispatch) => {
 };
 
 export const logout = () => (dispatch) => {
-  dispatch({ type: USER_LOGOUT });
-  dispatch({ type: USER_DETAILS_RESET });
-  // dispatch({ type: ORDER_MY_LIST_RESET });
-  dispatch({ type: USER_LIST_RESET });
-  document.location.href = "/login";
+  // dispatch({ type: USER_LOGOUT });
+  // dispatch({ type: USER_DETAILS_RESET });
+  // // dispatch({ type: ORDER_MY_LIST_RESET });
+  // dispatch({ type: USER_LIST_RESET });
+  document.location.href = "/sign-in";
 };
 
-
-
 export const register =
-  (name, email, password, phone) =>
-  async (dispatch) => {
+  (name, email, phone, password) => async (dispatch, getState) => {
     try {
       dispatch({
         type: USER_REGISTER_REQUEST,
       });
+      const {
+        userLogin: { userInfo },
+      } = getState();
 
       const config = {
-        hearders: {
-          "Content-Type": "application/json",
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
         },
       };
 
       const { data } = await axios.post(
-        "api/users",
-        { name, email, password, phone },
+        "/api/users",
+        { name, email, phone, password },
         config
       );
 
@@ -102,12 +103,12 @@ export const register =
         payload: data,
       });
 
-      dispatch({
-        type: USER_LOGIN_SUCCESS,
-        payload: data,
-      });
+      // dispatch({
+      //   type: USER_LOGIN_SUCCESS,
+      //   payload: data,
+      // });
 
-      localStorage.setItem("xrm-userInfo", JSON.stringify(data));
+      // localStorage.setItem("xrm-userInfo", JSON.stringify(data));
     } catch (error) {
       dispatch({
         type: USER_REGISTER_FAIL,
@@ -354,6 +355,39 @@ export const UpdUser = (user) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: USER_UPD_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+export const UpdateUserRole = (id, role) => async (dispatch, getState) => {
+  try {
+    dispatch({
+      type: USER_ROLE_UPDATE_REQUEST,
+    });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.put(`/api/users/role/${id}`, { role }, config);
+
+    dispatch({
+      type: USER_ROLE_UPDATE_SUCCESS,
+    });
+  } catch (error) {
+    dispatch({
+      type: USER_ROLE_UPDATE_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

@@ -32,6 +32,11 @@ import {
   USER_PASSWORD_UPDATE_FAIL,
   USER_PASSWORD_UPDATE_RESET,
   USER_PASSWORD_UPDATE_SUCCESS,
+  USER_REGISTER_RESET,
+  USER_ROLE_UPDATE_REQUEST,
+  USER_ROLE_UPDATE_SUCCESS,
+  USER_ROLE_UPDATE_RESET,
+  USER_ROLE_UPDATE_FAIL,
 } from "../constants/userConstants";
 
 export const userLoginReducer = (state = {}, action) => {
@@ -54,9 +59,11 @@ export const userRegisterReducer = (state = {}, action) => {
     case USER_REGISTER_REQUEST:
       return { loading: true };
     case USER_REGISTER_SUCCESS:
-      return { loading: false, userInfo: action.payload };
+      return { loading: false, success: true, userInfo: action.payload };
     case USER_REGISTER_FAIL:
       return { loading: false, error: action.payload };
+    case USER_REGISTER_RESET:
+      return { user: {} };
     default:
       return state;
   }
@@ -167,4 +174,17 @@ export const userUpdReducer = (state = { user: {} }, action) => {
 };
 
 
-
+export const userUpdateRoleReducer = (state = { user: {} }, action) => {
+  switch (action.type) {
+    case USER_ROLE_UPDATE_REQUEST:
+      return { loading: true };
+    case USER_ROLE_UPDATE_SUCCESS:
+      return { loading: false, success: true };
+    case USER_ROLE_UPDATE_FAIL:
+      return { loading: false, error: action.payload };
+    case USER_ROLE_UPDATE_RESET:
+      return { user: {} };
+    default:
+      return state;
+  }
+};

@@ -11,6 +11,7 @@ import {
   MenuItem,
   Avatar,
 } from "@material-tailwind/react";
+import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import {
   UserCircleIcon,
   Cog6ToothIcon,
@@ -25,6 +26,8 @@ import {
   setOpenSidenav,
 } from "@/context";
 import { useSelector } from "react-redux";
+import { confirmAlert } from "react-confirm-alert";
+import { useEffect } from "react";
 
 export function DashboardNavbar() {
   const [controller, dispatch] = useMaterialTailwindController();
@@ -32,10 +35,24 @@ export function DashboardNavbar() {
   const { pathname } = useLocation();
   const [layout, page] = pathname.split("/").filter((el) => el !== "");
 
-
-  
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
+
+  const logoutHandler = () => {
+    confirmAlert({
+      title: "Confirm to LogOut",
+      message: "Are you sure to do this.",
+      buttons: [
+        {
+          label: "Yes",
+          onClick: () => window.location.reload(),
+        },
+        {
+          label: "No",
+        },
+      ],
+    });
+  };
 
   return (
     <Navbar
@@ -72,10 +89,8 @@ export function DashboardNavbar() {
               {page}
             </Typography>
           </Breadcrumbs>
-          
         </div>
         <div className="flex items-center">
-          
           <IconButton
             variant="text"
             color="blue-gray"
@@ -84,23 +99,28 @@ export function DashboardNavbar() {
           >
             <Bars3Icon strokeWidth={3} className="h-6 w-6 text-blue-gray-500" />
           </IconButton>
-          <Link to={userInfo ? '/': "/sign-in"}>
-            <Button
-              variant="text"
-              color="blue-gray"
-              className="hidden items-center gap-1 px-4 xl:flex"
-            >
-              <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
-              {userInfo ? userInfo.name.split(' ')[0] : 'Sign In'}
-            </Button>
-            <IconButton
-              variant="text"
-              color="blue-gray"
-              className="grid xl:hidden"
-            >
-              <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
-            </IconButton>
-          </Link>
+          {/* <Link to={userInfo ? '/': "/sign-in"}> */}
+          <Button
+            variant="text"
+            color="blue-gray"
+            className="hidden items-center gap-1 px-4 xl:flex"
+          >
+            <Menu placement="left-start">
+              <MenuHandler>
+                <IconButton size="sm" variant="text" color="blue-gray">
+                  <div className="flex items-center">
+                    <UserCircleIcon className="h-5 w-5 text-blue-gray-500" />
+                  </div>
+                </IconButton>
+              </MenuHandler>
+              <MenuList>
+                <MenuItem>My Profile</MenuItem>
+                <MenuItem onClick={logoutHandler}>LOGOUT</MenuItem>
+              </MenuList>
+            </Menu>
+          </Button>
+
+          {/* </Link> */}
           <IconButton
             variant="text"
             color="blue-gray"

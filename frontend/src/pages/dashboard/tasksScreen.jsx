@@ -197,7 +197,7 @@ export function TasksScreen() {
           dispatch(listTaskstDetails(taskId));
           
         } else {
-          {
+          
             setName(task.customer.name);
             setPhone(task.customer.phone);
             setItem(task.item);
@@ -206,7 +206,7 @@ export function TasksScreen() {
             setAmount(task.amount);
             setStage(task.stage);
             setComment(task.comment);
-          }
+          
         }
       }
     }
@@ -341,7 +341,7 @@ export function TasksScreen() {
             </Menu>
           </CardHeader>
 
-          <CardBody className="table-wrp block max-h-[34rem] overflow-x-scroll px-0 pt-0 pb-2">
+          <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
             {loadingDelete && (
               <ProgressSpinner
                 style={{ width: "20px", height: "20px" }}
@@ -371,7 +371,7 @@ export function TasksScreen() {
                     <th className="border-b border-blue-gray-50 py-3 px-4 text-left">
                       <Typography
                         variant="small"
-                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        className="text-[11px] font-medium uppercase text-blue-gray-600"
                       >
                         {el}
                       </Typography>
@@ -407,23 +407,23 @@ export function TasksScreen() {
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
-                          {task.customer ? task.customer.name : "Not Found"}
+                          {task.customer ? task.customer.name : task.name}
                         </Typography>
                       </td>
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
-                          {task.phone}
+                          {task.customer ?task.customer.phone :task.phone}
                         </Typography>
                       </td>
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
                           {task.item}
                         </Typography>
@@ -431,7 +431,7 @@ export function TasksScreen() {
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
                           {task.problem}
                         </Typography>
@@ -439,7 +439,7 @@ export function TasksScreen() {
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
                           {task.date && task.date.substring(0, 10)}
                         </Typography>
@@ -447,7 +447,7 @@ export function TasksScreen() {
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
                           ${task.amount}
                         </Typography>
@@ -456,7 +456,7 @@ export function TasksScreen() {
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
                           {task.stage === 0 ? (
                             <p className="cursor-pointer bg-blue-600 px-1 text-center text-white">
@@ -480,7 +480,7 @@ export function TasksScreen() {
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
                           <icon
                             className="pi pi-comment cursor-pointer text-blue-700"
@@ -617,7 +617,7 @@ export function TasksScreen() {
           <div className="mt-4 flex justify-center">
             <button
               onClick={() => updateTaskStage(stage)}
-              className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium uppercase text-white transition hover:bg-transparent hover:text-primary"
+              className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium capitalize text-white transition hover:bg-transparent hover:text-primary"
             >
               Update
             </button>

@@ -35,7 +35,6 @@ export const getTotalCustomersAndSales = expressAsync(async (req, res) => {
     var start = new Date()
     var mth =  start.setDate(start.getDate() - 1);
     start = new Date().toDateString();
-    console.log(start);
 
     const todaySalesTotal = (await Sales.find({ date: { $gte: start } }))
       .length;
@@ -125,7 +124,7 @@ export const getTotalCustomersAndSales = expressAsync(async (req, res) => {
 
 export const getTasksCustomersById = expressAsync(async (req, res) => {
   try {
-    const tasks = await Tasks.find({ customer: req.params.id });
+    const tasks = await Tasks.find({ customer: req.params.id }).populate("customer");
     if (tasks) {
       res.json({ tasks });
     } else {

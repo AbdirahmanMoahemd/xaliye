@@ -40,7 +40,7 @@ import {
 import axios from "axios";
 
 export const createExisTask =
-  (name, phone, item, problem, date, amount, userid, comment, customer) =>
+  (name, phone, item, problem, date, amount,invoiceId, userid, comment, customer) =>
   async (dispatch, getState) => {
     try {
       dispatch({
@@ -59,7 +59,7 @@ export const createExisTask =
 
       const { data } = await axios.post(
         '/api/tasks/existing',
-        {name,phone, item, problem, date, amount, userid, comment, customer },
+        {name,phone, item, problem, date, amount,invoiceId, userid, comment, customer },
         config
       );
 
@@ -82,7 +82,7 @@ export const createExisTask =
 
   
 export const createNewTask =
-(name, phone, item, problem, date, amount, userid, comment) =>
+(name, phone, item, problem, date, amount,invoiceId, userid, comment) =>
 async (dispatch, getState) => {
   try {
     dispatch({
@@ -101,7 +101,7 @@ async (dispatch, getState) => {
 
     const { data } = await axios.post(
       '/api/tasks',
-      { name, phone, item, problem, date, amount, userid, comment },
+      { name, phone, item, problem, date, amount,invoiceId, userid, comment },
       config
     );
 
@@ -171,6 +171,37 @@ export const listTasksByphone = (keyword = "") => async (dispatch, getState) => 
     };
 
     const { data } = await axios.get(`/api/tasks/taskslist/byphone?keyword=${keyword}`, config);
+
+    dispatch({
+      type: GET_TASKS_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GET_TASKS_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+export const listTasksByRangeDate = (keyword = "", startDate, endDate) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: GET_TASKS_REQUEST });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.get(`/api/tasks/range/tasks?keyword=${keyword}`,{startDate, endDate}, config);
 
     dispatch({
       type: GET_TASKS_SUCCESS,

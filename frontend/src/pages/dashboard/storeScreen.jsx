@@ -206,7 +206,7 @@ export function StoreScreen() {
             />
           )}
           {errorDelete && <Message severity="error" text={errorDelete} />}
-          <CardBody className="table-wrp block max-h-[34rem] overflow-x-scroll px-0 pt-0 pb-2">
+          <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
             <table className="w-full min-w-[640px] table-auto">
               <thead className="sticky top-0 z-40 border-b bg-white">
                 <tr>
@@ -224,7 +224,7 @@ export function StoreScreen() {
                     >
                       <Typography
                         variant="small"
-                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        className="text-[11px] font-medium uppercase text-blue-gray-600"
                       >
                         {el}
                       </Typography>
@@ -250,7 +250,7 @@ export function StoreScreen() {
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Typography
                             variant="small"
-                            className="text-[11px] font-medium uppercase text-blue-gray-400"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
                             {item.name}
                           </Typography>
@@ -258,7 +258,7 @@ export function StoreScreen() {
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Typography
                             variant="small"
-                            className="text-[11px] font-medium uppercase text-blue-gray-400"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
                             ${item.cost}
                           </Typography>
@@ -266,7 +266,7 @@ export function StoreScreen() {
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Typography
                             variant="small"
-                            className="text-[11px] font-medium uppercase text-blue-gray-400"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
                             ${item.selling}
                           </Typography>
@@ -274,7 +274,7 @@ export function StoreScreen() {
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Typography
                             variant="small"
-                            className="text-[11px] font-medium uppercase text-blue-gray-400"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
                             {item.countInStock}
                           </Typography>

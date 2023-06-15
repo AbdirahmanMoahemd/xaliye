@@ -30,6 +30,7 @@ import {
   deleteTasks,
   getTasksTotal,
   listTasks,
+  listTasksByRangeDate,
   listTasksByRecent,
   listTasksByThisWeek,
   listTasksByphone,
@@ -92,9 +93,17 @@ export function Home() {
   const [quantity, setQuantity] = useState("");
   const [pricesale, setPriceSale] = useState("");
   const [datesale, setDateSale] = useState(new Date());
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
   const [isPaid, setIsPaid] = useState(false);
+  const [nameToPrint, setNameToPrint] = useState("");
+  const [invoiceId, setInvoiceId] = useState("");
+  const [isPrinting, setIsPrinting] = useState(false);
+  const [onPrint, setOnPrint] = useState(false);
+  const [dateRange, setDateRange] = useState(false);
 
   let componentRef = useRef();
+  let componentRef2 = useRef();
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -193,19 +202,22 @@ export function Home() {
       dispatch({ type: UPDATE_TASKS_STAGE_RESET });
     }
     if (successCreate) {
-      dispatch({ type: TASK_CREATE_RESET });
-      setCreate(false);
-      setEdit(false);
-      setKeyword2("");
-      setKeyword("");
-      setName("");
-      setPhone("");
-      setAmount("");
-      setItem("");
-      setProblem("");
-      setComment("");
-      setCustomer("");
-      setDate(new Date());
+      // dispatch({ type: TASK_CREATE_RESET });
+      // setCreate(false);
+      // setEdit(false);
+      // setKeyword2("");
+      // setKeyword("");
+      // setName("");
+      // setPhone("");
+      // setAmount("");
+      // setItem("");
+      // setProblem("");
+      // setComment("");
+      // setCustomer("");
+      // setDate(new Date());
+      // setNameToPrint("")
+      // setInvoiceId("");
+      setIsPrinting(true);
     }
 
     if (successUpdate) {
@@ -329,10 +341,23 @@ export function Home() {
 
   const submitHandler = (e) => {
     e.preventDefault();
+    var val = Math.floor(10000 + Math.random() * 9000);
+    setInvoiceId(val);
+
     if (customer == null) {
       setName(keyword2);
       dispatch(
-        createNewTask(name, phone, item, problem, date, amount, userid, comment)
+        createNewTask(
+          name,
+          phone,
+          item,
+          problem,
+          date,
+          amount,
+          invoiceId,
+          userid,
+          comment
+        )
       );
     } else {
       dispatch(
@@ -343,6 +368,7 @@ export function Home() {
           problem,
           date,
           amount,
+          invoiceId,
           userid,
           comment,
           customer
@@ -370,6 +396,10 @@ export function Home() {
         isPaid
       )
     );
+  };
+
+  const printHandler = (e) => {
+    e.preventDefault();
   };
 
   return (
@@ -407,6 +437,8 @@ export function Home() {
                   ? "0"
                   : counter.todayPerc == null
                   ? 0
+                  : counter.todayPerc < 49.9
+                  ? 100 - counter.todayPerc
                   : counter.todayPerc}
                 %
               </strong>
@@ -572,7 +604,7 @@ export function Home() {
                 >
                   Tasks of this Week
                 </MenuItem>
-                <MenuItem>Tasks of this Month</MenuItem>
+                <MenuItem>Tasks By Date Range</MenuItem>
                 <MenuItem onClick={() => dispatch(listTasksByRecent(keyword))}>
                   Recent Tasks
                 </MenuItem>
@@ -580,7 +612,7 @@ export function Home() {
             </Menu>
           </CardHeader>
 
-          <CardBody className="table-wrp block max-h-[34rem] overflow-x-scroll px-0 pt-0 pb-2">
+          <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
             <table className="w-full min-w-[640px] table-auto">
               <thead className="sticky top-0 z-40 border-b bg-white">
                 <tr>
@@ -601,7 +633,7 @@ export function Home() {
                     <th className="border-b border-blue-gray-50 py-3 px-4 text-left">
                       <Typography
                         variant="small"
-                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        className="text-[11px] font-medium uppercase text-blue-gray-600"
                       >
                         {el}
                       </Typography>
@@ -637,31 +669,23 @@ export function Home() {
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
-                          {task.customer ? (
-                            task.customer.name
-                          ) : (
-                            <p className=" text-red-700">Not Found</p>
-                          )}
+                          {task.customer ? task.customer.name : task.name}
                         </Typography>
                       </td>
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium  capitalize text-blue-gray-400"
                         >
-                          {task.customer ? (
-                            task.customer.name
-                          ) : (
-                            <p className=" text-red-700">Not Found</p>
-                          )}
+                          {task.customer ? task.customer.phone : task.phone}
                         </Typography>
                       </td>
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium  capitalize text-blue-gray-400"
                         >
                           {task.item}
                         </Typography>
@@ -669,7 +693,7 @@ export function Home() {
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
                           {task.problem}
                         </Typography>
@@ -677,7 +701,7 @@ export function Home() {
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium  capitalize text-blue-gray-400"
                         >
                           {task.date && task.date.substring(0, 10)}
                         </Typography>
@@ -685,7 +709,7 @@ export function Home() {
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium  capitalize text-blue-gray-400"
                         >
                           ${task.amount}
                         </Typography>
@@ -694,7 +718,7 @@ export function Home() {
                       <td>
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
                           {task.stage === 0 ? (
                             <p className="cursor-pointer bg-blue-600 px-1 text-center text-white">
@@ -718,7 +742,7 @@ export function Home() {
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
                           <icon
                             className="pi pi-comment cursor-pointer text-blue-700"
@@ -762,6 +786,21 @@ export function Home() {
                               }}
                             >
                               Update
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() => {
+                                setNameToPrint(task.name);
+                                setPhone(task.phone);
+                                setItem(task.item);
+                                setAmount(task.amount);
+                                setComment(task.comment);
+                                setInvoiceId(task.invoiceId);
+                                setDate(moment(task.date).toDate());
+                                setProblem(task.problem);
+                                setOnPrint(true);
+                              }}
+                            >
+                              Print
                             </MenuItem>
                             <MenuItem onClick={() => binTask(task._id)}>
                               Move To Bin
@@ -864,6 +903,15 @@ export function Home() {
           </ScrollPanel>
         </Card>
       </div>
+      <Dialog
+        header="Comment"
+        visible={message}
+        onHide={() => setMessage(false)}
+        style={{ width: "40vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        {message}
+      </Dialog>
 
       <Dialog
         header="Quick Edit"
@@ -939,7 +987,7 @@ export function Home() {
           <div className="mt-4 flex justify-center">
             <button
               onClick={() => updateTaskStage(stage)}
-              className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium uppercase text-white transition hover:bg-transparent hover:text-primary"
+              className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium capitalize text-white transition hover:bg-transparent hover:text-primary"
             >
               Update
             </button>
@@ -950,11 +998,45 @@ export function Home() {
       {/* create ticket  */}
       <Dialog
         blockScroll="false"
+        aria-expanded={dateRange ? true : false}
+        header="Select Date"
+        visible={dateRange}
+        onHide={() => {}}
+        style={{ width: "40vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <p>Start Date</p>
+        <div className=" rounded border border-gray-400 py-2 px-2">
+          <DatePicker
+            selected={startDate}
+            onChange={(dt) => setStartDate(dt)}
+          />
+        </div>
+        <br />
+        <p>End Date</p>
+        <div className=" rounded border border-gray-400 py-2 px-2">
+          <DatePicker selected={endDate} onChange={(dt) => setEndDate(dt)} />
+        </div>
+        <br />
+        <div className="flex justify-center">
+          <Button
+            onClick={() => dispatch(listTasksByRangeDate(startDate, endDate))}
+          >
+            Search
+          </Button>
+        </div>
+      </Dialog>
+
+      {/* create ticket  */}
+      <Dialog
+        blockScroll="false"
         aria-expanded={create ? true : false}
         header="Add New Ticket"
         visible={create}
         onHide={() => {
+          dispatch({ type: TASK_CREATE_RESET });
           setCreate(false);
+          setEdit(false);
           setKeyword2("");
           setKeyword("");
           setName("");
@@ -965,6 +1047,8 @@ export function Home() {
           setComment("");
           setCustomer("");
           setDate(new Date());
+          setNameToPrint("");
+          setInvoiceId("");
         }}
         style={{ width: "40vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
@@ -982,10 +1066,10 @@ export function Home() {
           <div className="mx-auto space-y-4 p-4">
             <AutoComplete
               type="text"
-              inputStyle={{ width: "36.5vw" }}
               field="name"
               value={keyword2}
-              className="input-box w-full"
+              inputClassName="w-full"
+              className=" w-full"
               required
               placeholder="Customer name"
               suggestions={customers}
@@ -996,6 +1080,8 @@ export function Home() {
                 customer == null
                   ? setName(e.target.value)
                   : setName(keyword2.name);
+                setNameToPrint(typeof name === "string" ? name : name.name);
+
                 e.target.value == "" ? setPhone("") : setPhone(keyword2.phone);
               }}
             />
@@ -1045,7 +1131,7 @@ export function Home() {
               onChange={(e) => setComment(e.target.value)}
             />
 
-            <div className="mt-4 flex justify-center justify-around">
+            <div className="mt-4 flex  justify-around">
               <button
                 type="submit"
                 className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium uppercase text-white transition hover:bg-transparent hover:text-primary"
@@ -1054,9 +1140,17 @@ export function Home() {
               </button>
 
               {/* button to trigger printing of target component */}
+
               <ReactToPrint
-                trigger={() => <Button>Save & Print</Button>}
-                content={() => componentRef}
+                trigger={() =>
+                  isPrinting ? (
+                    <Button>Save & Print</Button>
+                  ) : (
+                    <Button>Save & Print</Button>
+                  )
+                }
+                content={() => (isPrinting ? componentRef : "")}
+                onBeforeGetContent={() => submitHandler}
               />
             </div>
           </div>
@@ -1224,6 +1318,113 @@ export function Home() {
         </form>
       </Dialog>
 
+      {/* update ticket  */}
+      <Dialog
+        blockScroll="false"
+        aria-expanded={onPrint ? true : false}
+        header="Selected Data"
+        visible={onPrint}
+        onHide={() => {
+          setOnPrint(false);
+          // setCreate(false);
+          // setEdit(false);
+          // setKeyword2("");
+          // setKeyword("");
+          // setName("");
+          // setPhone("");
+          // setAmount("");
+          // setItem("");
+          // setProblem("");
+          // setComment("");
+          // setCustomer("");
+          // setDate(new Date());
+          // setTaskId("");
+        }}
+        style={{ width: "40vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        {/* <form> */}
+        {/* {loadingUpdate && (
+            <ProgressSpinner
+              style={{ width: "20px", height: "20px" }}
+              strokeWidth="6"
+              fill="var(--surface-ground)"
+              animationDuration=".5s"
+            />
+          )}
+          {errorUpdate && <Message severity="error" text={errorUpdate} />}
+          {loadingDetails ? (
+            <ProgressSpinner
+              style={{ width: "20px", height: "20px" }}
+              strokeWidth="6"
+              fill="var(--surface-ground)"
+              animationDuration=".5s"
+            />
+          ) : errorDetails ? (
+            <Message severity="error" text={errorDetails} />
+          ) : ( */}
+        <div className="mx-auto space-y-4 p-4">
+          <Input
+            type="text"
+            disabled
+            value={name}
+            label="Customer name"
+            size="lg"
+            required
+          />
+          <Input
+            type="number"
+            disabled
+            value={phone}
+            label="Phone Number"
+            size="lg"
+            required
+          />
+
+          <Input
+            type="text"
+            label="Item name"
+            value={item}
+            size="lg"
+            required
+            disabled
+          />
+
+          <Input
+            type="text"
+            label="Problem Type"
+            value={problem}
+            size="lg"
+            required
+            disabled
+          />
+          <div className=" rounded border border-gray-400 py-2 px-2">
+            <DatePicker disabled selected={date} />
+          </div>
+
+          <Input
+            type="number"
+            label="Amount"
+            value={amount}
+            size="lg"
+            required
+            disabled
+          />
+
+          <Textarea label="Message" disabled value={comment} />
+
+          <div className="mt-4 flex justify-center">
+            <ReactToPrint
+              color=" blue"
+              trigger={() => <Button>Print</Button>}
+              content={() => componentRef2}
+            />
+          </div>
+        </div>
+        {/* )} */}
+        {/* </form> */}
+      </Dialog>
+
       {/* Create Inventory */}
       <Dialog
         blockScroll="false"
@@ -1255,9 +1456,8 @@ export function Home() {
           <div className="mx-auto space-y-4 p-4">
             <AutoComplete
               placeholder="item name"
-              inputStyle={{ width: "35vw" }}
-              className=" border-black"
-              breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+              inputClassName="w-full"
+              className=" w-full"
               field="name"
               value={itemsale}
               suggestions={items}
@@ -1313,10 +1513,31 @@ export function Home() {
           </div>
         </form>
       </Dialog>
-
       {/* component to be printed */}
       <div style={{ display: "none" }}>
-      <ComponentToPrint ref={(el) => (componentRef = el)} text={<p>hello</p>} />
+        <ComponentToPrint
+          ref={(el) => (componentRef = el)}
+          invoiceId={invoiceId}
+          name={nameToPrint}
+          phone={phone}
+          date={date}
+          amount={amount}
+          item={item}
+          problem={problem}
+        />
+      </div>
+
+      <div style={{ display: "none" }}>
+        <ComponentToPrint
+          ref={(el) => (componentRef2 = el)}
+          invoiceId={invoiceId}
+          name={nameToPrint}
+          phone={phone}
+          date={date}
+          amount={amount}
+          item={item}
+          problem={problem}
+        />
       </div>
     </div>
   );
@@ -1325,9 +1546,17 @@ export function Home() {
 export default Home;
 import invoice from "@/data/images/invoicebg.png";
 import { IoMdCall } from "react-icons/io";
+
 class ComponentToPrint extends React.Component {
   render() {
-    const { text } = this.props;
+    const { invoiceId } = this.props;
+    const { name } = this.props;
+    const { phone } = this.props;
+    const { date } = this.props;
+    const { amount } = this.props;
+    const { item } = this.props;
+    const { problem } = this.props;
+
     return (
       <>
         <div className="">
@@ -1342,7 +1571,7 @@ class ComponentToPrint extends React.Component {
                 </p>
               </div>
               <div className="flex justify-between">
-                <p className="px-1 font-normal rounded border border-blue-500 bg-blue-500 text-center uppercase  text-white">
+                <p className="rounded border border-blue-500 bg-blue-500 px-1 text-center font-normal uppercase  text-white">
                   HEl xal fudud waqti gaaban
                 </p>
                 <div className="flex items-center">
@@ -1365,20 +1594,26 @@ class ComponentToPrint extends React.Component {
 
           <div className=" mx-14 mt-4 grid grid-cols-3 gap-4">
             <div className="col-span-2">
-              <p className=" text-2xl font-normal">Invoice to:</p>
-              <p>Name name name</p>
-              <p>Phone number</p>
+              <p className="text-2xl font-normal">Invoice to:</p>
+              <p className="text-xl">{name}</p>
+              <p className="text-xl">{phone}</p>
             </div>
             <div className="">
-              <div className=" flex justify-between">
+              <div className=" flex items-center">
                 <p className=" text-2xl font-normal">Invoice ID:</p>
-                <span className=" ">12345</span>
+                <span className="pl-2 text-xl">#{invoiceId}</span>
               </div>
-              <div className=" flex justify-between">
-                <p p className=" text-2xl font-normal">
+              <div className=" flex items-center">
+                <p className=" text-2xl font-normal">Amount: </p>
+                <span className="pl-2 text-xl">${amount}</span>
+              </div>
+              <div className=" flex items-center">
+                <p p className="text-2xl font-normal">
                   Date:
                 </p>
-                <p>6/10/2023</p>
+                <p className="pl-2 text-xl">
+                  {moment(date).toString().substring(0, 15)}
+                </p>
               </div>
             </div>
           </div>
@@ -1394,9 +1629,13 @@ class ComponentToPrint extends React.Component {
               </thead>
               <tbody>
                 <tr className=" border border-blue-500 ">
-                  <td className="border border-blue-500 text-center">1</td>
-                  <td className="border border-blue-500"></td>
-                  <td className="border border-blue-500"></td>
+                  <td className="border border-blue-500 py-1 pl-1 text-center">
+                    1
+                  </td>
+                  <td className="border border-blue-500 py-1 pl-1">{item}</td>
+                  <td className="border border-blue-500 py-1 pl-1">
+                    {problem}
+                  </td>
                 </tr>
                 <tr className="border border-blue-500">
                   <td className="border border-blue-500 text-center">2</td>
@@ -1462,7 +1701,7 @@ class ComponentToPrint extends React.Component {
                 </p>
               </div>
               <div className="flex justify-between">
-                <p className="font-normal px-1 rounded border border-blue-500 bg-blue-500 text-center uppercase  text-white">
+                <p className="rounded border border-blue-500 bg-blue-500 px-1 text-center font-normal uppercase  text-white">
                   HEl xal fudud waqti gaaban
                 </p>
                 <div className="flex items-center">
@@ -1484,20 +1723,26 @@ class ComponentToPrint extends React.Component {
 
           <div className=" mx-14 mt-5 grid grid-cols-3 gap-4">
             <div className="col-span-2">
-              <p className=" text-2xl font-normal">Invoice to:</p>
-              <p>Name name name</p>
-              <p>Phone number</p>
+              <p className="text-2xl font-normal">Invoice to:</p>
+              <p className="text-xl">{name}</p>
+              <p className="text-xl">{phone}</p>
             </div>
             <div className="">
-              <div className=" flex justify-between">
+              <div className=" flex items-center">
                 <p className=" text-2xl font-normal">Invoice ID:</p>
-                <span className=" ">12345</span>
+                <span className="pl-2 text-xl">#{invoiceId}</span>
               </div>
-              <div className=" flex justify-between">
-                <p p className=" text-2xl font-normal">
+              <div className=" flex items-center">
+                <p className=" text-2xl font-normal">Amount: </p>
+                <span className="pl-2 text-xl">${amount}</span>
+              </div>
+              <div className=" flex items-center">
+                <p p className="text-2xl font-normal">
                   Date:
                 </p>
-                <p>6/10/2023</p>
+                <p className="pl-2 text-xl">
+                  {moment(date).toString().substring(0, 15)}
+                </p>
               </div>
             </div>
           </div>
@@ -1513,9 +1758,13 @@ class ComponentToPrint extends React.Component {
               </thead>
               <tbody>
                 <tr className=" border border-blue-500 ">
-                  <td className="border border-blue-500 text-center">1</td>
-                  <td className="border border-blue-500"></td>
-                  <td className="border border-blue-500"></td>
+                  <td className="border border-blue-500 py-1 pl-1 text-center">
+                    1
+                  </td>
+                  <td className="border border-blue-500 py-1 pl-1">{item}</td>
+                  <td className="border border-blue-500 py-1 pl-1">
+                    {problem}
+                  </td>
                 </tr>
                 <tr className="border border-blue-500">
                   <td className="border border-blue-500 text-center">2</td>

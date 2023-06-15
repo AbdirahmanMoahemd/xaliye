@@ -137,7 +137,7 @@ const BinTasksScreen = () => {
               </Menu>
             </CardHeader>
 
-            <CardBody className="table-wrp block max-h-[34rem] overflow-x-scroll px-0 pt-0 pb-2">
+            <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
               <table className="w-full min-w-[640px] table-auto">
                 <thead className="sticky top-0 border-b bg-white">
                   <tr>
@@ -158,7 +158,7 @@ const BinTasksScreen = () => {
                       >
                         <Typography
                           variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          className="text-[11px] font-medium uppercase text-blue-gray-600"
                         >
                           {el}
                         </Typography>
