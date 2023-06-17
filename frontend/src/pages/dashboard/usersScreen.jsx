@@ -130,7 +130,7 @@ const UsersScreen = () => {
                 </IconButton>
               </MenuHandler>
               <MenuList>
-                <MenuItem onClick={() => setCreate(true)}>
+                <MenuItem onClick={() => setCreate(true)} className=" capitalize">
                   Add New User
                 </MenuItem>
               </MenuList>

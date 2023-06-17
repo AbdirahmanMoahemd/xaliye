@@ -326,15 +326,15 @@ export function TasksScreen() {
                 </IconButton>
               </MenuHandler>
               <MenuList>
-                <MenuItem onClick={() => setCreate(true)}>
+                <MenuItem onClick={() => setCreate(true)} className=" capitalize">
                   Add New Ticket
                 </MenuItem>
-                <MenuItem onClick={()=> dispatch(listTasksByThisWeek(keyword))}>Tasks of this Week</MenuItem>
+                <MenuItem onClick={()=> dispatch(listTasksByThisWeek(keyword))} className=" capitalize">Tasks of this Week</MenuItem>
                 <MenuItem>Tasks of this Month</MenuItem>
-                <MenuItem onClick={() => navigate("/dashboard/bin")}>
+                <MenuItem onClick={() => navigate("/dashboard/bin")} className=" capitalize">
                   Tasks In Recycle Bin
                 </MenuItem>
-                <MenuItem onClick={() => dispatch(listTasksByphone(keyword))}>
+                <MenuItem onClick={() => dispatch(listTasksByphone(keyword))} className=" capitalize">
                   All Tasks
                 </MenuItem>
               </MenuList>

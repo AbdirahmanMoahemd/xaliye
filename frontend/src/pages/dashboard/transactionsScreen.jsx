@@ -164,12 +164,12 @@ export function TransactionsScreen() {
               </IconButton>
             </MenuHandler>
             <MenuList>
-              <MenuItem onClick={() => setCreate(true)}>
+              <MenuItem onClick={() => setCreate(true)} className=" capitalize">
                 Add New Transaction
               </MenuItem>
-              <MenuItem onClick={()=> setDateRange(true)}>Search By Date Range</MenuItem>
-              <MenuItem>Prepare Income Statement</MenuItem>
-              <MenuItem onClick={() => dispatch(listTransactions())}>
+              <MenuItem onClick={()=> setDateRange(true)} className=" capitalize">Search By Date Range</MenuItem>
+              <MenuItem className=" capitalize">Prepare Income Statement</MenuItem>
+              <MenuItem onClick={() => dispatch(listTransactions())} className=" capitalize">
                 Get All Transactions
               </MenuItem>
             </MenuList>

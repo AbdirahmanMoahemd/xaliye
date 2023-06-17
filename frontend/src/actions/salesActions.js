@@ -27,7 +27,7 @@ import {
 } from "../constants/salesConstants";
 
 export const createNewSales =
-  (item, customer, quantity, price, date, isPaid) =>
+  (item, customer,phone, quantity, price, date,invoiceId, isPaid) =>
   async (dispatch, getState) => {
     try {
       dispatch({
@@ -46,7 +46,7 @@ export const createNewSales =
 
       const { data } = await axios.post(
         "/api/Sales",
-        { item, customer, quantity, price, date, isPaid },
+        { item, customer,phone, quantity, price, date,invoiceId, isPaid },
         config
       );
 

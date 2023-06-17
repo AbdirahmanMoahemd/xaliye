@@ -201,13 +201,13 @@ export function CustomersScreen() {
                 </IconButton>
               </MenuHandler>
               <MenuList>
-                <MenuItem onClick={() => setCreate(true)}>
+                <MenuItem onClick={() => setCreate(true)} className=" capitalize">
                   Add New Customer
                 </MenuItem>
-                <MenuItem onClick={() => setDateRange(true)}>
+                <MenuItem onClick={() => setDateRange(true)} className=" capitalize">
                   Search By Date Range
                 </MenuItem>
-                <MenuItem onClick={() => dispatch(listCustomers(keyword2))}>
+                <MenuItem onClick={() => dispatch(listCustomers(keyword2))} className=" capitalize">
                   Get All Customers
                 </MenuItem>
               </MenuList>

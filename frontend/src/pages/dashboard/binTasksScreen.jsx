@@ -130,7 +130,7 @@ const BinTasksScreen = () => {
                   </IconButton>
                 </MenuHandler>
                 <MenuList>
-                  <MenuItem onClick={() => navigate("/dashboard/tasks")}>
+                  <MenuItem onClick={() => navigate("/dashboard/tasks")} className=" capitalize">
                     Back To Tasks
                   </MenuItem>
                 </MenuList>

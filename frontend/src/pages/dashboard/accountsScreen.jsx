@@ -289,11 +289,10 @@ export function AccountsScreen() {
               </IconButton>
             </MenuHandler>
             <MenuList>
-              <MenuItem onClick={() => setCreate(true)}>
+              <MenuItem onClick={() => setCreate(true)} className=" capitalize">
                 Add New Account
               </MenuItem>
-              <MenuItem>Another Action</MenuItem>
-              <MenuItem>Something else here</MenuItem>
+              
             </MenuList>
           </Menu>
         </CardHeader>

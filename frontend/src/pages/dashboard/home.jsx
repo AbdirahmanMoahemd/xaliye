@@ -97,8 +97,9 @@ export function Home() {
   const [endDate, setEndDate] = useState(new Date());
   const [isPaid, setIsPaid] = useState(false);
   const [nameToPrint, setNameToPrint] = useState("");
-  const [invoiceId, setInvoiceId] = useState("");
+  const [itemnameToPrint, setItemNameToPrint] = useState("");
   const [isPrinting, setIsPrinting] = useState(false);
+  const [isSalesPrinting, setIsSalesPrinting] = useState(false);
   const [onPrint, setOnPrint] = useState(false);
   const [dateRange, setDateRange] = useState(false);
   const [showTotal, setShowTotal] = useState(false);
@@ -106,6 +107,7 @@ export function Home() {
 
   let componentRef = useRef();
   let componentRef2 = useRef();
+  let componentRef3 = useRef();
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -204,6 +206,7 @@ export function Home() {
       dispatch({ type: UPDATE_TASKS_STAGE_RESET });
     }
     if (successCreate) {
+      setIsPrinting(true);
       // dispatch({ type: TASK_CREATE_RESET });
       // setCreate(false);
       // setEdit(false);
@@ -217,9 +220,7 @@ export function Home() {
       // setComment("");
       // setCustomer("");
       // setDate(new Date());
-      // setNameToPrint("")
-      // setInvoiceId("");
-      setIsPrinting(true);
+      // setNameToPrint("");
     }
 
     if (successUpdate) {
@@ -284,14 +285,15 @@ export function Home() {
 
   useEffect(() => {
     if (successSaleCreate) {
-      dispatch({ type: SALES_CREATE_RESET });
-      setCreateSale(false);
-      setItemSale("");
-      setCustomerSale("");
-      setQuantity("");
-      setPriceSale("");
-      setIsPaid(false);
-      setDateSale(new Date());
+      setIsSalesPrinting(true);
+      // dispatch({ type: SALES_CREATE_RESET });
+      // setCreateSale(false);
+      // setItemSale("");
+      // setCustomerSale("");
+      // setQuantity("");
+      // setPriceSale("");
+      // setIsPaid(false);
+      // setDateSale(new Date());
     }
     dispatch(listRecentSales());
   }, [dispatch, successSaleCreate]);
@@ -340,11 +342,11 @@ export function Home() {
   };
 
   let userid = userInfo ? userInfo._id : "";
+  let invoiceId = Math.floor(10000 + Math.random() * 9000);
 
   const submitHandler = (e) => {
     e.preventDefault();
-    var val = Math.floor(10000 + Math.random() * 9000);
-    setInvoiceId(val);
+    console.log(invoiceId);
 
     if (customer == null) {
       setName(keyword2);
@@ -388,13 +390,17 @@ export function Home() {
   const submitSaleHandler = (e) => {
     e.preventDefault();
 
+    console.log(quantity);
+
     dispatch(
       createNewSales(
         itemsale,
         customersale,
+        phone,
         quantity,
         pricesale,
         datesale,
+        invoiceId,
         isPaid
       )
     );
@@ -412,8 +418,6 @@ export function Home() {
     setToltalAmount(toltal);
     setShowTotal(true);
   };
-
-  console.log(tasks);
 
   return (
     <div className="mt-12">
@@ -609,18 +613,28 @@ export function Home() {
                 </IconButton>
               </MenuHandler>
               <MenuList>
-                <MenuItem onClick={() => setCreate(true)}>
+                <MenuItem
+                  onClick={() => setCreate(true)}
+                  className=" capitalize"
+                >
                   Add New Ticket
                 </MenuItem>
                 <MenuItem
                   onClick={() => dispatch(listTasksByThisWeek(keyword))}
+                  className=" capitalize"
                 >
                   Tasks of this Week
                 </MenuItem>
-                <MenuItem onClick={() => setDateRange(true)}>
+                <MenuItem
+                  onClick={() => setDateRange(true)}
+                  className=" capitalize"
+                >
                   Tasks By Date Range
                 </MenuItem>
-                <MenuItem onClick={() => dispatch(listTasksByRecent(keyword))}>
+                <MenuItem
+                  onClick={() => dispatch(listTasksByRecent(keyword))}
+                  className=" capitalize"
+                >
                   Recent Tasks
                 </MenuItem>
                 <MenuItem onClick={getTotal}>Get Total Amount</MenuItem>
@@ -806,11 +820,12 @@ export function Home() {
                             <MenuItem
                               onClick={() => {
                                 setNameToPrint(task.name);
+                                setName(task.name);
                                 setPhone(task.phone);
                                 setItem(task.item);
                                 setAmount(task.amount);
                                 setComment(task.comment);
-                                setInvoiceId(task.invoiceId);
+
                                 setDate(moment(task.date).toDate());
                                 setProblem(task.problem);
                                 setOnPrint(true);
@@ -1086,7 +1101,6 @@ export function Home() {
           setCustomer("");
           setDate(new Date());
           setNameToPrint("");
-          setInvoiceId("");
         }}
         style={{ width: "40vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
@@ -1364,19 +1378,19 @@ export function Home() {
         visible={onPrint}
         onHide={() => {
           setOnPrint(false);
-          // setCreate(false);
-          // setEdit(false);
-          // setKeyword2("");
-          // setKeyword("");
-          // setName("");
-          // setPhone("");
-          // setAmount("");
-          // setItem("");
-          // setProblem("");
-          // setComment("");
-          // setCustomer("");
-          // setDate(new Date());
-          // setTaskId("");
+          setCreate(false);
+          setEdit(false);
+          setKeyword2("");
+          setKeyword("");
+          setName("");
+          setPhone("");
+          setAmount("");
+          setItem("");
+          setProblem("");
+          setComment("");
+          setCustomer("");
+          setDate(new Date());
+          setTaskId("");
         }}
         style={{ width: "40vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
@@ -1471,10 +1485,14 @@ export function Home() {
         visible={createSale}
         onHide={() => {
           setCreateSale(false);
-          //     setName();
-          // setCost();
-          // setSelling();
-          // setCountInStock();
+          setIsSalesPrinting(true);
+          dispatch({ type: SALES_CREATE_RESET });
+          setItemSale("");
+          setCustomerSale("");
+          setQuantity("");
+          setPriceSale("");
+          setIsPaid(false);
+          setDateSale(new Date());
         }}
         style={{ width: "40vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
@@ -1500,7 +1518,9 @@ export function Home() {
               value={itemsale}
               suggestions={items}
               completeMethod={() => dispatch(listStoreItems())}
-              onChange={(e) => setItemSale(e.value)}
+              onChange={(e) => {
+                setItemSale(e.target.value);
+              }}
               required
             />
 
@@ -1511,6 +1531,14 @@ export function Home() {
               size="lg"
               required
               onChange={(e) => setCustomerSale(e.target.value)}
+            />
+            <Input
+              type="number"
+              value={phone}
+              label="Phone Number"
+              size="lg"
+              required
+              onChange={(e) => setPhone(e.target.value)}
             />
 
             <Input
@@ -1540,13 +1568,25 @@ export function Home() {
               ></Checkbox>
             </div>
 
-            <div className="mt-4 flex justify-center">
+            <div className="mt-4 flex justify-around">
               <button
                 type="submit"
                 className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium uppercase text-white transition hover:bg-transparent hover:text-primary"
               >
                 Save
               </button>
+
+              <ReactToPrint
+                trigger={() =>
+                  isSalesPrinting ? (
+                    <Button>Save & Print</Button>
+                  ) : (
+                    <Button>Save & Print</Button>
+                  )
+                }
+                content={() => (isSalesPrinting ? componentRef3 : "")}
+                onBeforeGetContent={() => submitHandler}
+              />
             </div>
           </div>
         </form>
@@ -1577,11 +1617,25 @@ export function Home() {
           problem={problem}
         />
       </div>
+
+      <div style={{ display: "none" }}>
+        <ComponentToPrint2
+          ref={(el) => (componentRef3 = el)}
+          invoiceId={invoiceId}
+          name={customersale}
+          phone={phone}
+          date={date}
+          amount={pricesale}
+          item={itemsale.name}
+          quantity={quantity}
+        />
+      </div>
     </div>
   );
 }
 
 export default Home;
+
 import invoice from "@/data/images/invoicebg.png";
 import { IoMdCall } from "react-icons/io";
 
@@ -1840,3 +1894,235 @@ class ComponentToPrint extends React.Component {
 // {/* <MenuItem onClick={() => navigate("/dashboard/bin")}>
 //   Tasks In Recycle Bin
 // </MenuItem> */}
+
+class ComponentToPrint2 extends React.Component {
+  render() {
+    const { invoiceId } = this.props;
+    const { name } = this.props;
+    const { phone } = this.props;
+    const { item } = this.props;
+    const { quantity } = this.props;
+    const { date } = this.props;
+    const { amount } = this.props;
+
+    return (
+      <>
+        <div className="">
+          <div className="mx-12 flex items-center">
+            <div className=" w-24">
+              <img src={invoice} />
+            </div>
+            <div className="flex-1">
+              <div>
+                <p className="text-2xl  font-semibold uppercase">
+                  XALIYE COMPUTER & MOBILE REPAIR
+                </p>
+              </div>
+              <div className="flex justify-between">
+                <p className="rounded border border-blue-500 bg-blue-500 px-1 text-center font-normal uppercase  text-white">
+                  HEl xal fudud waqti gaaban
+                </p>
+                <div className="flex items-center">
+                  <span className=" rounded-full border border-blue-500">
+                    <IoMdCall
+                      color="#2196F3"
+                      className="p-[0.1rem] "
+                      size={20}
+                    />
+                  </span>
+
+                  <span className="p-1 text-blue-600" color="blue"></span>
+                  <p>0613951588</p>
+                  <p>/ 0614128728</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mx-14 border border-blue-500 bg-blue-500"></div>
+
+          <div className=" mx-14 mt-4 grid grid-cols-3 gap-4">
+            <div className="col-span-2">
+              <p className="text-2xl font-normal">Invoice to:</p>
+              <p className="text-xl">{name}</p>
+              <p className="text-xl">{phone}</p>
+            </div>
+            <div className="">
+              <div className=" flex items-center">
+                <p className=" text-2xl font-normal">Invoice ID:</p>
+                <span className="pl-2 text-xl">#{invoiceId}</span>
+              </div>
+              <div className=" flex items-center">
+                <p className=" text-2xl font-normal">Amount: </p>
+                <span className="pl-2 text-xl">${amount}</span>
+              </div>
+              <div className=" flex items-center">
+                <p p className="text-2xl font-normal">
+                  Date:
+                </p>
+                <p className="pl-2 text-xl">
+                  {moment(date).toString().substring(0, 15)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mx-14 mt-4">
+            <table className="w-full table-auto">
+              <thead className=" bg-blue-500 text-white">
+                <tr className="text-xl font-normal">
+                  <td>Item</td>
+                  <td>Quantity</td>
+                  <td>Total Price</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className=" h-12 border border-blue-500">
+                  <td className="border border-blue-500 py-1 pl-1 ">{item}</td>
+                  <td className="border border-blue-500 py-1 pl-1">
+                    {quantity}
+                  </td>
+                  <td className="border border-blue-500 py-1 pl-1">
+                    ${amount}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mx-14 mt-6 grid grid-cols-2 gap-x-80 ">
+            <div className=" flex justify-center">
+              <p className=" col-span-2">Saxiixa Customer-ka</p>
+            </div>
+            <div className="flex justify-center">
+              <p className=" ">Saxiixa Maamulaha</p>
+            </div>
+          </div>
+          <div className="mx-14 mt-6 flex justify-between">
+            <div className="w-[35%] border border-blue-500"></div>
+            <div className="w-[35%] border border-blue-500"></div>
+          </div>
+          <br />
+
+          <div className="mx-14 mt-3 flex">
+            <i>
+              <AiOutlineWarning className=" text-5xl text-blue-500" />
+            </i>
+            <p className=" pl-2 text-xl capitalize ">
+              Digniin hadii aad alaabtaada aad ku qaadan wadid mudo 4 cisho ah
+              shirkadda masuul kama ahan, silamid ah shaqo laqabtay lacagteeda
+              labixiyay dib looma celin karo
+            </p>
+          </div>
+          <br />
+
+          <p className="mx-14 border border-blue-500 bg-blue-500 text-center uppercase  text-white">
+            Waa kuma mahadsantahay latacaa mulkaaga
+          </p>
+          <br />
+
+          {/* <div className=" mr-14 flex items-center  justify-between">
+            <div className=" h-1 flex-1 border border-blue-500 bg-blue-500"></div>
+            <div className=" w-10"></div>
+            <div className=" flex-non">
+              <p className=" text-3xl font-medium">INVOICE</p>
+            </div>
+          </div> */}
+
+          <div className="mx-12 flex items-center">
+            <div className=" w-24">
+              <img src={invoice} />
+            </div>
+            <div className="flex-1">
+              <div>
+                <p className="text-2xl  font-semibold uppercase">
+                  XALIYE COMPUTER & MOBILE REPAIR
+                </p>
+              </div>
+              <div className="flex justify-between">
+                <p className="rounded border border-blue-500 bg-blue-500 px-1 text-center font-normal uppercase  text-white">
+                  HEl xal fudud waqti gaaban
+                </p>
+                <div className="flex items-center">
+                  <span className=" rounded-full border border-blue-500">
+                    <IoMdCall
+                      color="#2196F3"
+                      className="p-[0.1rem] "
+                      size={20}
+                    />
+                  </span>
+                  <span className="p-1 text-blue-600" color="blue"></span>
+                  <p>0613951588</p>
+                  <p>/ 0614128728</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mx-14 border border-blue-500 bg-blue-500"></div>
+
+          <div className=" mx-14 mt-5 grid grid-cols-3 gap-4">
+            <div className="col-span-2">
+              <p className="text-2xl font-normal">Invoice to:</p>
+              <p className="text-xl">{name}</p>
+              <p className="text-xl">{phone}</p>
+            </div>
+            <div className="">
+              <div className=" flex items-center">
+                <p className=" text-2xl font-normal">Invoice ID:</p>
+                <span className="pl-2 text-xl">#{invoiceId}</span>
+              </div>
+              <div className=" flex items-center">
+                <p className=" text-2xl font-normal">Amount: </p>
+                <span className="pl-2 text-xl">${amount}</span>
+              </div>
+              <div className=" flex items-center">
+                <p p className="text-2xl font-normal">
+                  Date:
+                </p>
+                <p className="pl-2 text-xl">
+                  {moment(date).toString().substring(0, 15)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mx-14 mt-4">
+            <table className="w-full table-auto">
+              <thead className=" bg-blue-500 text-white">
+                <tr className="text-xl font-normal">
+                  <td>Item</td>
+                  <td>Quantity</td>
+                  <td>Total Price</td>
+                </tr>
+              </thead>
+              <tbody>
+                <tr className=" h-12 border border-blue-500">
+                  <td className="border border-blue-500 py-1 pl-1 ">{item}</td>
+                  <td className="border border-blue-500 py-1 pl-1">
+                    {quantity}
+                  </td>
+                  <td className="border border-blue-500 py-1 pl-1">
+                    ${amount}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mx-14 mt-6 grid grid-cols-2 gap-x-80 ">
+            <div className=" flex justify-center">
+              <p className=" col-span-2">Saxiixa Customer-ka</p>
+            </div>
+            <div className="flex justify-center">
+              <p className=" ">Saxiixa Maamulaha</p>
+            </div>
+          </div>
+          <div className="mx-14 mt-6 flex justify-between">
+            <div className="w-[35%] border border-blue-500"></div>
+            <div className="w-[35%] border border-blue-500"></div>
+          </div>
+          <br />
+        </div>
+      </>
+    );
+  }
+}

@@ -8,7 +8,7 @@ const tasksSchema = mongoose.Schema(
     },
     custID: {
       type: Number,
-      require: true,
+      required: true,
       default:1
     },
     user: {
@@ -17,15 +17,15 @@ const tasksSchema = mongoose.Schema(
     },
     name: {
       type: String,
-      require: true,
+      required: true,
     }, 
     phone: {
       type: Number,
-      require: true,
+      required: true,
     },
     item: {
       type: String,
-      require: true,
+      required: true,
     },
     bin: {
         type: Boolean,
@@ -34,22 +34,23 @@ const tasksSchema = mongoose.Schema(
       },
     problem: {
       type: String,
-      require: true,
+      required: true,
     },
     date: {
       type: Date,
     },
     amount: {
       type: Number,
-      require: true,
+      required: true,
     },
     invoiceId: {
       type: Number,
-      unique:true
+      unique:true,
+      required: true,
     },
     stage: {
       type: Number,
-      require: true,
+      required: true,
       default: 0,
     },
     review: {
@@ -57,7 +58,7 @@ const tasksSchema = mongoose.Schema(
     },
     comment: {
       type: String,
-      require: true,
+      required: true,
       default: 'No Comment yet.'
     },
   },

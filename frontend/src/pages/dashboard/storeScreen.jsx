@@ -189,11 +189,11 @@ export function StoreScreen() {
                 </IconButton>
               </MenuHandler>
               <MenuList>
-                <MenuItem onClick={() => setCreate(true)}>
+                <MenuItem onClick={() => setCreate(true)} className=" capitalize">
                   Add New Item
                 </MenuItem>
-                <MenuItem>Another Action</MenuItem>
-                <MenuItem>Something else here</MenuItem>
+                <MenuItem className=" capitalize">Another Action</MenuItem>
+                <MenuItem className=" capitalize">Something else here</MenuItem>
               </MenuList>
             </Menu>
           </CardHeader>

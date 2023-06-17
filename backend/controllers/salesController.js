@@ -75,7 +75,7 @@ export const getSalesById = expressAsync(async (req, res) => {
 });
 
 export const createSalesItem = expressAsync(async (req, res) => {
-  const { item, customer, quantity, price, date, isPaid } = req.body;
+  const { item, customer,phone, quantity, price, date,invoiceId, isPaid } = req.body;
 
   const store = await Store.findById(item);
   if (store) {
@@ -83,9 +83,11 @@ export const createSalesItem = expressAsync(async (req, res) => {
       item,
       itemName: item.name,
       customer,
+      phone,
       quantity,
       price,
       date,
+      invoiceId,
       isPaid,
     });
     const createdSales = await sale.save();

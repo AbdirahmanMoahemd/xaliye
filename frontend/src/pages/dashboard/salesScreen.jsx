@@ -53,6 +53,7 @@ export function SalesScreen() {
   const [dateRange, setDateRange] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+  const [phone, setPhone] = useState();
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -137,11 +138,12 @@ export function SalesScreen() {
   useEffect(() => {
     dispatch(listCustomers());
   }, [dispatch]);
+  let invoiceId = Math.floor(10000 + Math.random() * 9000);
 
   const submitHandler = (e) => {
     e.preventDefault();
 
-    dispatch(createNewSales(item, customer, quantity, price, date, isPaid));
+    dispatch(createNewSales(item, customer, quantity, price, date,invoiceId, isPaid));
   };
 
   const updateHandler = (e) => {
@@ -204,17 +206,17 @@ export function SalesScreen() {
                 </IconButton>
               </MenuHandler>
               <MenuList>
-                <MenuItem onClick={() => setCreate(true)}>New Sale</MenuItem>
-                <MenuItem onClick={() => dispatch(listUnPaidSalesItems)}>
+                <MenuItem onClick={() => setCreate(true)} className=" capitalize">New Sale</MenuItem>
+                <MenuItem onClick={() => dispatch(listUnPaidSalesItems)} className=" capitalize">
                   UnPaid Orders
                 </MenuItem>
-                <MenuItem onClick={() => dispatch(listPaidSalesItems)}>
+                <MenuItem onClick={() => dispatch(listPaidSalesItems)} className=" capitalize">
                   Paid Orders
                 </MenuItem>
-                <MenuItem onClick={() => setDateRange(true)}>
+                <MenuItem onClick={() => setDateRange(true)} className=" capitalize">
                   Search By Date Range
                 </MenuItem>
-                <MenuItem onClick={() => dispatch(listSalesItems(keyword))}>
+                <MenuItem onClick={() => dispatch(listSalesItems(keyword))} className=" capitalize">
                   Get All Sales
                 </MenuItem>
               </MenuList>
@@ -456,6 +458,14 @@ export function SalesScreen() {
               required
               onChange={(e) => setCustomer(e.target.value)}
             />
+            <Input
+                type="number"
+                disabled
+                value={phone}
+                label="Phone Number"
+                size="lg"
+                required
+              />
 
             <Input
               type="number"

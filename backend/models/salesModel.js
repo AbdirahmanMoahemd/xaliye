@@ -8,26 +8,35 @@ const salesSchema = mongoose.Schema(
     },
     itemName: {
       type: String,
-      require: true,
+      required: true,
     },
     customer: {
       type: String,
-      require: true,
+      required: true,
+    },
+    phone: {
+      type: Number,
+      required: true,
     },
     quantity: {
       type: Number,
-      require: true,
+      required: true,
     },
     price: {
       type: Number,
-      require: true,
+      required: true,
     },
     date: {
       type: Date,
     },
+    invoiceId: {
+      type: Number,
+      unique:true,
+      required: true,
+    },
     isPaid: {
       type: Boolean,
-      require: true,
+      required: true,
       default: false,
     },
   },

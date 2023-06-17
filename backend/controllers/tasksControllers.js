@@ -240,11 +240,7 @@ export const createTask = expressAsync(async (req, res) => {
     comment,
   } = req.body;
 
-  const check = await Tasks.findOne({ invoiceId });
-
-  if (check) {
-    res.status(500).json({ message: "Please try again" });
-  } else {
+ 
     const excustomers = await Customers.findOne({ phone });
     if (!excustomers) {
       const customers = await Customers.find().sort({ createdAt: -1 });
@@ -275,7 +271,7 @@ export const createTask = expressAsync(async (req, res) => {
     } else {
       res.status(500).json({ message: "Already exists" });
     }
-  }
+  
 });
 
 export const createTaskExsting = expressAsync(async (req, res) => {
@@ -292,11 +288,7 @@ export const createTaskExsting = expressAsync(async (req, res) => {
     customer,
   } = req.body;
 
-  const check = await Tasks.findOne({ invoiceId });
-
-  if (check) {
-    res.status(500).json({ message: "Please try again" });
-  } else {
+ 
     const tasks = new Tasks({
       user: userid,
       name,
@@ -312,7 +304,7 @@ export const createTaskExsting = expressAsync(async (req, res) => {
 
     const createdTasks = await tasks.save();
     res.status(201).json(createdTasks);
-  }
+  
 });
 
 export const updateTasksStage = expressAsync(async (req, res) => {
