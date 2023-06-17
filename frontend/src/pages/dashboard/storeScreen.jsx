@@ -169,7 +169,7 @@ export function StoreScreen() {
           >
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-1">
-                Inventory
+                Inventory ({items && items.length})
               </Typography>
             </div>
             <div>

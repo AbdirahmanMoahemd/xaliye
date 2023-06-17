@@ -25,6 +25,38 @@ export const getCustomers = expressAsync(async (req, res) => {
   }
 });
 
+
+export const getCustomersBYDateRage = expressAsync(async (req, res) => {
+  try {
+    const { startDate, endDate } = req.body;
+    const keyword2 = req.query.keyword2
+      ? {
+          name: {
+            $regex: req.query.keyword2,
+            $options: "i",
+          },
+        }
+      : {};
+
+      var start = new Date(startDate);
+      start.setDate(start.getDate() - 1);
+      start.toDateString();
+    
+      var end = new Date(endDate);
+      end.setDate(end.getDate() +1);
+      end.toDateString();
+
+      
+    const customers = await Customers.find({ ...keyword2, createdAt: { $lte: end, $gte: start } }).sort({
+      createdAt: -1,
+    });
+
+    res.json({ customers });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
 export const getTotalCustomersAndSales = expressAsync(async (req, res) => {
   try {
     var yesterday = new Date();

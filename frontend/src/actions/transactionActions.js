@@ -125,6 +125,42 @@ export const listTransactions = () => async (dispatch, getState) => {
   }
 };
 
+
+export const listTransactionsByRangeDate = (startDate, endDate) => async (dispatch, getState) => {
+  try {
+    dispatch({ type: TRANSACTION_LIST_REQUEST });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.post('/api/transaction/date/range',{startDate, endDate}, config);
+
+    dispatch({
+      type: TRANSACTION_LIST_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: TRANSACTION_LIST_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+
+
+
+
 export const listTransactionetails = (id) => async (dispatch, getState) => {
   try {
     dispatch({ type: TRANSACTION_DETAILS_REQUEST });

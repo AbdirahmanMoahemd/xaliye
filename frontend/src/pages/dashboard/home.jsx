@@ -102,8 +102,7 @@ export function Home() {
   const [onPrint, setOnPrint] = useState(false);
   const [dateRange, setDateRange] = useState(false);
   const [showTotal, setShowTotal] = useState(false);
-  const [toltalAmount, setToltalAmount]= useState("");
-
+  const [toltalAmount, setToltalAmount] = useState("");
 
   let componentRef = useRef();
   let componentRef2 = useRef();
@@ -401,20 +400,20 @@ export function Home() {
     );
   };
   let toltal;
-  const getTotal = (e)=>{
+  const getTotal = (e) => {
     e.preventDefault();
     const addDecimals = (num) => {
       return (Math.round(num * 100) / 100).toFixed(2);
     };
-    
+
     let totalIncome = addDecimals(
       (toltal = tasks.reduce((acc, item) => acc + item.amount, 0))
     );
-    setToltalAmount(toltal)
-    setShowTotal(true)
-  }
+    setToltalAmount(toltal);
+    setShowTotal(true);
+  };
 
- 
+  console.log(tasks);
 
   return (
     <div className="mt-12">
@@ -590,7 +589,7 @@ export function Home() {
           >
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-1">
-                Recent Tasks
+                Recent Tasks ({tasks && tasks.length})
               </Typography>
             </div>
             <div className="mr-auto md:mr-4 md:w-56">
@@ -618,13 +617,13 @@ export function Home() {
                 >
                   Tasks of this Week
                 </MenuItem>
-                <MenuItem>Tasks By Date Range</MenuItem>
+                <MenuItem onClick={() => setDateRange(true)}>
+                  Tasks By Date Range
+                </MenuItem>
                 <MenuItem onClick={() => dispatch(listTasksByRecent(keyword))}>
                   Recent Tasks
                 </MenuItem>
-                <MenuItem onClick={getTotal}>
-                Get Total Amount
-                </MenuItem>
+                <MenuItem onClick={getTotal}>Get Total Amount</MenuItem>
               </MenuList>
             </Menu>
           </CardHeader>
@@ -1019,7 +1018,6 @@ export function Home() {
         visible={showTotal}
         onHide={() => {
           setShowTotal(false);
-          
         }}
         style={{ width: "40vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
@@ -1027,16 +1025,19 @@ export function Home() {
         <div className="flex justify-center">
           <p>Total Amount: ${toltalAmount}</p>
         </div>
-        
       </Dialog>
 
-      {/* create ticket  */}
+      {/* date rage  */}
       <Dialog
         blockScroll="false"
         aria-expanded={dateRange ? true : false}
         header="Select Date"
         visible={dateRange}
-        onHide={() => {}}
+        onHide={() => {
+          setDateRange(false);
+          setStartDate(new Date());
+          setEndDate(new Date());
+        }}
         style={{ width: "40vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
       >
@@ -1055,7 +1056,9 @@ export function Home() {
         <br />
         <div className="flex justify-center">
           <Button
-            onClick={() => dispatch(listTasksByRangeDate(startDate, endDate))}
+            onClick={() =>
+              dispatch(listTasksByRangeDate("", startDate, endDate))
+            }
           >
             Search
           </Button>

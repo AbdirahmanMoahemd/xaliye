@@ -19,6 +19,7 @@ import {
   createNewTransaction,
   deleteTransaction,
   listTransactions,
+  listTransactionsByRangeDate,
 } from "@/actions/transactionActions";
 import { listSubAccounts } from "@/actions/subAccountActions";
 import { AutoComplete } from "primereact/autocomplete";
@@ -30,6 +31,7 @@ import { Message } from "primereact/message";
 import { confirmAlert } from "react-confirm-alert";
 import moment from "moment";
 import { listAccounts } from "@/actions/accountActions";
+import { Button } from "primereact/button";
 
 export function TransactionsScreen() {
   const [create, setCreate] = useState(false);
@@ -42,6 +44,9 @@ export function TransactionsScreen() {
   const [id, setId] = useState("");
   const [keyword, setKeyword] = useState("");
   const [keyword2, setKeyword2] = useState("");
+  const [dateRange, setDateRange] = useState(false);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -145,7 +150,7 @@ export function TransactionsScreen() {
         >
           <div>
             <Typography variant="h6" color="blue-gray" className="mb-1">
-              Transactions
+              Transactions ({transactions && transactions.length})
             </Typography>
           </div>
           <Menu placement="left-start">
@@ -162,8 +167,11 @@ export function TransactionsScreen() {
               <MenuItem onClick={() => setCreate(true)}>
                 Add New Transaction
               </MenuItem>
-              <MenuItem>Search By Date</MenuItem>
+              <MenuItem onClick={()=> setDateRange(true)}>Search By Date Range</MenuItem>
               <MenuItem>Prepare Income Statement</MenuItem>
+              <MenuItem onClick={() => dispatch(listTransactions())}>
+                Get All Transactions
+              </MenuItem>
             </MenuList>
           </Menu>
         </CardHeader>
@@ -287,6 +295,44 @@ export function TransactionsScreen() {
           </table>
         </CardBody>
       </Card>
+
+
+       {/* date rage  */}
+       <Dialog
+        blockScroll="false"
+        aria-expanded={dateRange ? true : false}
+        header="Select Date"
+        visible={dateRange}
+        onHide={() => {
+          setDateRange(false)
+          setStartDate(new Date())
+          setEndDate(new Date())
+          
+        }}
+        style={{ width: "40vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <p>Start Date</p>
+        <div className=" rounded border border-gray-400 py-2 px-2">
+          <DatePicker
+            selected={startDate}
+            onChange={(dt) => setStartDate(dt)}
+          />
+        </div>
+        <br />
+        <p>End Date</p>
+        <div className=" rounded border border-gray-400 py-2 px-2">
+          <DatePicker selected={endDate} onChange={(dt) => setEndDate(dt)} />
+        </div>
+        <br />
+        <div className="flex justify-center">
+          <Button
+            onClick={() =>  dispatch(listTransactionsByRangeDate(startDate, endDate))}
+          >
+            Search
+          </Button>
+        </div>
+      </Dialog>
 
       {/* create subAccount */}
       <Dialog

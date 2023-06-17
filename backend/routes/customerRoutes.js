@@ -4,6 +4,7 @@ import {
   createCustomers,
   deleteCustomersById,
   getCustomers,
+  getCustomersBYDateRage,
   getCustomersById,
   getTasksCustomersById,
   getTasksCustomersByName,
@@ -14,6 +15,7 @@ import {
 const router = express.Router();
 
 router.route("/").get(protect, getCustomers).post(protect, createCustomers);
+router.route('/date/range').post(protect, getCustomersBYDateRage)
 router.route('/total/customer').get(getTotalCustomersAndSales)
 router.route("/byname/:name").get(getTasksCustomersByName)
 router.route("/mytasks/:id").get(protect, getTasksCustomersById);

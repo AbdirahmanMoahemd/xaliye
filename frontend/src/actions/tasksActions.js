@@ -201,7 +201,7 @@ export const listTasksByRangeDate = (keyword = "", startDate, endDate) => async 
       },
     };
 
-    const { data } = await axios.get(`/api/tasks/range/tasks?keyword=${keyword}`,{startDate, endDate}, config);
+    const { data } = await axios.post(`/api/tasks/range/tasks?keyword=${keyword}`,{startDate, endDate}, config);
 
     dispatch({
       type: GET_TASKS_SUCCESS,

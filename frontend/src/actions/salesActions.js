@@ -27,7 +27,8 @@ import {
 } from "../constants/salesConstants";
 
 export const createNewSales =
-  (item, customer, quantity,price, date,isPaid) => async (dispatch, getState) => {
+  (item, customer, quantity, price, date, isPaid) =>
+  async (dispatch, getState) => {
     try {
       dispatch({
         type: SALES_CREATE_REQUEST,
@@ -44,8 +45,8 @@ export const createNewSales =
       };
 
       const { data } = await axios.post(
-        '/api/Sales',
-        { item, customer, quantity,price, date,isPaid },
+        "/api/Sales",
+        { item, customer, quantity, price, date, isPaid },
         config
       );
 
@@ -65,7 +66,8 @@ export const createNewSales =
   };
 
 export const updateSalesItem =
-  (id, item, customer, quantity,price, date,isPaid) => async (dispatch, getState) => {
+  (id, item, customer, quantity, price, date, isPaid) =>
+  async (dispatch, getState) => {
     try {
       dispatch({
         type: SALES_UPDATE_REQUEST,
@@ -84,7 +86,7 @@ export const updateSalesItem =
 
       const { data } = await axios.put(
         `/api/Sales/${id}`,
-        { item, customer, quantity,price, date,isPaid },
+        { item, customer, quantity, price, date, isPaid },
         config
       );
 
@@ -103,8 +105,7 @@ export const updateSalesItem =
     }
   };
 
-
-  export const updateSalesBillingItem =
+export const updateSalesBillingItem =
   (id, isPaid) => async (dispatch, getState) => {
     try {
       dispatch({
@@ -143,42 +144,75 @@ export const updateSalesItem =
     }
   };
 
+export const listSalesItems =
+  (keyword = "") =>
+  async (dispatch, getState) => {
+    try {
+      dispatch({ type: SALES_LIST_REQUEST });
 
+      const {
+        userLogin: { userInfo },
+      } = getState();
 
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
 
+      const { data } = await axios.get(`/api/Sales?keyword=${keyword}`, config);
 
-export const listSalesItems = (keyword = "") => async (dispatch, getState) => {
-  try {
-    dispatch({ type: SALES_LIST_REQUEST });
+      dispatch({
+        type: SALES_LIST_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: SALES_LIST_FAIL,
+        payload:
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message,
+      });
+    }
+  };
 
-    const {
-      userLogin: { userInfo },
-    } = getState();
+export const listSalesByDateRange =
+  (keyword = "", startDate, endDate) =>
+  async (dispatch, getState) => {
+    try {
+      dispatch({ type: SALES_LIST_REQUEST });
 
-    const config = {
-      headers: {
-        Authorization: `Bearer ${userInfo.token}`,
-      },
-    };
+      const {
+        userLogin: { userInfo },
+      } = getState();
 
-    const { data } = await axios.get(`/api/Sales?keyword=${keyword}`, config);
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
 
-    dispatch({
-      type: SALES_LIST_SUCCESS,
-      payload: data,
-    });
-  } catch (error) {
-    dispatch({
-      type: SALES_LIST_FAIL,
-      payload:
-        error.response && error.response.data.message
-          ? error.response.data.message
-          : error.message,
-    });
-  }
-};
+      const { data } = await axios.post(
+        "/api/Sales/date/range",
+        { startDate, endDate },  
+        config
+      );
 
-
+      dispatch({
+        type: SALES_LIST_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: SALES_LIST_FAIL,
+        payload:
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message,
+      });
+    }
+  };
 
 export const listRecentSales = () => async (dispatch, getState) => {
   try {
@@ -194,7 +228,7 @@ export const listRecentSales = () => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.get('/api/Sales/recent/sales', config);
+    const { data } = await axios.get("/api/Sales/recent/sales", config);
 
     dispatch({
       type: RECENT_SALES_LIST_SUCCESS,
@@ -211,8 +245,6 @@ export const listRecentSales = () => async (dispatch, getState) => {
   }
 };
 
-
-
 export const listUnPaidSalesItems = () => async (dispatch, getState) => {
   try {
     dispatch({ type: SALES_LIST_REQUEST });
@@ -227,7 +259,7 @@ export const listUnPaidSalesItems = () => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.get('/api/Sales/unpaid/sales', config);
+    const { data } = await axios.get("/api/Sales/unpaid/sales", config);
 
     dispatch({
       type: SALES_LIST_SUCCESS,
@@ -244,10 +276,6 @@ export const listUnPaidSalesItems = () => async (dispatch, getState) => {
   }
 };
 
-
-
-
-
 export const listPaidSalesItems = () => async (dispatch, getState) => {
   try {
     dispatch({ type: SALES_LIST_REQUEST });
@@ -262,7 +290,7 @@ export const listPaidSalesItems = () => async (dispatch, getState) => {
       },
     };
 
-    const { data } = await axios.get('/api/Sales/paid/sales', config);
+    const { data } = await axios.get("/api/Sales/paid/sales", config);
 
     dispatch({
       type: SALES_LIST_SUCCESS,

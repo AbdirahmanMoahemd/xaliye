@@ -14,10 +14,31 @@ export const getTransactions = expressAsync(async (req, res) => {
   }
 });
 
+export const getTransactionsByDateRage = expressAsync(async (req, res) => {
+  const { startDate, endDate } = req.body;
+  var start = new Date(startDate);
+  start.setDate(start.getDate() - 1);
+  start.toDateString();
+
+  var end = new Date(endDate);
+  end.setDate(end.getDate() +1);
+  end.toDateString();
+
+  const transactions = await Transactions.find({
+    date: { $lte: end, $gte: start },
+  })
+    .sort({ createdAt: -1 })
+    .populate("Account")
+    .populate("subAccount");
+
+  res.json({ transactions });
+});
+
 export const getTransactionById = expressAsync(async (req, res) => {
   try {
-    const transaction = await Transactions.findById(req.params.id).populate("Account")
-    .populate("SubAccount");;
+    const transaction = await Transactions.findById(req.params.id)
+      .populate("Account")
+      .populate("SubAccount");
     if (transaction) {
       res.json(transaction);
     }
@@ -27,8 +48,7 @@ export const getTransactionById = expressAsync(async (req, res) => {
 });
 
 export const createTransaction = expressAsync(async (req, res) => {
-  const { Account, subAccount, Amount, date, ref } =
-    req.body;
+  const { Account, subAccount, Amount, date, ref } = req.body;
 
   const transaction = new Transactions({
     Account: Account._id,
@@ -42,8 +62,7 @@ export const createTransaction = expressAsync(async (req, res) => {
 });
 
 export const updateTransactions = expressAsync(async (req, res) => {
-  const { Account, subAccount, Amount, date, ref } =
-    req.body;
+  const { Account, subAccount, Amount, date, ref } = req.body;
 
   const transaction = await Transactions.findById(req.params.id);
 

@@ -5,6 +5,7 @@ import {
   deleteTransactionsById,
   getTransactionById,
   getTransactions,
+  getTransactionsByDateRage,
   updateTransactions,
 } from "../controllers/transactionsController.js";
 import { protect, admin } from "../middlewares/authMiddleware.js";
@@ -15,6 +16,8 @@ router
   .route("/")
   .get(protect, getTransactions)
   .post(protect, createTransaction);
+
+router.route('/date/range').post(protect, getTransactionsByDateRage)
 
 router
   .route("/:id")

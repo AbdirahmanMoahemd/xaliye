@@ -13,9 +13,6 @@ export const getTasks = expressAsync(async (req, res) => {
       }
     : {};
 
-  var yesterday = moment().subtract(2, "days");
-  var yest = yesterday.format();
-
   var date = new Date();
   date.setUTCHours(0, 0, 0);
   // var dates = new Date(date.setDate(date.getDate() - 2));
@@ -124,13 +121,28 @@ export const getTasksByRange = expressAsync(async (req, res) => {
           phone: req.query.keyword,
         }
       : {};
-    var start = startDate.toDateString();
-    var end = endDate.toDateString();
 
+      // var yesterday = new Date();
+      // yesterday.setDate(yesterday.getDate() - 10);
+      // var test = yesterday.toDateString();
+    
+      var start = new Date(startDate);
+      start.setDate(start.getDate() - 1);
+      start.toDateString();
+    
+      var end = new Date(endDate);
+      end.setDate(end.getDate() +1);
+      end.toDateString();
+
+    
+
+
+    
+    
     const tasks = await Tasks.find({
       ...keyword,
       bin: false,
-      date:{$lte: start, $gte: end}
+      date:{$lte:end , $gte: start}
     })
       .sort({ createdAt: -1 })
       .populate("user")

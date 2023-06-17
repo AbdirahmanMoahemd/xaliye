@@ -113,7 +113,7 @@ const UsersScreen = () => {
           >
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-1">
-                Users
+                Users ({users && users.length})
               </Typography>
             </div>
             <div className="mr-auto md:mr-4 md:w-56">

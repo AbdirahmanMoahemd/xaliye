@@ -18,6 +18,7 @@ import {
   createNewSales,
   deleteSalesItem,
   listPaidSalesItems,
+  listSalesByDateRange,
   listSalesItems,
   listUnPaidSalesItems,
   updateSalesBillingItem,
@@ -35,6 +36,7 @@ import { Checkbox } from "primereact/checkbox";
 import { useNavigate } from "react-router-dom";
 import { confirmAlert } from "react-confirm-alert";
 import DatePicker from "react-datepicker";
+import { Button } from "primereact/button";
 
 export function SalesScreen() {
   const [keyword, setKeyword] = useState("");
@@ -48,6 +50,9 @@ export function SalesScreen() {
   const [isPaidBilling, setIsPaidBilling] = useState(false);
   const [create, setCreate] = useState(false);
   const [edit, setEdit] = useState(false);
+  const [dateRange, setDateRange] = useState(false);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -179,7 +184,7 @@ export function SalesScreen() {
           >
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-1">
-                Sales
+                Sales ({sales && sales.length})
               </Typography>
             </div>
             <div>
@@ -205,6 +210,12 @@ export function SalesScreen() {
                 </MenuItem>
                 <MenuItem onClick={() => dispatch(listPaidSalesItems)}>
                   Paid Orders
+                </MenuItem>
+                <MenuItem onClick={() => setDateRange(true)}>
+                  Search By Date Range
+                </MenuItem>
+                <MenuItem onClick={() => dispatch(listSalesItems(keyword))}>
+                  Get All Sales
                 </MenuItem>
               </MenuList>
             </Menu>
@@ -359,6 +370,45 @@ export function SalesScreen() {
           </CardBody>
         </Card>
       </div>
+
+      {/* date rage  */}
+      <Dialog
+        blockScroll="false"
+        aria-expanded={dateRange ? true : false}
+        header="Select Date"
+        visible={dateRange}
+        onHide={() => {
+          setDateRange(false);
+          setStartDate(new Date());
+          setEndDate(new Date());
+        }}
+        style={{ width: "40vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <p>Start Date</p>
+        <div className=" rounded border border-gray-400 py-2 px-2">
+          <DatePicker
+            selected={startDate}
+            onChange={(dt) => setStartDate(dt)}
+          />
+        </div>
+        <br />
+        <p>End Date</p>
+        <div className=" rounded border border-gray-400 py-2 px-2">
+          <DatePicker selected={endDate} onChange={(dt) => setEndDate(dt)} />
+        </div>
+        <br />
+        <div className="flex justify-center">
+          <Button
+            onClick={() =>
+              dispatch(listSalesByDateRange("", startDate, endDate))
+            }
+          >
+            Search
+          </Button>
+        </div>
+      </Dialog>
+
       {/* Create Inventory */}
       <Dialog
         blockScroll="false"
@@ -425,8 +475,8 @@ export function SalesScreen() {
               onChange={(e) => setPrice(e.target.value)}
             />
             <div className=" rounded border border-gray-400 py-2 px-2">
-                <DatePicker selected={date} onChange={(dt) => setDate(dt)} />
-              </div>
+              <DatePicker selected={date} onChange={(dt) => setDate(dt)} />
+            </div>
 
             <div>
               IsPaid

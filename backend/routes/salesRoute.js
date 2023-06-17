@@ -6,6 +6,7 @@ import {
   getPaidSalesItems,
   getRecentSales,
   getSalesById,
+  getSalesIByDateRange,
   getSalesItems,
   getUnPaidSalesItems,
   updateSalesBillingItem,
@@ -15,6 +16,7 @@ import {
 const router = express.Router();
 
 router.route("/").get(protect, getSalesItems).post(protect, createSalesItem);
+router.route('/date/range').post(protect, getSalesIByDateRange)
 router.route('/recent/sales').get(protect, getRecentSales)
 router.route('/sale/billing/:id').put(updateSalesBillingItem)
 router.route('/unpaid/sales').get(protect, getUnPaidSalesItems)

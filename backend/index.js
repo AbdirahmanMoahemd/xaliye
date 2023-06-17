@@ -26,7 +26,7 @@ if (process.env.NODE_ENV === "Development") {
 app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", tasksRoutes);
-app.use("/api/store", storeRoutes);
+app.use("/api/store", storeRoutes); 
 // app.use('/api/income', incomeRoutes)
 // app.use('/api/expense', expenseRoutes)
 app.use("/api/customers", customerRoutes);

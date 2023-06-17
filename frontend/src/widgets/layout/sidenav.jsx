@@ -103,7 +103,7 @@ export function Sidenav({ brandName, routes }) {
 }
 
 Sidenav.defaultProps = {
-  brandImg: "/img/logo-ct.png",
+  brandImg: "",
   brandName: "XALIYE COMPUTER REPAIRING",
 };
 

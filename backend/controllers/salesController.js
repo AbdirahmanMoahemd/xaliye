@@ -47,6 +47,22 @@ export const getPaidSalesItems = expressAsync(async (req, res) => {
   res.json({ sales });
 });
 
+export const getSalesIByDateRange= expressAsync(async (req, res) => {
+  const { startDate, endDate } = req.body;
+  var start = new Date(startDate);
+  start.setDate(start.getDate() - 1);
+  start.toDateString();
+
+  var end = new Date(endDate);
+  end.setDate(end.getDate() +1);
+  end.toDateString();
+  const sales = await Sales.find({ date: { $lte: end, $gte: start }, })
+    .sort({ createdAt: -1 })
+    .populate("item");
+
+  res.json({ sales });
+});
+
 export const getSalesById = expressAsync(async (req, res) => {
   try {
     const sale = await Sales.findById(req.params.id);

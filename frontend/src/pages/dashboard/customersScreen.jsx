@@ -25,6 +25,7 @@ import {
   deleteCustomer,
   listCustomerDetails,
   listCustomers,
+  listCustomersByDateRange,
   listMyTasks,
   updateCustomer,
 } from "@/actions/cusomerActions";
@@ -33,6 +34,7 @@ import { Message } from "primereact/message";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Dialog } from "primereact/dialog";
 import { confirmAlert } from "react-confirm-alert";
+import DatePicker from "react-datepicker";
 
 export function CustomersScreen() {
   const [create, setCreate] = useState(false);
@@ -43,6 +45,9 @@ export function CustomersScreen() {
   const [id, setId] = useState("");
   const [keyword2, setKeyword2] = useState("");
   const [custname, setCustname] = useState("");
+  const [dateRange, setDateRange] = useState(false);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -176,7 +181,7 @@ export function CustomersScreen() {
           >
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-1">
-                Customers
+                Customers ({customers && customers.length})
               </Typography>
             </div>
             <div className="mr-auto md:mr-4 md:w-56">
@@ -198,6 +203,12 @@ export function CustomersScreen() {
               <MenuList>
                 <MenuItem onClick={() => setCreate(true)}>
                   Add New Customer
+                </MenuItem>
+                <MenuItem onClick={() => setDateRange(true)}>
+                  Search By Date Range
+                </MenuItem>
+                <MenuItem onClick={() => dispatch(listCustomers(keyword2))}>
+                  Get All Customers
                 </MenuItem>
               </MenuList>
             </Menu>
@@ -325,7 +336,48 @@ export function CustomersScreen() {
           </CardBody>
         </Card>
       </div>
+      
 
+      {/* date rage  */}
+      <Dialog
+        blockScroll="false"
+        aria-expanded={dateRange ? true : false}
+        header="Select Date"
+        visible={dateRange}
+        onHide={() => {
+          setDateRange(false);
+          setStartDate(new Date());
+          setEndDate(new Date());
+        }}
+        style={{ width: "40vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <p>Start Date</p>
+        <div className=" rounded border border-gray-400 py-2 px-2">
+          <DatePicker
+            selected={startDate}
+            onChange={(dt) => setStartDate(dt)}
+          />
+        </div>
+        <br />
+        <p>End Date</p>
+        <div className=" rounded border border-gray-400 py-2 px-2">
+          <DatePicker selected={endDate} onChange={(dt) => setEndDate(dt)} />
+        </div>
+        <br />
+        <div className="flex justify-center">
+          <Button
+            onClick={() =>
+              dispatch(listCustomersByDateRange("", startDate, endDate))
+            }
+          >
+            Search
+          </Button>
+        </div>
+      </Dialog>
+
+
+                              
       {/* create customers */}
       <Dialog
         blockScroll="false"
