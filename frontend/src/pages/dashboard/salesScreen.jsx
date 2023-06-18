@@ -125,9 +125,11 @@ export function SalesScreen() {
     }
 
     if (successCreate) {
+      dispatch({ type: SALES_CREATE_RESET });
       setCreate(false);
       setItem("");
       setCustomer("");
+      setPhone("");
       setQuantity("");
       setPrice("");
       setIsPaid(false);
@@ -143,7 +145,18 @@ export function SalesScreen() {
   const submitHandler = (e) => {
     e.preventDefault();
 
-    dispatch(createNewSales(item, customer, quantity, price, date,invoiceId, isPaid));
+    dispatch(
+      createNewSales(
+        item,
+        customer,
+        phone,
+        quantity,
+        price,
+        date,
+        invoiceId,
+        isPaid
+      )
+    );
   };
 
   const updateHandler = (e) => {
@@ -206,17 +219,34 @@ export function SalesScreen() {
                 </IconButton>
               </MenuHandler>
               <MenuList>
-                <MenuItem onClick={() => setCreate(true)} className=" capitalize">New Sale</MenuItem>
-                <MenuItem onClick={() => dispatch(listUnPaidSalesItems)} className=" capitalize">
+                <MenuItem
+                  onClick={() => setCreate(true)}
+                  className=" capitalize"
+                >
+                  New Sale
+                </MenuItem>
+                <MenuItem
+                  onClick={() => dispatch(listUnPaidSalesItems)}
+                  className=" capitalize"
+                >
                   UnPaid Orders
                 </MenuItem>
-                <MenuItem onClick={() => dispatch(listPaidSalesItems)} className=" capitalize">
+                <MenuItem
+                  onClick={() => dispatch(listPaidSalesItems)}
+                  className=" capitalize"
+                >
                   Paid Orders
                 </MenuItem>
-                <MenuItem onClick={() => setDateRange(true)} className=" capitalize">
+                <MenuItem
+                  onClick={() => setDateRange(true)}
+                  className=" capitalize"
+                >
                   Search By Date Range
                 </MenuItem>
-                <MenuItem onClick={() => dispatch(listSalesItems(keyword))} className=" capitalize">
+                <MenuItem
+                  onClick={() => dispatch(listSalesItems(keyword))}
+                  className=" capitalize"
+                >
                   Get All Sales
                 </MenuItem>
               </MenuList>
@@ -239,6 +269,7 @@ export function SalesScreen() {
                   {[
                     "Item Name",
                     "Customer",
+                    "Phone",
                     "Quantity",
                     "Price",
                     "Date",
@@ -286,6 +317,14 @@ export function SalesScreen() {
                             className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
                             {item.customer}
+                          </Typography>
+                        </td>
+                        <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                          <Typography
+                            variant="small"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
+                          >
+                            {item.phone}
                           </Typography>
                         </td>
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
@@ -418,11 +457,15 @@ export function SalesScreen() {
         header="New Sale"
         visible={create}
         onHide={() => {
+          dispatch({ type: SALES_CREATE_RESET });
           setCreate(false);
-          //     setName();
-          // setCost();
-          // setSelling();
-          // setCountInStock();
+          setItem("");
+          setCustomer("");
+          setPhone("");
+          setQuantity("");
+          setPrice("");
+          setIsPaid(false);
+          setDate(new Date());
         }}
         style={{ width: "40vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
@@ -459,13 +502,13 @@ export function SalesScreen() {
               onChange={(e) => setCustomer(e.target.value)}
             />
             <Input
-                type="number"
-                disabled
-                value={phone}
-                label="Phone Number"
-                size="lg"
-                required
-              />
+              type="number"
+              value={phone}
+              label="Phone Number"
+              size="lg"
+              required
+              onChange={(e) => setPhone(e.target.value)}
+            />
 
             <Input
               type="number"
