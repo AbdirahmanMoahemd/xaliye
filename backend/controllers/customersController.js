@@ -218,7 +218,7 @@ export const createCustomers = expressAsync(async (req, res) => {
 
     const excustomers = await Customers.findOne({ phone });
     if (!excustomers) {
-      const customers = await Customers.find().sort({ createdAt: -1 });
+      const customers = await Customers.find().sort({ custID: -1 });
 
       const customer = new Customers({
         custID: customers[0].custID + 1,
