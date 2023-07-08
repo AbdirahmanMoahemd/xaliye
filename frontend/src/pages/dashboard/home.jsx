@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import {
   Typography,
   Card,
@@ -29,15 +29,14 @@ import {
   createNewTask,
   deleteTasks,
   getTasksTotal,
-  listTasks,
   listTasksByRangeDate,
   listTasksByRecent,
   listTasksByThisWeek,
-  listTasksByphone,
   listTasksInBin,
   listTaskstDetails,
   updateTasks,
   updateTasksStage,
+  updateTasksStatus,
   updateTasksToBin,
 } from "@/actions/tasksActions";
 import { Message } from "primereact/message";
@@ -103,6 +102,8 @@ export function Home() {
   const [onPrint, setOnPrint] = useState(false);
   const [dateRange, setDateRange] = useState(false);
   const [showTotal, setShowTotal] = useState(false);
+  const [status, setStatus] = useState("");
+  const [statusStage, setStatusStage] = useState("");
   const [toltalAmount, setToltalAmount] = useState("");
 
   let componentRef = useRef();
@@ -114,13 +115,6 @@ export function Home() {
 
   const tasksList = useSelector((state) => state.tasksList);
   const { loading, error, tasks } = tasksList;
-
-  const tasksListInBin = useSelector((state) => state.tasksListInBin);
-  const {
-    loading: loadingBin,
-    error: errorBin,
-    tasks: tasksBinlist,
-  } = tasksListInBin;
 
   const tasksUpdate = useSelector((state) => state.tasksUpdate);
   const {
@@ -135,6 +129,13 @@ export function Home() {
     error: errorStageUpdate,
     success: successStageUpdate,
   } = tasksUpdateStage;
+
+  const tasksUpdateStatus = useSelector((state) => state.tasksUpdateStatus);
+  const {
+    loading: loadingStatusUpdate,
+    error: errorStatusUpdate,
+    success: successStatusUpdate,
+  } = tasksUpdateStatus;
 
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
@@ -207,20 +208,23 @@ export function Home() {
     }
     if (successCreate) {
       setIsPrinting(true);
-      // dispatch({ type: TASK_CREATE_RESET });
-      // setCreate(false);
-      // setEdit(false);
-      // setKeyword2("");
-      // setKeyword("");
-      // setName("");
-      // setPhone("");
-      // setAmount("");
-      // setItem("");
-      // setProblem("");
-      // setComment("");
-      // setCustomer("");
-      // setDate(new Date());
-      // setNameToPrint("");
+      // console.log(true);
+      if (isPrinting) {
+        dispatch({ type: TASK_CREATE_RESET });
+        setCreate(false);
+        setEdit(false);
+        setKeyword2("");
+        setKeyword("");
+        setName("");
+        setPhone("");
+        setAmount("");
+        setItem("");
+        setProblem("");
+        setComment("");
+        setCustomer("");
+        setDate(new Date());
+        // setNameToPrint("");
+      }
     }
 
     if (successUpdate) {
@@ -302,10 +306,17 @@ export function Home() {
     dispatch(getCustomerTotal());
   }, [dispatch]);
 
-  const updateTaskStage = (istage) => {
+  const updateTaskStage = () => {
     if (stage !== "") {
       dispatch(updateTasksStage(id, stage));
       setVisible(false);
+    }
+  };
+
+  const updateTaskStatus = () => {
+    if (statusStage !== "") {
+      dispatch(updateTasksStatus(id, statusStage));
+      setStatus(false);
     }
   };
 
@@ -319,7 +330,10 @@ export function Home() {
         },
         {
           label: "Yes",
-          onClick: () => dispatch(updateTasksToBin(id)),
+          onClick: () => {
+            console.log(id);
+            dispatch(updateTasksToBin(id))
+          },
         },
       ],
     });
@@ -342,7 +356,7 @@ export function Home() {
   };
 
   let userid = userInfo ? userInfo._id : "";
-  let invoiceId = Math.floor(10000 + Math.random() * 9000);
+  let invoiceId = Math.floor(10000 + Math.random() * 90000);
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -427,8 +441,8 @@ export function Home() {
           icon={<BiTask className="h-6 w-6 text-white" />}
           value={counter == null ? "0" : counter.totalTasks}
           value2={counter == null ? "0" : counter.totalOnProcess}
-          value3={counter == null ? "0" : counter.totalDelivered}
-          value4={counter == null ? "0" : counter.totalFinished}
+          value3={counter == null ? "0" : counter.totalFinished}
+          value4={counter == null ? "0" : counter.totalDelivered}
           value5={counter == null ? "0" : counter.totalUnfinished}
           footer={
             <Typography className="font-normal text-blue-gray-600">
@@ -654,7 +668,8 @@ export function Home() {
                     "Problem Type",
                     "Date",
                     "Amount",
-                    "Status",
+                    "Repairing Stage",
+                    "Item Status",
                     "",
                     "",
                     "",
@@ -744,8 +759,7 @@ export function Home() {
                           ${task.amount}
                         </Typography>
                       </td>
-
-                      <td>
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
                         <Typography
                           variant="small"
                           className="text-[11px] font-medium capitalize text-blue-gray-400"
@@ -758,13 +772,25 @@ export function Home() {
                             <p className="text-whit cursor-pointer bg-yellow-300 px-1 text-center">
                               Finished
                             </p>
-                          ) : task.stage === 2 ? (
-                            <p className="cursor-pointer bg-green-500 px-1 text-center text-white">
-                              Delivered
-                            </p>
                           ) : (
                             <p className="cursor-pointer bg-red-600 px-1  text-center text-white">
                               Unfinished
+                            </p>
+                          )}
+                        </Typography>
+                      </td>
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
+                        >
+                          {task.status === 0 ? (
+                            <p className="cursor-pointer bg-blue-600 px-1 text-center text-white">
+                              In Store
+                            </p>
+                          ) : (
+                            <p className="cursor-pointer bg-green-500 px-1 text-center text-white">
+                              Delivered
                             </p>
                           )}
                         </Typography>
@@ -806,7 +832,16 @@ export function Home() {
                                 setId(task._id);
                               }}
                             >
-                              Change Status
+                              Change Repairing Stage
+                            </MenuItem>
+                            <MenuItem
+                              onClick={() => {
+                                setStatus(true);
+                                setStatusStage(task.status);
+                                setId(task._id);
+                              }}
+                            >
+                              Change Item Status
                             </MenuItem>
                             <MenuItem
                               onClick={() => {
@@ -825,7 +860,6 @@ export function Home() {
                                 setItem(task.item);
                                 setAmount(task.amount);
                                 setComment(task.comment);
-
                                 setDate(moment(task.date).toDate());
                                 setProblem(task.problem);
                                 setOnPrint(true);
@@ -941,11 +975,11 @@ export function Home() {
         style={{ width: "40vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
       >
-        {message}
+        {text}
       </Dialog>
 
       <Dialog
-        header="Quick Edit"
+        header="Quick Edit For Repairing Status"
         visible={visible}
         onHide={() => setVisible(false)}
         style={{ width: "50vw" }}
@@ -964,7 +998,7 @@ export function Home() {
             <Message severity="error" text={errorStageUpdate} />
           )}
 
-          <label className="mb-2 block text-gray-600">Task Stage</label>
+          <label className="mb-2 block text-gray-600">Repairing Stage</label>
           <div className="flex flex-wrap gap-3">
             <div className="align-items-center flex">
               <RadioButton
@@ -998,18 +1032,6 @@ export function Home() {
                 onChange={(e) => setStage(e.value)}
                 checked={stage === 2}
               />
-              <label htmlFor="ingredient3" className="ml-2">
-                Delivired
-              </label>
-            </div>
-            <div className="align-items-center flex">
-              <RadioButton
-                inputId="ingredient3"
-                name="stage"
-                value={3}
-                onChange={(e) => setStage(e.value)}
-                checked={stage === 3}
-              />
               <label htmlFor="ingredient4" className="ml-2">
                 Unfinished
               </label>
@@ -1018,6 +1040,65 @@ export function Home() {
           <div className="mt-4 flex justify-center">
             <button
               onClick={() => updateTaskStage(stage)}
+              className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium capitalize text-white transition hover:bg-transparent hover:text-primary"
+            >
+              Update
+            </button>
+          </div>
+        </>
+      </Dialog>
+
+      <Dialog
+        header="Quick Edit For Item Status"
+        visible={status}
+        onHide={() => setStatus(false)}
+        style={{ width: "50vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <>
+          {loadingStatusUpdate && (
+            <ProgressSpinner
+              style={{ width: "20px", height: "20px" }}
+              strokeWidth="6"
+              fill="var(--surface-ground)"
+              animationDuration=".5s"
+            />
+          )}
+          {errorStatusUpdate && (
+            <Message severity="error" text={errorStatusUpdate} />
+          )}
+
+          <label className="mb-2 block text-gray-600">Item Stage</label>
+          <div className="flex flex-wrap gap-3">
+            <div className="align-items-center flex">
+              <RadioButton
+                inputId="ingredient1"
+                name="stage"
+                value={0}
+                onChange={(e) => setStatusStage(e.value)}
+                checked={statusStage === 0}
+              />
+              <label htmlFor="ingredient1" className="ml-2">
+                In Store
+              </label>
+            </div>
+
+            <div className="align-items-center flex">
+              <RadioButton
+                inputId="ingredient3"
+                name="stage"
+                value={1}
+                onChange={(e) => setStatusStage(e.value)}
+                checked={statusStage === 1}
+              />
+              <label htmlFor="ingredient3" className="ml-2">
+                Delivered
+              </label>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={() => updateTaskStatus()}
               className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium capitalize text-white transition hover:bg-transparent hover:text-primary"
             >
               Update

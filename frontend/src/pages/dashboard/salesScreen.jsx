@@ -37,6 +37,9 @@ import { useNavigate } from "react-router-dom";
 import { confirmAlert } from "react-confirm-alert";
 import DatePicker from "react-datepicker";
 import { Button } from "primereact/button";
+import { Paginator } from "primereact/paginator";
+
+
 
 export function SalesScreen() {
   const [keyword, setKeyword] = useState("");
@@ -54,6 +57,9 @@ export function SalesScreen() {
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [phone, setPhone] = useState();
+  const [first, setFirst] = useState(1);
+  const [rows, setRows] = useState(200);
+  const [pageNumber, setPageNumber] = useState(1);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -62,7 +68,7 @@ export function SalesScreen() {
   const { userInfo } = userLogin;
 
   const salesList = useSelector((state) => state.salesList);
-  const { loading: loadingSales, error: errorSales, sales } = salesList;
+  const { loading: loadingSales, error: errorSales, sales, salesCount } = salesList;
 
   const storeItemList = useSelector((state) => state.storeItemList);
   const { loading, error, items } = storeItemList;
@@ -109,9 +115,9 @@ export function SalesScreen() {
     if (!userInfo) {
       navigate("/sign-in");
     } else {
-      dispatch(listSalesItems(keyword));
+      dispatch(listSalesItems(keyword, pageNumber));
     }
-  }, [dispatch, successCreate, successUpdate, keyword, successDelete]);
+  }, [dispatch, successCreate, successUpdate, keyword,pageNumber, successDelete]);
 
   useEffect(() => {
     dispatch(listStoreItems());
@@ -167,8 +173,12 @@ export function SalesScreen() {
     }
   };
 
-  const onClickFn = () => {
-    setCreate(true);
+ 
+
+  const onPageChange = (event) => {
+    setFirst(event.first);
+    setRows(event.rows);
+    setPageNumber(event.page +1)
   };
 
   const deleteSalesItems = (id) => {
@@ -199,7 +209,7 @@ export function SalesScreen() {
           >
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-1">
-                Sales ({sales && sales.length})
+                Sales
               </Typography>
             </div>
             <div>
@@ -408,6 +418,12 @@ export function SalesScreen() {
                 </>
               )}
             </table>
+            <Paginator
+              first={first}
+              rows={rows}
+              totalRecords={salesCount}
+              onPageChange={onPageChange}
+            />
           </CardBody>
         </Card>
       </div>

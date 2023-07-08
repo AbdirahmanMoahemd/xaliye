@@ -35,6 +35,9 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { Dialog } from "primereact/dialog";
 import { confirmAlert } from "react-confirm-alert";
 import DatePicker from "react-datepicker";
+import { Paginator } from "primereact/paginator";
+
+
 
 export function CustomersScreen() {
   const [create, setCreate] = useState(false);
@@ -48,6 +51,9 @@ export function CustomersScreen() {
   const [dateRange, setDateRange] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+  const [first, setFirst] = useState(1);
+  const [rows, setRows] = useState(200);
+  const [pageNumber, setPageNumber] = useState(1);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -63,7 +69,7 @@ export function CustomersScreen() {
   } = createCustomer;
 
   const customersList = useSelector((state) => state.customersList);
-  const { loading, error, customers } = customersList;
+  const { loading, error, customers , customerCount } = customersList;
 
   const customerDelete = useSelector((state) => state.customerDelete);
   const {
@@ -107,8 +113,8 @@ export function CustomersScreen() {
       setName("");
       setPhone("");
     }
-    dispatch(listCustomers(keyword2));
-  }, [dispatch, userInfo, keyword2, navigate, successCreate,successUpdate, successDelete]);
+    dispatch(listCustomers(keyword2, pageNumber));
+  }, [dispatch, userInfo, keyword2,pageNumber, navigate, successCreate,successUpdate, successDelete]);
 
   useEffect(() => {
     if (successUpdate) {
@@ -129,9 +135,7 @@ export function CustomersScreen() {
     }
   }, [dispatch, id, customer, successUpdate]);
 
-  const onClickFn = () => {
-    setCreate(true);
-  };
+  
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -151,6 +155,12 @@ export function CustomersScreen() {
   const getCustomers = (e) => {
     e.preventDefault();
     dispatch(listCustomers(keyword2));
+  };
+
+  const onPageChange = (event) => {
+    setFirst(event.first);
+    setRows(event.rows);
+    setPageNumber(event.page +1)
   };
 
   const deleteCustomers = (id) => {
@@ -181,7 +191,7 @@ export function CustomersScreen() {
           >
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-1">
-                Customers ({customers && customers.length})
+                Customers
               </Typography>
             </div>
             <div className="mr-auto md:mr-4 md:w-56">
@@ -333,6 +343,12 @@ export function CustomersScreen() {
                 </tbody>
               )}
             </table>
+            <Paginator
+              first={first}
+              rows={rows}
+              totalRecords={customerCount}
+              onPageChange={onPageChange}
+            />
           </CardBody>
         </Card>
       </div>

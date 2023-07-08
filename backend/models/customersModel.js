@@ -5,6 +5,7 @@ const customerSchema = mongoose.Schema(
     custID: {
       type: Number,
       default: 1,
+      unique: true,
     },
     name: {
       type: String,
@@ -12,15 +13,9 @@ const customerSchema = mongoose.Schema(
     phone: {
       type: Number,
       unique: true,
+      default: 0
     },
-    tasks: [
-      {
-        task: {
-          type: mongoose.Schema.Types.ObjectId,
-          ref: "tasks",
-        },
-      },
-    ],
+    
   },
   {
     timestamps: true,

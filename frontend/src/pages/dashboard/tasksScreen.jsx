@@ -13,7 +13,7 @@ import {
 } from "@material-tailwind/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import {
   BIN_TASKS_RESET,
@@ -34,6 +34,7 @@ import {
   listTaskstDetails,
   updateTasks,
   updateTasksStage,
+  updateTasksStatus,
   updateTasksToBin,
 } from "@/actions/tasksActions";
 import { confirmAlert } from "react-confirm-alert";
@@ -45,7 +46,8 @@ import { AutoComplete } from "primereact/autocomplete";
 import DatePicker from "react-datepicker";
 import { listCustomers } from "@/actions/cusomerActions";
 import { RadioButton } from "primereact/radiobutton";
-import moment from 'moment';
+import moment from "moment";
+import { Paginator } from "primereact/paginator";
 
 export function TasksScreen() {
   const [name, setName] = useState("");
@@ -59,6 +61,8 @@ export function TasksScreen() {
   const [create, setCreate] = useState(false);
   const [edit, setEdit] = useState(false);
   const [keyword, setKeyword] = useState("");
+  const [pageNumber, setPageNumber] = useState(1);
+
   const [keyword2, setKeyword2] = useState("");
   const [visible, setVisible] = useState(false);
   const [text, setText] = useState("");
@@ -66,12 +70,16 @@ export function TasksScreen() {
   const [message, setMessage] = useState(false);
   const [id, setId] = useState(0);
   const [stage, setStage] = useState("");
+  const [status, setStatus] = useState("");
+  const [statusStage, setStatusStage] = useState("");
+  const [first, setFirst] = useState(1);
+  const [rows, setRows] = useState(200);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
   const tasksList = useSelector((state) => state.tasksList);
-  const { loading, error, tasks } = tasksList;
+  const { loading, error, tasks, count } = tasksList;
 
   const tasksListInBin = useSelector((state) => state.tasksListInBin);
   const {
@@ -92,10 +100,17 @@ export function TasksScreen() {
 
   const tasksUpdateStage = useSelector((state) => state.tasksUpdateStage);
   const {
+    loading: loadingStatusUpdate,
+    error: errorStatusUpdate,
+    success: successStatusUpdate,
+  } = tasksUpdateStage;
+
+  const tasksUpdateStatus = useSelector((state) => state.tasksUpdateStatus);
+  const {
     loading: loadingSategUpdate,
     error: errorStageUpdate,
     success: successStageUpdate,
-  } = tasksUpdateStage;
+  } = tasksUpdateStatus;
 
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
@@ -166,51 +181,45 @@ export function TasksScreen() {
       setCustomer("");
       setDate(new Date());
     }
-    if (successStageUpdate) {
+    if ((successStageUpdate, successStatusUpdate)) {
       dispatch({ type: UPDATE_TASKS_STAGE_RESET });
     }
 
-    dispatch(listTasksByphone(keyword));
+    dispatch(listTasksByphone(keyword, pageNumber));
     dispatch(listTasksInBin());
   }, [
     dispatch,
     navigate,
     keyword,
+    pageNumber,
     successUpdate,
     successStageUpdate,
     userInfo,
     successDelete,
     successBinUpdate,
     successCreate,
-    
   ]);
 
   useEffect(() => {
-    
-    if(successUpdate){
+    if (successUpdate) {
       dispatch({ type: UPDATE_TASKS_RESET });
-      dispatch({type: TASK_DETAILS_RESET})
-    }
-    else{
+      dispatch({ type: TASK_DETAILS_RESET });
+    } else {
       if (taskId != "") {
         if (!task.name || task._id !== taskId) {
           dispatch(listTaskstDetails(taskId));
-          
         } else {
-          
-            setName(task.customer.name);
-            setPhone(task.customer.phone);
-            setItem(task.item);
-            setProblem(task.problem);
-            setDate(moment(task.date).toDate());
-            setAmount(task.amount);
-            setStage(task.stage);
-            setComment(task.comment);
-          
+          setName(task.customer.name);
+          setPhone(task.customer.phone);
+          setItem(task.item);
+          setProblem(task.problem);
+          setDate(moment(task.date).toDate());
+          setAmount(task.amount);
+          setStage(task.stage);
+          setComment(task.comment);
         }
       }
     }
-    
   }, [dispatch, taskId, task, successUpdate]);
 
   useEffect(() => {
@@ -223,10 +232,23 @@ export function TasksScreen() {
     };
   }, [navigate]);
 
-  const updateTaskStage = (istage) => {
+  const onPageChange = (event) => {
+    setFirst(event.first);
+    setRows(event.rows);
+    setPageNumber(event.page +1)
+  };
+
+  const updateTaskStage = () => {
     if (stage !== "") {
       dispatch(updateTasksStage(id, stage));
       setVisible(false);
+    }
+  };
+
+  const updateTaskStatus = () => {
+    if (statusStage !== "") {
+      dispatch(updateTasksStatus(id, statusStage));
+      setStatus(false);
     }
   };
 
@@ -291,8 +313,9 @@ export function TasksScreen() {
   const updateHandler = (e) => {
     e.preventDefault();
     dispatch(updateTasks(taskId, item, problem, date, amount, stage, comment));
-    setTaskId("")
+    setTaskId("");
   };
+ 
 
   return (
     <>
@@ -306,7 +329,7 @@ export function TasksScreen() {
           >
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-1">
-                Tasks ({tasks && tasks.length})
+                Tasks
               </Typography>
             </div>
             <div className="mr-auto md:mr-4 md:w-56">
@@ -326,15 +349,29 @@ export function TasksScreen() {
                 </IconButton>
               </MenuHandler>
               <MenuList>
-                <MenuItem onClick={() => setCreate(true)} className=" capitalize">
+                <MenuItem
+                  onClick={() => setCreate(true)}
+                  className=" capitalize"
+                >
                   Add New Ticket
                 </MenuItem>
-                <MenuItem onClick={()=> dispatch(listTasksByThisWeek(keyword))} className=" capitalize">Tasks of this Week</MenuItem>
+                <MenuItem
+                  onClick={() => dispatch(listTasksByThisWeek(keyword))}
+                  className=" capitalize"
+                >
+                  Tasks of this Week
+                </MenuItem>
                 <MenuItem>Tasks of this Month</MenuItem>
-                <MenuItem onClick={() => navigate("/dashboard/bin")} className=" capitalize">
+                <MenuItem
+                  onClick={() => navigate("/dashboard/bin")}
+                  className=" capitalize"
+                >
                   Tasks In Recycle Bin
                 </MenuItem>
-                <MenuItem onClick={() => dispatch(listTasksByphone(keyword))} className=" capitalize">
+                <MenuItem
+                  onClick={() => dispatch(listTasksByphone(keyword))}
+                  className=" capitalize"
+                >
                   All Tasks
                 </MenuItem>
               </MenuList>
@@ -362,7 +399,8 @@ export function TasksScreen() {
                     "Problem Type",
                     "Date",
                     "Amount",
-                    "Status",
+                    "Repairing Stage",
+                    "Item Status",
                     "",
                     "",
                     "",
@@ -417,7 +455,7 @@ export function TasksScreen() {
                           variant="small"
                           className="text-[11px] font-medium capitalize text-blue-gray-400"
                         >
-                          {task.customer ?task.customer.phone :task.phone}
+                          {task.customer ? task.customer.phone : task.phone}
                         </Typography>
                       </td>
                       <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
@@ -466,13 +504,26 @@ export function TasksScreen() {
                             <p className="text-whit cursor-pointer bg-yellow-300 px-1 text-center">
                               Finished
                             </p>
-                          ) : task.stage === 2 ? (
-                            <p className="cursor-pointer bg-green-500 px-1 text-center text-white">
-                              Delivered
-                            </p>
                           ) : (
                             <p className="cursor-pointer bg-red-600 px-1  text-center text-white">
                               Unfinished
+                            </p>
+                          )}
+                        </Typography>
+                      </td>
+
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
+                        >
+                          {task.status === 0 ? (
+                            <p className="cursor-pointer bg-blue-600 px-1 text-center text-white">
+                              In Store
+                            </p>
+                          ) : (
+                            <p className="cursor-pointer bg-green-500 px-1 text-center text-white">
+                              Delivered
                             </p>
                           )}
                         </Typography>
@@ -514,8 +565,18 @@ export function TasksScreen() {
                                 setId(task._id);
                               }}
                             >
-                              Change Status
+                              Change Repairing Stage
                             </MenuItem>
+                            <MenuItem
+                              onClick={() => {
+                                setStatus(true);
+                                setStatusStage(task.status);
+                                setId(task._id);
+                              }}
+                            >
+                              Change Item Status
+                            </MenuItem>
+
                             <MenuItem
                               onClick={() => {
                                 setTaskId("");
@@ -539,12 +600,27 @@ export function TasksScreen() {
                 </tbody>
               )}
             </table>
+            <Paginator
+              first={first}
+              rows={rows}
+              totalRecords={count}
+              onPageChange={onPageChange}
+            />
           </CardBody>
         </Card>
       </div>
+      <Dialog
+        header="Comment"
+        visible={message}
+        onHide={() => setMessage(false)}
+        style={{ width: "40vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        {text}
+      </Dialog>
 
       <Dialog
-        header="Quick Edit"
+        header="Quick Edit For Repairing Status"
         visible={visible}
         onHide={() => setVisible(false)}
         style={{ width: "50vw" }}
@@ -563,7 +639,7 @@ export function TasksScreen() {
             <Message severity="error" text={errorStageUpdate} />
           )}
 
-          <label className="mb-2 block text-gray-600">Task Stage</label>
+          <label className="mb-2 block text-gray-600">Repairing Stage</label>
           <div className="flex flex-wrap gap-3">
             <div className="align-items-center flex">
               <RadioButton
@@ -597,18 +673,6 @@ export function TasksScreen() {
                 onChange={(e) => setStage(e.value)}
                 checked={stage === 2}
               />
-              <label htmlFor="ingredient3" className="ml-2">
-                Delivired
-              </label>
-            </div>
-            <div className="align-items-center flex">
-              <RadioButton
-                inputId="ingredient3"
-                name="stage"
-                value={3}
-                onChange={(e) => setStage(e.value)}
-                checked={stage === 3}
-              />
               <label htmlFor="ingredient4" className="ml-2">
                 Unfinished
               </label>
@@ -617,6 +681,65 @@ export function TasksScreen() {
           <div className="mt-4 flex justify-center">
             <button
               onClick={() => updateTaskStage(stage)}
+              className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium capitalize text-white transition hover:bg-transparent hover:text-primary"
+            >
+              Update
+            </button>
+          </div>
+        </>
+      </Dialog>
+
+      <Dialog
+        header="Quick Edit For Item Status"
+        visible={status}
+        onHide={() => setStatus(false)}
+        style={{ width: "50vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <>
+          {loadingStatusUpdate && (
+            <ProgressSpinner
+              style={{ width: "20px", height: "20px" }}
+              strokeWidth="6"
+              fill="var(--surface-ground)"
+              animationDuration=".5s"
+            />
+          )}
+          {errorStatusUpdate && (
+            <Message severity="error" text={errorStatusUpdate} />
+          )}
+
+          <label className="mb-2 block text-gray-600">Item Stage</label>
+          <div className="flex flex-wrap gap-3">
+            <div className="align-items-center flex">
+              <RadioButton
+                inputId="ingredient1"
+                name="stage"
+                value={0}
+                onChange={(e) => setStatusStage(e.value)}
+                checked={statusStage === 0}
+              />
+              <label htmlFor="ingredient1" className="ml-2">
+                In Store
+              </label>
+            </div>
+
+            <div className="align-items-center flex">
+              <RadioButton
+                inputId="ingredient3"
+                name="stage"
+                value={1}
+                onChange={(e) => setStatusStage(e.value)}
+                checked={statusStage === 1}
+              />
+              <label htmlFor="ingredient3" className="ml-2">
+                Delivered
+              </label>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-center">
+            <button
+              onClick={() => updateTaskStatus()}
               className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium capitalize text-white transition hover:bg-transparent hover:text-primary"
             >
               Update

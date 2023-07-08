@@ -81,7 +81,7 @@ export const createNewCustomer =
   
 
 
-  export const listCustomers = (keyword2 = "") => async (dispatch, getState) => {
+  export const listCustomers = (keyword2 = "", pageNumber = '') => async (dispatch, getState) => {
     try {
       dispatch({ type: CUSTOMER_LIST_REQUEST });
   
@@ -95,7 +95,7 @@ export const createNewCustomer =
         },
       };
   
-      const { data } = await axios.get(`/api/customers?keyword2=${keyword2}`, config);
+      const { data } = await axios.get(`/api/customers?keyword2=${keyword2}&pageNumber=${pageNumber}`, config);
   
       dispatch({
         type: CUSTOMER_LIST_SUCCESS,

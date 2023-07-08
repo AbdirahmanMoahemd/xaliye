@@ -35,6 +35,9 @@ import {
   UPDATE_TASKS_STAGE_FAIL,
   UPDATE_TASKS_STAGE_REQUEST,
   UPDATE_TASKS_STAGE_SUCCESS,
+  UPDATE_TASKS_STATUS_FAIL,
+  UPDATE_TASKS_STATUS_REQUEST,
+  UPDATE_TASKS_STATUS_SUCCESS,
   UPDATE_TASKS_SUCCESS,
 } from "../constants/tasksConstants";
 import axios from "axios";
@@ -156,7 +159,7 @@ export const listTasks = (keyword = "") => async (dispatch, getState) => {
 
 
 
-export const listTasksByphone = (keyword = "") => async (dispatch, getState) => {
+export const listTasksByphone = (keyword = "", pageNumber = '') => async (dispatch, getState) => {
   try {
     dispatch({ type: GET_TASKS_REQUEST });
 
@@ -170,7 +173,7 @@ export const listTasksByphone = (keyword = "") => async (dispatch, getState) => 
       },
     };
 
-    const { data } = await axios.get(`/api/tasks/taskslist/byphone?keyword=${keyword}`, config);
+    const { data } = await axios.get(`/api/tasks/taskslist/byphone?keyword=${keyword}&pageNumber=${pageNumber}`, config);
 
     dispatch({
       type: GET_TASKS_SUCCESS,
@@ -348,7 +351,7 @@ export const listTaskstDetails = (id) => async (dispatch, getState) => {
   }
 };
 
-export const updateTasks = (id,item, problem, date, amount, stage, comment) => async (dispatch, getState) => {
+export const updateTasks = (id,item, problem, date, amount, stage,status, comment) => async (dispatch, getState) => {
   try {
     dispatch({
       type: UPDATE_TASKS_REQUEST,
@@ -367,7 +370,7 @@ export const updateTasks = (id,item, problem, date, amount, stage, comment) => a
 
     const { data } = await axios.put(
       `/api/tasks/${id}`,
-      {item, problem, date, amount,stage, comment},
+      {item, problem, date, amount,stage,status, comment},
       config
     );
 
@@ -417,6 +420,46 @@ export const updateTasksStage = (id, stage) => async (dispatch, getState) => {
   } catch (error) {
     dispatch({
       type: UPDATE_TASKS_STAGE_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+
+
+export const updateTasksStatus = (id, status) => async (dispatch, getState) => {
+  try {
+    dispatch({
+      type: UPDATE_TASKS_STATUS_REQUEST,
+    });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.put(
+      `/api/tasks/status/${id}`,
+      {status},
+      config
+    );
+
+    dispatch({
+      type: UPDATE_TASKS_STATUS_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: UPDATE_TASKS_STATUS_FAIL,
       payload:
         error.response && error.response.data.message
           ? error.response.data.message

@@ -14,7 +14,7 @@ import {
 
 const router = express.Router();
 
-router.route("/").get(protect, getCustomers).post(protect, createCustomers);
+router.route("/").get(getCustomers).post(protect, createCustomers);
 router.route('/date/range').post(protect, getCustomersBYDateRage)
 router.route('/total/customer').get(getTotalCustomersAndSales)
 router.route("/byname/:name").get(getTasksCustomersByName)

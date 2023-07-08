@@ -17,7 +17,7 @@ import {
   userUpdateRoleReducer,
 } from "./reducers/userReducers";
 
-import {createTaskReducer, taskDeleteReducer, tasksBinReducer, tasksDetailsReducer, tasksListInBinReducer, tasksListReducer, tasksListReducer2, tasksUnBinReducer, tasksUpdateReducer, tasksUpdateStageReducer, totalTasksReducerCount} from './reducers/tasksReducers'
+import {createTaskReducer, taskDeleteReducer, tasksBinReducer, tasksDetailsReducer, tasksListInBinReducer, tasksListReducer, tasksListReducer2, tasksUnBinReducer, tasksUpdateReducer, tasksUpdateStageReducer, tasksUpdateStatusReducer, totalTasksReducerCount} from './reducers/tasksReducers'
 import { createStoreItemReducer, storeItemDeleteReducer, storeItemDetailsReducer, storeItemListReducer, storeItemUpdateReducer } from "./reducers/storeReducers";
 import { createIncomeItemReducer, incomeItemDeleteReducer, incomeItemDetailsReducer, incomeItemListReducer, incomeItemUpdateReducer, totalTasksIncomeReducerCount } from "./reducers/incomeReducers";
 import { blanceReducerCount, createExpenseItemReducer, expenseItemDeleteReducer, expenseItemDetailsReducer, expenseItemListReducer, expenseItemUpdateReducer } from "./reducers/expenseReducers";
@@ -26,6 +26,7 @@ import { createSalesReducer, salesDeleteReducer, salesDetailsReducer, salesListR
 import { accountDeleteReducer, accountDetailsReducer, accountUpdateReducer, accountsListReducer, createAccountReducer } from "./reducers/accountReducers";
 import { createSubAccountReducer, subAccountDeleteReducer, subAccountDetailsReducer, subAccountUpdateReducer, subAccountsListReducer } from "./reducers/subaccountReducers";
 import { createTransactionReducer, transactionDeleteReducer, transactionDetailsReducer, transactionUpdateReducer, transactionsListReducer } from "./reducers/transactionReducers";
+import { eventsListReducer } from "./reducers/eventReducers";
 
 
 const reducer = combineReducers({
@@ -54,6 +55,7 @@ const reducer = combineReducers({
   tasksUnBin:tasksUnBinReducer,
   totalTasks:totalTasksReducerCount,
   myTasksList:myTasksListReducer,
+  tasksUpdateStatus:tasksUpdateStatusReducer,
 
 
   createStoreItem:createStoreItemReducer,
@@ -118,7 +120,11 @@ const reducer = combineReducers({
   transactionsList:transactionsListReducer,
   transactionDetails:transactionDetailsReducer,
   transactionUpdate:transactionUpdateReducer,
-  transactionDelete:transactionDeleteReducer
+  transactionDelete:transactionDeleteReducer,
+
+
+
+  eventsList:eventsListReducer
 
 
 

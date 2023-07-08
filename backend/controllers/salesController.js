@@ -3,6 +3,8 @@ import Sales from "../models/salesModel.js";
 import Store from "../models/storeModel.js";
 
 export const getSalesItems = expressAsync(async (req, res) => {
+  let pageSize = 200;
+  const page = Number(req.query.pageNumber) || 1;
   const keyword = req.query.keyword
     ? {
         customer: {
@@ -12,21 +14,21 @@ export const getSalesItems = expressAsync(async (req, res) => {
       }
     : {};
 
-
-
+  const salesCount = await Sales.countDocuments({ ...keyword });
   const sales = await Sales.find({ ...keyword })
     .sort({ createdAt: -1 })
-    .populate("item");
+    .populate("item")
+    .limit(pageSize)
+    .skip(pageSize * (page - 1));
 
-  res.json({ sales });
+  res.json({ sales, salesCount });
 });
 
 export const getRecentSales = expressAsync(async (req, res) => {
   var start = new Date().toDateString();
-  const sales = await Sales.find({date: { $gte: start },})
+  const sales = await Sales.find({ date: { $gte: start } })
     .sort({ createdAt: -1 })
-    .populate("item")
-    
+    .populate("item");
 
   res.json({ sales });
 });
@@ -47,16 +49,16 @@ export const getPaidSalesItems = expressAsync(async (req, res) => {
   res.json({ sales });
 });
 
-export const getSalesIByDateRange= expressAsync(async (req, res) => {
+export const getSalesIByDateRange = expressAsync(async (req, res) => {
   const { startDate, endDate } = req.body;
   var start = new Date(startDate);
   start.setDate(start.getDate() - 1);
   start.toDateString();
 
   var end = new Date(endDate);
-  end.setDate(end.getDate() +1);
+  end.setDate(end.getDate() + 1);
   end.toDateString();
-  const sales = await Sales.find({ date: { $lte: end, $gte: start }, })
+  const sales = await Sales.find({ date: { $lte: end, $gte: start } })
     .sort({ createdAt: -1 })
     .populate("item");
 
@@ -75,7 +77,8 @@ export const getSalesById = expressAsync(async (req, res) => {
 });
 
 export const createSalesItem = expressAsync(async (req, res) => {
-  const { item, customer,phone, quantity, price, date,invoiceId, isPaid } = req.body;
+  const { item, customer, phone, quantity, price, date, invoiceId, isPaid } =
+    req.body;
 
   const store = await Store.findById(item);
   if (store) {

@@ -4,12 +4,13 @@ import {
 } from "@heroicons/react/24/solid";
 import { Home, StoreScreen, SalesScreen, CustomersScreen, TasksScreen, AccountsScreen, TransactionsScreen } from "@/pages/dashboard";
 import { FcSalesPerformance } from "react-icons/fc";
-import { MdAccountBalanceWallet } from "react-icons/md";
-import { BiTask, BiHistory, BiTransfer } from "react-icons/bi";
+import { MdAccountBalanceWallet, MdOutlineEventRepeat } from "react-icons/md";
+import { BiTask, BiTransfer } from "react-icons/bi";
 import { AiTwotoneAppstore } from "react-icons/ai";
 import { HiUserGroup } from "react-icons/hi";
-import { SignIn, SignUp } from "./pages/auth";
+import { BsPersonLinesFill } from "react-icons/bs";
 import UsersScreen from "./pages/dashboard/usersScreen";
+import EventsScreen from "./pages/dashboard/EventsScreen";
 
 
 const icon = { 
@@ -45,19 +46,19 @@ export const routes = [
         element: <TasksScreen />,
       },
       {
-        icon: <BiHistory {...icon} />,
-        name: "Tasks Events",
-        path: "/tasks-events",
-        element: <TasksScreen />,
+        icon: <MdOutlineEventRepeat {...icon} />,
+        name: "Events",
+        path: "/events",
+        element: <EventsScreen />,
       },
       {
-        icon: <BellIcon {...icon} />,
+        icon: <HiUserGroup {...icon} />,
         name: "Customers",
         path: "/customers",
         element: <CustomersScreen />,
       },
       {
-        icon: <HiUserGroup {...icon} />,
+        icon: <BsPersonLinesFill {...icon} />,
         name: "Users",
         path: "/users",
         element: <UsersScreen />,

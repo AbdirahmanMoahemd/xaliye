@@ -25,7 +25,7 @@ const tasksSchema = mongoose.Schema(
     },
     item: {
       type: String,
-      required: true,
+      
     },
     bin: {
         type: Boolean,
@@ -49,6 +49,11 @@ const tasksSchema = mongoose.Schema(
       required: true,
     },
     stage: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    status: {
       type: Number,
       required: true,
       default: 0,

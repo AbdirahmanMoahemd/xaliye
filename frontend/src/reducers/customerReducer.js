@@ -50,6 +50,7 @@ export const customersListReducer = (state = { customers: [] }, action) => {
       return {
         loading: false,
         customers: action.payload.customers,
+        customerCount: action.payload.customerCount,
       };
     case CUSTOMER_LIST_FAIL:
       return { loading: false, error: action.payload };

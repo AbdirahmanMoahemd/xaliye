@@ -5,6 +5,8 @@ import Sales from "../models/salesModel.js";
 
 export const getCustomers = expressAsync(async (req, res) => {
   try {
+  let pageSize = 200;
+  const page = Number(req.query.pageNumber) || 1;
     const keyword2 = req.query.keyword2
       ? {
           name: {
@@ -14,12 +16,13 @@ export const getCustomers = expressAsync(async (req, res) => {
         }
       : {};
 
-      
+    const customerCount = await Customers.countDocuments({ ...keyword2 });  
     const customers = await Customers.find({ ...keyword2 }).sort({
-      createdAt: -1,
-    });
+      createdAt: 1,
+    }).limit(pageSize)
+    .skip(pageSize * (page - 1));;
 
-    res.json({ customers });
+    res.json({ customers , customerCount});
   } catch (error) {
     res.json({ error: error.message });
   }
@@ -29,6 +32,8 @@ export const getCustomers = expressAsync(async (req, res) => {
 export const getCustomersBYDateRage = expressAsync(async (req, res) => {
   try {
     const { startDate, endDate } = req.body;
+
+    
     const keyword2 = req.query.keyword2
       ? {
           name: {
@@ -85,57 +90,71 @@ export const getTotalCustomersAndSales = expressAsync(async (req, res) => {
     let todayCusPerc;
     let yesterdayCusPerc;
 
-    if (todaySalesTotal > yesterdaySalesTotal) {
-      todayPerc = parseInt(
-        ((yesterdaySalesTotal / todaySalesTotal) * 100).toFixed(0)
-      );
-      yesterdayPerc =
-        parseInt(((yesterdaySalesTotal / todaySalesTotal) * 100).toFixed(0)) -
-        100;
-    } else if (todaySalesTotal < yesterdaySalesTotal) {
-      yesterdayPerc = parseInt(
-        ((todaySalesTotal / yesterdaySalesTotal) * 100).toFixed(0)
-      );
-      todayPerc =
-        parseInt(((todaySalesTotal / yesterdaySalesTotal) * 100).toFixed(0)) -
-        100;
+    if (todaySalesTotal != 0 && yesterdaySalesTotal != 0) {
+      if (todaySalesTotal > yesterdaySalesTotal) {
+        todayPerc = parseInt(
+          ((yesterdaySalesTotal / todaySalesTotal) * 100).toFixed(0)
+        );
+        yesterdayPerc =
+          parseInt(((yesterdaySalesTotal / todaySalesTotal) * 100).toFixed(0)) -
+          100;
+      } else if (todaySalesTotal < yesterdaySalesTotal) {
+        yesterdayPerc = parseInt(
+          ((todaySalesTotal / yesterdaySalesTotal) * 100).toFixed(0)
+        );
+        todayPerc =
+          parseInt(((todaySalesTotal / yesterdaySalesTotal) * 100).toFixed(0)) -
+          100;
+      } else {
+        yesterdayPerc = parseInt(
+          ((todaySalesTotal / yesterdaySalesTotal) * 100).toFixed(0)
+        );
+        todayPerc = parseInt(
+          ((todaySalesTotal / yesterdaySalesTotal) * 100).toFixed(0)
+        );
+      }
     } else {
-      yesterdayPerc = parseInt(
-        ((todaySalesTotal / yesterdaySalesTotal) * 100).toFixed(0)
-      );
-      todayPerc = parseInt(
-        ((todaySalesTotal / yesterdaySalesTotal) * 100).toFixed(0)
-      );
+      todayPerc = todaySalesTotal == 0 ? 0 :100
+
+      yesterdayPerc = yesterdaySalesTotal == 0 ? 0 :100
     }
 
+   
 
 
 
 
 
 
-    if (todayCustomersTotal > yesterdayCustomersTotal) {
-      todayCusPerc = parseInt(
-        ((yesterdayCustomersTotal / todayCustomersTotal) * 100).toFixed(0)
-      );
-      yesterdayCusPerc =
-        parseInt(((yesterdayCustomersTotal / todayCustomersTotal) * 100).toFixed(0)) -
-        100;
-    } else if (todayCustomersTotal < yesterdayCustomersTotal) {
-      yesterdayCusPerc = parseInt(
-        ((todayCustomersTotal / yesterdayCustomersTotal) * 100).toFixed(0)
-      );
-      todayCusPerc =
-        parseInt(((todayCustomersTotal / yesterdayCustomersTotal) * 100).toFixed(0)) -
-        100;
+    if (todayCustomersTotal != 0 && yesterdayCustomersTotal != 0) {
+      if (todayCustomersTotal > yesterdayCustomersTotal ) {
+        todayCusPerc = parseInt(
+          ((yesterdayCustomersTotal / todayCustomersTotal) * 100).toFixed(0)
+        );
+        yesterdayCusPerc =
+          parseInt(((yesterdayCustomersTotal / todayCustomersTotal) * 100).toFixed(0)) -
+          100;
+      } else if (todayCustomersTotal < yesterdayCustomersTotal) {
+        yesterdayCusPerc = parseInt(
+          ((todayCustomersTotal / yesterdayCustomersTotal) * 100).toFixed(0)
+        );
+        todayCusPerc =
+          parseInt(((todayCustomersTotal / yesterdayCustomersTotal) * 100).toFixed(0)) -
+          100;
+      } else {
+        yesterdayCusPerc = parseInt(
+          ((todayCustomersTotal / yesterdayCustomersTotal) * 100).toFixed(0)
+        );
+        todayCusPerc = parseInt(
+          ((todayCustomersTotal / yesterdayCustomersTotal) * 100).toFixed(0)
+        );
+      }
     } else {
-      yesterdayCusPerc = parseInt(
-        ((todayCustomersTotal / yesterdayCustomersTotal) * 100).toFixed(0)
-      );
-      todayCusPerc = parseInt(
-        ((todayCustomersTotal / yesterdayCustomersTotal) * 100).toFixed(0)
-      );
+      todayCusPerc = todayCustomersTotal == 0 ? 0 :100
+
+      yesterdayCusPerc = yesterdayCustomersTotal == 0 ? 0 :100
     }
+    
     const customers = (await Customers.find()).length;
     const sales = (await Sales.find()).length;
 

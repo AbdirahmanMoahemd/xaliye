@@ -13,6 +13,7 @@ import salesRoute from "../backend/routes/salesRoute.js";
 import accountRoutes from "../backend/routes/accountRoutes.js";
 import subAccountRoutes from "../backend/routes/subAccountRoutes.js";
 import transactionRoutes from "../backend/routes/transactionRoutes.js";
+import eventsRouets from "../backend/routes/eventsRouets.js";
 import { errorHandler, notFound } from "./middlewares/errorMidlleware.js";
 
 dotenv.config();
@@ -26,14 +27,15 @@ if (process.env.NODE_ENV === "Development") {
 app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", tasksRoutes);
-app.use("/api/store", storeRoutes); 
+app.use("/api/store", storeRoutes);  
 // app.use('/api/income', incomeRoutes)
 // app.use('/api/expense', expenseRoutes)
 app.use("/api/customers", customerRoutes);
 app.use("/api/Sales", salesRoute);
-app.use("/api/account", accountRoutes);
+app.use("/api/account", accountRoutes); 
 app.use("/api/subaccount", subAccountRoutes);
 app.use("/api/transaction", transactionRoutes);
+app.use("/api/events", eventsRouets);
 // app.use('/api/upload', uploadRoutes)
 
 

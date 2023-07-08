@@ -45,15 +45,7 @@ export function StatisticsCard({ color, icon, title, value,value2, value3, value
               {value3}
             </Typography>
           </div>
-          <div className="flex items-center space-x-1">
-            <div class="h-3 w-3 rounded-full bg-green-500 "></div>
-            <Typography
-              variant="small"
-              className="font-normal text-blue-gray-600"
-            >
-              {value4}
-            </Typography>
-          </div>
+          
 
           <div className="flex items-center space-x-1">
             <div class="h-3 w-3 rounded-full bg-red-600 "></div>
@@ -62,6 +54,15 @@ export function StatisticsCard({ color, icon, title, value,value2, value3, value
               className="font-normal text-blue-gray-600"
             >
               {value5}
+            </Typography>
+          </div>
+          <div className="flex items-center space-x-1">
+            <div class="h-3 w-3 rounded-full bg-green-500 "></div>
+            <Typography
+              variant="small"
+              className="font-normal text-blue-gray-600"
+            >
+              {value4}
             </Typography>
           </div>
         </div>

@@ -53,6 +53,7 @@ export const salesListReducer = (
       return {
         loading: false,
         sales: action.payload.sales,
+        salesCount:action.payload.salesCount
       };
     case SALES_LIST_FAIL:
       return { loading: false, error: action.payload };

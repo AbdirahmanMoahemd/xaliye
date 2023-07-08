@@ -40,6 +40,10 @@ import {
   TOTAL_TASK_REQUEST,
   TOTAL_TASK_SUCCESS,
   TOTAL_TASK_FAIL,
+  UPDATE_TASKS_STATUS_REQUEST,
+  UPDATE_TASKS_STATUS_SUCCESS,
+  UPDATE_TASKS_STATUS_RESET,
+  UPDATE_TASKS_STATUS_FAIL,
 } from "../constants/tasksConstants";
 
 export const createTaskReducer = (state = {}, action) => {
@@ -65,6 +69,7 @@ export const tasksListReducer = (state = { tasks: [{ user: [], customer: [] }] }
       return {
         loading: false,
         tasks: action.payload.tasks,
+        count:action.payload.count,
       };
     case GET_TASKS_FAIL:
       return { loading: false, error: action.payload };
@@ -85,6 +90,7 @@ export const tasksListReducer2 = (state = { tasks: [{ user: [], customer: [] }] 
       return {
         loading: false,
         tasks: action.payload.tasks,
+        count:action.payload.count,
       };
     case GET_TASKS_FAIL2:
       return { loading: false, error: action.payload };
@@ -201,6 +207,23 @@ export const tasksUpdateStageReducer = (state = { task: {} }, action) => {
   }
 };
 
+
+
+
+export const tasksUpdateStatusReducer = (state = { task: {} }, action) => {
+  switch (action.type) {
+    case UPDATE_TASKS_STATUS_REQUEST:
+      return { loading: true };
+    case UPDATE_TASKS_STATUS_SUCCESS:
+      return { loading: false, success: true, task: action.payload };
+    case UPDATE_TASKS_STATUS_RESET:
+      return { task: {} };
+    case UPDATE_TASKS_STATUS_FAIL:
+      return { loading: false, error: action.payload };
+    default:
+      return state;
+  }
+};
 
 export const totalTasksReducerCount = (state = { counter:{} }, action) => {
   switch (action.type) {

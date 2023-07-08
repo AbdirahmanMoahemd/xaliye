@@ -145,7 +145,7 @@ export const updateSalesBillingItem =
   };
 
 export const listSalesItems =
-  (keyword = "") =>
+  (keyword = "",  pageNumber = '') =>
   async (dispatch, getState) => {
     try {
       dispatch({ type: SALES_LIST_REQUEST });
@@ -160,7 +160,7 @@ export const listSalesItems =
         },
       };
 
-      const { data } = await axios.get(`/api/Sales?keyword=${keyword}`, config);
+      const { data } = await axios.get(`/api/Sales?keyword=${keyword}&pageNumber=${pageNumber}`, config);
 
       dispatch({
         type: SALES_LIST_SUCCESS,

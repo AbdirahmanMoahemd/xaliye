@@ -2,6 +2,7 @@ import expressAsync from "express-async-handler";
 import Tasks from "../models/tasksModel.js";
 import Customers from "../models/customersModel.js";
 import moment from "moment";
+import Events from "../models/eventsModel.js";
 
 export const getTasks = expressAsync(async (req, res) => {
   const keyword = req.query.keyword
@@ -41,32 +42,40 @@ export const getTotalTasks = expressAsync(async (req, res) => {
   ).length;
   let todayPerc;
   let yesterdayPerc;
-  if (todayTaskTotal > yesterdayTaskTotal) {
-    todayPerc = parseInt(
-      ((yesterdayTaskTotal / todayTaskTotal) * 100).toFixed(0)
-    );
-    yesterdayPerc =
-      parseInt(((yesterdayTaskTotal / todayTaskTotal) * 100).toFixed(0)) - 100;
-  } else if (todayTaskTotal < yesterdayTaskTotal) {
-    yesterdayPerc = parseInt(
-      ((todayTaskTotal / yesterdayTaskTotal) * 100).toFixed(0)
-    );
-    todayPerc =
-      parseInt(((todayTaskTotal / yesterdayTaskTotal) * 100).toFixed(0)) - 100;
+
+  if (todayTaskTotal != 0 && yesterdayTaskTotal != 0) {
+    if (todayTaskTotal > yesterdayTaskTotal) {
+      todayPerc = parseInt(
+        ((yesterdayTaskTotal / todayTaskTotal) * 100).toFixed(0)
+      );
+      yesterdayPerc =
+        parseInt(((yesterdayTaskTotal / todayTaskTotal) * 100).toFixed(0)) -
+        100;
+    } else if (todayTaskTotal < yesterdayTaskTotal) {
+      yesterdayPerc = parseInt(
+        ((todayTaskTotal / yesterdayTaskTotal) * 100).toFixed(0)
+      );
+      todayPerc =
+        parseInt(((todayTaskTotal / yesterdayTaskTotal) * 100).toFixed(0)) -
+        100;
+    } else {
+      yesterdayPerc = parseInt(
+        ((todayTaskTotal / yesterdayTaskTotal) * 100).toFixed(0)
+      );
+      todayPerc = parseInt(
+        ((todayTaskTotal / yesterdayTaskTotal) * 100).toFixed(0)
+      );
+    }
   } else {
-    yesterdayPerc = parseInt(
-      ((todayTaskTotal / yesterdayTaskTotal) * 100).toFixed(0)
-    );
-    todayPerc = parseInt(
-      ((todayTaskTotal / yesterdayTaskTotal) * 100).toFixed(0)
-    );
+    todayPerc = todayTaskTotal == 0 ? 0 : 100;
+    yesterdayPerc = yesterdayTaskTotal == 0 ? 0 : 100;
   }
 
   const tasks = (await Tasks.find({ bin: false })).length;
   const onProcess = (await Tasks.find({ bin: false, stage: 0 })).length;
-  const delivered = (await Tasks.find({ bin: false, stage: 1 })).length;
-  const finished = (await Tasks.find({ bin: false, stage: 2 })).length;
-  const unfinished = (await Tasks.find({ bin: false, stage: 3 })).length;
+  const delivered = (await Tasks.find({ bin: false, status: 1 })).length;
+  const finished = (await Tasks.find({ bin: false, stage: 1 })).length;
+  const unfinished = (await Tasks.find({ bin: false, stage: 2 })).length;
 
   function kFormatter(num) {
     return Math.abs(num) > 999
@@ -93,21 +102,25 @@ export const getTotalTasks = expressAsync(async (req, res) => {
 
 export const getTasksByPhone = expressAsync(async (req, res) => {
   try {
+    let pageSize = 200;
+    const page = Number(req.query.pageNumber) || 1;
     const keyword = req.query.keyword
       ? {
           phone: req.query.keyword,
         }
       : {};
-
+    const count = await Tasks.countDocuments({ ...keyword });
     const tasks = await Tasks.find({
       ...keyword,
       bin: false,
     })
-      .sort({ createdAt: -1 })
+      .sort({ date: -1 })
       .populate("user")
-      .populate("customer");
+      .populate("customer")
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
 
-    res.json({ tasks });
+    res.json({ tasks, count });
   } catch (error) {
     res.json({ error: error.message });
   }
@@ -115,34 +128,29 @@ export const getTasksByPhone = expressAsync(async (req, res) => {
 
 export const getTasksByRange = expressAsync(async (req, res) => {
   try {
-    const { startDate, endDate} = req.body
+    const { startDate, endDate } = req.body;
     const keyword = req.query.keyword
       ? {
           phone: req.query.keyword,
         }
       : {};
 
-      // var yesterday = new Date();
-      // yesterday.setDate(yesterday.getDate() - 10);
-      // var test = yesterday.toDateString();
-    
-      var start = new Date(startDate);
-      start.setDate(start.getDate() - 1);
-      start.toDateString();
-    
-      var end = new Date(endDate);
-      end.setDate(end.getDate() +1);
-      end.toDateString();
+    // var yesterday = new Date();
+    // yesterday.setDate(yesterday.getDate() - 10);
+    // var test = yesterday.toDateString();
 
-    
+    var start = new Date(startDate);
+    start.setDate(start.getDate() - 1);
+    start.toDateString();
 
+    var end = new Date(endDate);
+    end.setDate(end.getDate() + 1);
+    end.toDateString();
 
-    
-    
     const tasks = await Tasks.find({
       ...keyword,
       bin: false,
-      date:{$lte:end , $gte: start}
+      date: { $lte: end, $gte: start },
     })
       .sort({ createdAt: -1 })
       .populate("user")
@@ -240,55 +248,64 @@ export const createTask = expressAsync(async (req, res) => {
     comment,
   } = req.body;
 
- 
-    const excustomers = await Customers.findOne({ phone });
-    if (!excustomers) {
-      const customers = await Customers.find().sort({ createdAt: -1 });
+  const excustomers = await Customers.findOne({ phone });
+  if (!excustomers) {
+    const customers = await Customers.find().sort({ createdAt: -1 });
 
-      const newCustomer = new Customers({
-        custID: customers[0].custID + 1,
+    const newCustomer = new Customers({
+      custID: customers[0].custID + 1,
+      name,
+      phone,
+    });
+    const createdCustomers = await newCustomer.save();
+    if (createdCustomers) {
+      const tasks = new Tasks({
+        user: userid,
         name,
         phone,
+        item,
+        problem,
+        amount,
+        invoiceId,
+        date,
+        comment,
+        customer: createdCustomers._id,
       });
-      const createdCustomers = await newCustomer.save();
-      if (createdCustomers) {
-        const tasks = new Tasks({
-          user: userid,
-          name,
-          phone,
-          item,
-          problem,
-          amount,
-          invoiceId,
-          date,
-          comment,
-          customer: createdCustomers._id,
-        });
 
-        const createdTasks = await tasks.save();
-        res.status(201).json(createdTasks);
+      
+
+      const createdTasks = await tasks.save();
+      if (createdTasks) {
+        const newEvent = new Events({
+          user: userid,
+          event:`Created New Ticket, invoiceId=${invoiceId} for customer ${name}`
+        });
+        const createdEvent = await newEvent.save();
       }
-    } else {
-      res.status(500).json({ message: "Already exists" });
+
+
+      res.status(201).json(createdTasks);
     }
-  
+  } else {
+    res.status(500).json({ message: "Already exists" });
+  }
 });
 
 export const createTaskExsting = expressAsync(async (req, res) => {
-  const {
-    name,
-    phone,
-    item,
-    problem,
-    amount,
-    invoiceId,
-    date,
-    userid,
-    comment,
-    customer,
-  } = req.body;
-
- 
+  try {
+    const {
+      name,
+      phone,
+      item,
+      problem,
+      amount,
+      invoiceId,
+      date,
+      userid,
+      comment,
+      customer,
+    } = req.body;
+  
     const tasks = new Tasks({
       user: userid,
       name,
@@ -301,9 +318,19 @@ export const createTaskExsting = expressAsync(async (req, res) => {
       comment,
       customer: customer,
     });
-
+  
     const createdTasks = await tasks.save();
+    if(createdTasks){
+      const newEvent = new Events({
+        user: userid,
+        event:`Created New Ticket, invoiceId=${invoiceId} for customer ${name}`
+      });
+      const createdEvent = await newEvent.save();
+    }
     res.status(201).json(createdTasks);
+  } catch (error) {
+    res.status(500).json(error);
+  }
   
 });
 
@@ -316,6 +343,38 @@ export const updateTasksStage = expressAsync(async (req, res) => {
     task.stage = stage;
 
     const updatedTasks = await task.save();
+    if (updatedTasks) {
+      const newEvent = new Events({
+        user: updatedTasks.user,
+        event:`Updated ${updatedTasks.item} reparing stage for customer ${updatedTasks.name} to ${stage}`
+      });
+      const createdEvent = await newEvent.save();
+    }
+    res.json({
+      updatedTasks,
+    });
+  } else {
+    res.status(404);
+    throw new Error("Tasks Not Found");
+  }
+});
+
+export const updateTasksStatus = expressAsync(async (req, res) => {
+  const { status } = req.body;
+
+  const task = await Tasks.findById(req.params.id);
+
+  if (task) {
+    task.status = status;
+
+    const updatedTasks = await task.save();
+    if (updatedTasks) {
+      const newEvent = new Events({
+        user: updatedTasks.user,
+        event:`Updated ${updatedTasks.item} item status for customer ${updatedTasks.name} to ${status}`
+      });
+      const createdEvent = await newEvent.save();
+    }
     res.json({
       updatedTasks,
     });
@@ -326,7 +385,7 @@ export const updateTasksStage = expressAsync(async (req, res) => {
 });
 
 export const updateTasks = expressAsync(async (req, res) => {
-  const { item, problem, amount, date, stage, comment } = req.body;
+  const { item, problem, amount, date, stage, status, comment } = req.body;
 
   const task = await Tasks.findById(req.params.id);
 
@@ -336,9 +395,18 @@ export const updateTasks = expressAsync(async (req, res) => {
     task.amount = amount;
     task.date = date;
     task.stage = stage;
+    task.status = status;
     task.comment = comment;
 
     const updatedTasks = await task.save();
+    if (updatedTasks) {
+      const newEvent = new Events({
+        user: updatedTasks.user,
+        event:`Updated task data for customer ${updatedTasks.name}, phone: ${updatedTasks.phone}`
+      });
+      const createdEvent = await newEvent.save();
+      
+    }
     res.json({
       updatedTasks,
     });
@@ -355,9 +423,17 @@ export const moveTaskstoBin = expressAsync(async (req, res) => {
     task.bin = true;
 
     const updatedTasks = await task.save();
-    res.json({
-      updatedTasks,
-    });
+    if (updatedTasks) {
+      const newEvent = new Events({
+        user: task.user._id,
+        event:`Moved task to bin for customer ${task.name}, phone: ${task.phone}`
+      });
+      const createdEvent = await newEvent.save();
+      res.json({
+        updatedTasks,
+      });
+    }
+   
   } else {
     res.status(404);
     throw new Error("Tasks Not Found");

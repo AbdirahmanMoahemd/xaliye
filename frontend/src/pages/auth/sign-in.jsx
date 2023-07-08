@@ -37,10 +37,10 @@ export function SignIn() {
 
   useEffect(() => {
     if (userInfo) {
-      // navigate(redirect);
-      setMessage(
-        "Your system is in maintenance mode, please contact our support team"
-      );
+      navigate(redirect);
+      // setMessage(
+      //   "Your system is in maintenance mode, please contact our support team"
+      // );
     }
   }, [navigate, userInfo, redirect]);
 
@@ -72,7 +72,7 @@ export function SignIn() {
           </CardHeader>
           <form onSubmit={submitHandler}>
             <CardBody className="flex flex-col gap-4">
-              {message != "" && <Message severity="error" text={message} />}
+              {/* {message != "" && <Message severity="error" text={message} />} */}
               {error && <Message severity="error" text={error} />}
               {loading && (
                 <ProgressSpinner
