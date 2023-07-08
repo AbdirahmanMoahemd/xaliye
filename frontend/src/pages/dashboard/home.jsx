@@ -209,7 +209,7 @@ export function Home() {
     if (successCreate) {
       setIsPrinting(true);
       // console.log(true);
-      if (isPrinting) {
+      // if (isPrinting) {
         dispatch({ type: TASK_CREATE_RESET });
         setCreate(false);
         setEdit(false);
@@ -224,7 +224,7 @@ export function Home() {
         setCustomer("");
         setDate(new Date());
         // setNameToPrint("");
-      }
+      // }
     }
 
     if (successUpdate) {

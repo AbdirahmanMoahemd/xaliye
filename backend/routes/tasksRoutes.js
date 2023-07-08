@@ -33,7 +33,7 @@ router
   .put(protect, updateTasks)
   .get(protect, getTaskById)
   .delete(protect, admin, deleteTaskById);
-router.route("/bin/:id").put(moveTaskstoBin);
+router.route("/bin/:id").put(protect, moveTaskstoBin);
 router.route("/restore/:id").put(protect, restoreTasks);
 router.route("/stage/:id").put(protect, updateTasksStage);
 router.route("/status/:id").put(protect, updateTasksStatus);
