@@ -21,7 +21,7 @@ import { admin, protect } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.route("/").get(protect, getTasks).post(protect, createTask);
+router.route("/").get(protect, getTasks).post(createTask);
 router.route("/range/tasks").post(protect, getTasksByRange);
 router.route("/recent/tasks").get(protect, getTasksByRecent);
 router.route("/this/week").get(protect, getTasksByThisWeek);
