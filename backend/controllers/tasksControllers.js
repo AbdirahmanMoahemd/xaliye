@@ -48,23 +48,19 @@ export const getTotalTasks = expressAsync(async (req, res) => {
       todayPerc = parseInt(
         ((yesterdayTaskTotal / todayTaskTotal) * 100).toFixed(0)
       );
-      yesterdayPerc =
-        parseInt(((yesterdayTaskTotal / todayTaskTotal) * 100).toFixed(0)) -
-        100;
+      yesterdayPerc =0
+      //   parseInt(((yesterdayTaskTotal / todayTaskTotal) * 100).toFixed(0)) -
+      //   100;
     } else if (todayTaskTotal < yesterdayTaskTotal) {
       yesterdayPerc = parseInt(
         ((todayTaskTotal / yesterdayTaskTotal) * 100).toFixed(0)
       );
-      todayPerc =
-        parseInt(((todayTaskTotal / yesterdayTaskTotal) * 100).toFixed(0)) -
-        100;
-    } else {
-      yesterdayPerc = parseInt(
-        ((todayTaskTotal / yesterdayTaskTotal) * 100).toFixed(0)
-      );
-      todayPerc = parseInt(
-        ((todayTaskTotal / yesterdayTaskTotal) * 100).toFixed(0)
-      );
+      todayPerc = 0
+        // parseInt(((todayTaskTotal / yesterdayTaskTotal) * 100).toFixed(0))
+    } 
+    else {
+      yesterdayPerc =50
+      todayPerc = 50
     }
   } else {
     todayPerc = todayTaskTotal == 0 ? 0 : 100;
@@ -126,6 +122,99 @@ export const getTasksByPhone = expressAsync(async (req, res) => {
   }
 });
 
+
+
+export const getOnProcessTasks = expressAsync(async (req, res) => {
+  try {
+    let pageSize = 200;
+    const page = Number(req.query.pageNumber) || 1;
+    const keyword = req.query.keyword
+      ? {
+          phone: req.query.keyword,
+        }
+      : {};
+    const count = await Tasks.countDocuments({ ...keyword });
+    const tasks = await Tasks.find({
+      ...keyword,
+      bin: false,
+      stage: 0
+    })
+      .sort({ date: -1 })
+      .populate("user")
+      .populate("customer")
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
+
+    res.json({ tasks, count });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+
+
+export const getFinishedTasks = expressAsync(async (req, res) => {
+  try {
+    let pageSize = 200;
+    const page = Number(req.query.pageNumber) || 1;
+    const keyword = req.query.keyword
+      ? {
+          phone: req.query.keyword,
+        }
+      : {};
+    const count = await Tasks.countDocuments({ ...keyword });
+    const tasks = await Tasks.find({
+      ...keyword,
+      bin: false,
+      stage: 1
+    })
+      .sort({ date: -1 })
+      .populate("user")
+      .populate("customer")
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
+
+    res.json({ tasks, count });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+
+
+
+export const getUnFinishedTasks = expressAsync(async (req, res) => {
+  try {
+    let pageSize = 200;
+    const page = Number(req.query.pageNumber) || 1;
+    const keyword = req.query.keyword
+      ? {
+          phone: req.query.keyword,
+        }
+      : {};
+    const count = await Tasks.countDocuments({ ...keyword });
+    const tasks = await Tasks.find({
+      ...keyword,
+      bin: false,
+      stage: 2
+    })
+      .sort({ date: -1 })
+      .populate("user")
+      .populate("customer")
+      .limit(pageSize)
+      .skip(pageSize * (page - 1));
+
+    res.json({ tasks, count });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+
+
+
+
+
 export const getTasksByRange = expressAsync(async (req, res) => {
   try {
     const { startDate, endDate } = req.body;
@@ -175,6 +264,86 @@ export const getTasksByRecent = expressAsync(async (req, res) => {
     const tasks = await Tasks.find({
       ...keyword,
       bin: false,
+      date: { $gte: start },
+    })
+      .sort({ createdAt: -1 })
+      .populate("user")
+      .populate("customer");
+
+    res.json({ tasks });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+
+export const getOnProcessTasksByRecent = expressAsync(async (req, res) => {
+  try {
+    const keyword = req.query.keyword
+      ? {
+          phone: req.query.keyword,
+        }
+      : {};
+
+    var start = new Date().toDateString();
+
+    const tasks = await Tasks.find({
+      ...keyword,
+      bin: false,
+      stage:0,
+      date: { $gte: start },
+    })
+      .sort({ createdAt: -1 })
+      .populate("user")
+      .populate("customer");
+
+    res.json({ tasks });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+export const getFinishedTasksByRecent = expressAsync(async (req, res) => {
+  try {
+    const keyword = req.query.keyword
+      ? {
+          phone: req.query.keyword,
+        }
+      : {};
+
+    var start = new Date().toDateString();
+
+    const tasks = await Tasks.find({
+      ...keyword,
+      bin: false,
+      stage:1,
+      date: { $gte: start },
+    })
+      .sort({ createdAt: -1 })
+      .populate("user")
+      .populate("customer");
+
+    res.json({ tasks });
+  } catch (error) {
+    res.json({ error: error.message });
+  }
+});
+
+
+export const getUnFinishedTasksByRecent = expressAsync(async (req, res) => {
+  try {
+    const keyword = req.query.keyword
+      ? {
+          phone: req.query.keyword,
+        }
+      : {};
+
+    var start = new Date().toDateString();
+
+    const tasks = await Tasks.find({
+      ...keyword,
+      bin: false,
+      stage:2,
       date: { $gte: start },
     })
       .sort({ createdAt: -1 })

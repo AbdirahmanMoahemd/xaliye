@@ -27,11 +27,15 @@ import {
   createExisTask,
   createNewTask,
   deleteTasks,
+  finishedTasksList,
   listTasks,
+  listTasksByRangeDate,
   listTasksByThisWeek,
   listTasksByphone,
   listTasksInBin,
   listTaskstDetails,
+  onprecessTasksList,
+  unfinishedTasksList,
   updateTasks,
   updateTasksStage,
   updateTasksStatus,
@@ -40,7 +44,6 @@ import {
 import { confirmAlert } from "react-confirm-alert";
 import { Message } from "primereact/message";
 import { ProgressSpinner } from "primereact/progressspinner";
-import { ScrollPanel } from "primereact/scrollpanel";
 import { Dialog } from "primereact/dialog";
 import { AutoComplete } from "primereact/autocomplete";
 import DatePicker from "react-datepicker";
@@ -48,6 +51,9 @@ import { listCustomers } from "@/actions/cusomerActions";
 import { RadioButton } from "primereact/radiobutton";
 import moment from "moment";
 import { Paginator } from "primereact/paginator";
+import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import { FaFilter } from "react-icons/fa";
+import { Button } from "primereact/button";
 
 export function TasksScreen() {
   const [name, setName] = useState("");
@@ -74,6 +80,9 @@ export function TasksScreen() {
   const [statusStage, setStatusStage] = useState("");
   const [first, setFirst] = useState(1);
   const [rows, setRows] = useState(200);
+  const [dateRange, setDateRange] = useState(false);
+  const [startDate, setStartDate] = useState(new Date());
+  const [endDate, setEndDate] = useState(new Date());
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -232,6 +241,30 @@ export function TasksScreen() {
     };
   }, [navigate]);
 
+  const items = [
+    {
+        label: 'Update',
+        icon: 'pi pi-refresh'
+    },
+    {
+        label: 'Delete',
+        icon: 'pi pi-times'
+    },
+    {
+        label: 'React Website',
+        icon: 'pi pi-external-link',
+        command: () => {
+            window.location.href = 'https://reactjs.org/'
+        }
+    },
+    {   label: 'Upload',
+        icon: 'pi pi-upload',
+        command: () => {
+            //router.push('/fileupload');
+        }
+    }
+];
+
   const onPageChange = (event) => {
     setFirst(event.first);
     setRows(event.rows);
@@ -315,6 +348,7 @@ export function TasksScreen() {
     dispatch(updateTasks(taskId, item, problem, date, amount, stage, comment));
     setTaskId("");
   };
+
  
 
   return (
@@ -338,6 +372,42 @@ export function TasksScreen() {
                 onChange={(e) => setKeyword(e.target.value)}
               />
             </div>
+            <div>
+            <Menu placement="left-start">
+              <MenuHandler>
+                <IconButton size="sm" variant="text" color="blue-gray" >
+                  <FaFilter title="Filter"/>
+                </IconButton>
+              </MenuHandler>
+              <MenuList>
+              <MenuItem
+                  onClick={()=> dispatch(onprecessTasksList(keyword, pageNumber))}
+                  className=" capitalize"
+                >
+                  On Process
+                </MenuItem>
+                <MenuItem
+                  onClick={()=> dispatch(finishedTasksList(keyword, pageNumber))}
+                  className=" capitalize"
+                >
+                  Finished
+                </MenuItem>
+                <MenuItem
+                  onClick={()=> dispatch(unfinishedTasksList(keyword, pageNumber))}
+                  className=" capitalize"
+                >
+                  UnFinished
+                </MenuItem>
+                {/* <MenuItem
+                  onClick={()=> {}}
+                  className=" capitalize"
+                >
+                  Delivered
+                </MenuItem> */}
+                
+              </MenuList>
+              
+              </Menu>
             <Menu placement="left-start">
               <MenuHandler>
                 <IconButton size="sm" variant="text" color="blue-gray">
@@ -361,7 +431,12 @@ export function TasksScreen() {
                 >
                   Tasks of this Week
                 </MenuItem>
-                <MenuItem>Tasks of this Month</MenuItem>
+                <MenuItem
+                  onClick={() => setDateRange(true)}
+                  className=" capitalize"
+                >
+                  Tasks By Date Range
+                </MenuItem>
                 <MenuItem
                   onClick={() => navigate("/dashboard/bin")}
                   className=" capitalize"
@@ -374,8 +449,20 @@ export function TasksScreen() {
                 >
                   All Tasks
                 </MenuItem>
+                <MenuItem
+                  className=" capitalize"
+                >
+                  <ReactHTMLTableToExcel
+                    id="test-table-xls-button"
+                    className="download-table-xls-button"
+                    table="table-to-xls"
+                    filename="tasks"
+                    sheet="tablexls"
+                    buttonText="Download as XLS"/>
+                </MenuItem>
               </MenuList>
             </Menu>
+            </div>
           </CardHeader>
 
           <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
@@ -388,7 +475,7 @@ export function TasksScreen() {
               />
             )}
             {errorDelete && <Message severity="error" text={errorDelete} />}
-            <table className="w-full min-w-[640px] table-auto">
+            <table id="table-to-xls" className="w-full min-w-[640px] table-auto">
               <thead className="sticky top-0 z-40 border-b bg-white">
                 <tr>
                   {[
@@ -687,6 +774,46 @@ export function TasksScreen() {
             </button>
           </div>
         </>
+      </Dialog>
+    
+
+
+    {/* date rage  */}
+    <Dialog
+        blockScroll="false"
+        aria-expanded={dateRange ? true : false}
+        header="Select Date"
+        visible={dateRange}
+        onHide={() => {
+          setDateRange(false);
+          setStartDate(new Date());
+          setEndDate(new Date());
+        }}
+        style={{ width: "40vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <p>Start Date</p>
+        <div className=" rounded border border-gray-400 py-2 px-2">
+          <DatePicker
+            selected={startDate}
+            onChange={(dt) => setStartDate(dt)}
+          />
+        </div>
+        <br />
+        <p>End Date</p>
+        <div className=" rounded border border-gray-400 py-2 px-2">
+          <DatePicker selected={endDate} onChange={(dt) => setEndDate(dt)} />
+        </div>
+        <br />
+        <div className="flex justify-center">
+          <Button
+            onClick={() =>
+              dispatch(listTasksByRangeDate("", startDate, endDate))
+            }
+          >
+            Search
+          </Button>
+        </div>
       </Dialog>
 
       <Dialog

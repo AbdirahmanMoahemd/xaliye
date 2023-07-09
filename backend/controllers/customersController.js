@@ -95,23 +95,20 @@ export const getTotalCustomersAndSales = expressAsync(async (req, res) => {
         todayPerc = parseInt(
           ((yesterdaySalesTotal / todaySalesTotal) * 100).toFixed(0)
         );
-        yesterdayPerc =
-          parseInt(((yesterdaySalesTotal / todaySalesTotal) * 100).toFixed(0)) -
-          100;
+        yesterdayPerc = 0
+          // parseInt(((yesterdaySalesTotal / todaySalesTotal) * 100).toFixed(0)) -
+          // 100;
       } else if (todaySalesTotal < yesterdaySalesTotal) {
         yesterdayPerc = parseInt(
           ((todaySalesTotal / yesterdaySalesTotal) * 100).toFixed(0)
         );
-        todayPerc =
-          parseInt(((todaySalesTotal / yesterdaySalesTotal) * 100).toFixed(0)) -
-          100;
+        todayPerc =0
+          // parseInt(((todaySalesTotal / yesterdaySalesTotal) * 100).toFixed(0)) -
+          // 100;
       } else {
-        yesterdayPerc = parseInt(
-          ((todaySalesTotal / yesterdaySalesTotal) * 100).toFixed(0)
-        );
-        todayPerc = parseInt(
-          ((todaySalesTotal / yesterdaySalesTotal) * 100).toFixed(0)
-        );
+        yesterdayPerc = 50
+       
+        todayPerc = 50
       }
     } else {
       todayPerc = todaySalesTotal == 0 ? 0 :100
@@ -131,23 +128,19 @@ export const getTotalCustomersAndSales = expressAsync(async (req, res) => {
         todayCusPerc = parseInt(
           ((yesterdayCustomersTotal / todayCustomersTotal) * 100).toFixed(0)
         );
-        yesterdayCusPerc =
-          parseInt(((yesterdayCustomersTotal / todayCustomersTotal) * 100).toFixed(0)) -
-          100;
+        yesterdayCusPerc = 0
+          // parseInt(((yesterdayCustomersTotal / todayCustomersTotal) * 100).toFixed(0)) -
+          // 100;
       } else if (todayCustomersTotal < yesterdayCustomersTotal) {
         yesterdayCusPerc = parseInt(
           ((todayCustomersTotal / yesterdayCustomersTotal) * 100).toFixed(0)
         );
-        todayCusPerc =
-          parseInt(((todayCustomersTotal / yesterdayCustomersTotal) * 100).toFixed(0)) -
-          100;
+        todayCusPerc = 0
+          // parseInt(((todayCustomersTotal / yesterdayCustomersTotal) * 100).toFixed(0)) -
+          // 100;
       } else {
-        yesterdayCusPerc = parseInt(
-          ((todayCustomersTotal / yesterdayCustomersTotal) * 100).toFixed(0)
-        );
-        todayCusPerc = parseInt(
-          ((todayCustomersTotal / yesterdayCustomersTotal) * 100).toFixed(0)
-        );
+        yesterdayCusPerc = 50
+        todayCusPerc = 50
       }
     } else {
       todayCusPerc = todayCustomersTotal == 0 ? 0 :100

@@ -3,6 +3,10 @@ import {
   createTask,
   createTaskExsting,
   deleteTaskById,
+  getFinishedTasks,
+  getFinishedTasksByRecent,
+  getOnProcessTasks,
+  getOnProcessTasksByRecent,
   getTaskById,
   getTasks,
   getTasksByPhone,
@@ -11,6 +15,8 @@ import {
   getTasksByThisWeek,
   getTasksInBin,
   getTotalTasks,
+  getUnFinishedTasks,
+  getUnFinishedTasksByRecent,
   moveTaskstoBin,
   restoreTasks,
   updateTasks,
@@ -28,6 +34,13 @@ router.route("/this/week").get(protect, getTasksByThisWeek);
 router.route("/total/taskts").get(getTotalTasks);
 router.route("/taskslist/byphone").get(getTasksByPhone);
 router.route("/existing").post(protect, createTaskExsting);
+router.route('/onprecess/list').get(protect, getOnProcessTasks)
+router.route('/finished/list').get(protect, getFinishedTasks)
+router.route('/unfinished/list').get(protect, getUnFinishedTasks)
+
+router.route('/onprecess/recentlist').get(protect, getOnProcessTasksByRecent)
+router.route('/finished/recentlist').get(protect, getFinishedTasksByRecent)
+router.route('/unfinished/recentlist').get(protect, getUnFinishedTasksByRecent)
 router
   .route("/:id")
   .put(protect, updateTasks)

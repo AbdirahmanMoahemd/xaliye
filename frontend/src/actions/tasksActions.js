@@ -190,6 +190,200 @@ export const listTasksByphone = (keyword = "", pageNumber = '') => async (dispat
   }
 };
 
+
+
+export const onprecessTasksList = (keyword = "", pageNumber = '') => async (dispatch, getState) => {
+  try {
+    dispatch({ type: GET_TASKS_REQUEST });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.get(`/api/tasks/onprecess/list?keyword=${keyword}&pageNumber=${pageNumber}`, config);
+
+    dispatch({
+      type: GET_TASKS_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GET_TASKS_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+export const finishedTasksList = (keyword = "", pageNumber = '') => async (dispatch, getState) => {
+  try {
+    dispatch({ type: GET_TASKS_REQUEST });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.get(`/api/tasks/finished/list?keyword=${keyword}&pageNumber=${pageNumber}`, config);
+
+    dispatch({
+      type: GET_TASKS_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GET_TASKS_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+
+export const unfinishedTasksList = (keyword = "", pageNumber = '') => async (dispatch, getState) => {
+  try {
+    dispatch({ type: GET_TASKS_REQUEST });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.get(`/api/tasks/unfinished/list?keyword=${keyword}&pageNumber=${pageNumber}`, config);
+
+    dispatch({
+      type: GET_TASKS_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GET_TASKS_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+
+
+
+
+export const onprecessTasksRecentList = (keyword = "", pageNumber = '') => async (dispatch, getState) => {
+  try {
+    dispatch({ type: GET_TASKS_REQUEST });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.get(`/api/tasks/onprecess/recentlist?keyword=${keyword}&pageNumber=${pageNumber}`, config);
+
+    dispatch({
+      type: GET_TASKS_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GET_TASKS_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+export const finishedTasksRecentList = (keyword = "", pageNumber = '') => async (dispatch, getState) => {
+  try {
+    dispatch({ type: GET_TASKS_REQUEST });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.get(`/api/tasks/finished/recentlist?keyword=${keyword}&pageNumber=${pageNumber}`, config);
+
+    dispatch({
+      type: GET_TASKS_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GET_TASKS_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
+
+export const unfinishedTasksRecentList = (keyword = "", pageNumber = '') => async (dispatch, getState) => {
+  try {
+    dispatch({ type: GET_TASKS_REQUEST });
+
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+
+    const { data } = await axios.get(`/api/tasks/unfinished/recentlist?keyword=${keyword}&pageNumber=${pageNumber}`, config);
+
+    dispatch({
+      type: GET_TASKS_SUCCESS,
+      payload: data,
+    });
+  } catch (error) {
+    dispatch({
+      type: GET_TASKS_FAIL,
+      payload:
+        error.response && error.response.data.message
+          ? error.response.data.message
+          : error.message,
+    });
+  }
+};
+
 export const listTasksByRangeDate = (keyword = "", startDate, endDate) => async (dispatch, getState) => {
   try {
     dispatch({ type: GET_TASKS_REQUEST });

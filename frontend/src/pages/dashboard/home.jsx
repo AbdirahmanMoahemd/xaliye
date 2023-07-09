@@ -28,12 +28,15 @@ import {
   createExisTask,
   createNewTask,
   deleteTasks,
+  finishedTasksRecentList,
   getTasksTotal,
   listTasksByRangeDate,
   listTasksByRecent,
   listTasksByThisWeek,
   listTasksInBin,
   listTaskstDetails,
+  onprecessTasksRecentList,
+  unfinishedTasksRecentList,
   updateTasks,
   updateTasksStage,
   updateTasksStatus,
@@ -65,6 +68,9 @@ import { listStoreItems } from "@/actions/storeActions";
 import { SALES_CREATE_RESET } from "@/constants/salesConstants";
 import ReactToPrint from "react-to-print";
 import { Button } from "primereact/button";
+import ReactHTMLTableToExcel from "react-html-table-to-excel";
+import { Paginator } from "primereact/paginator";
+import { FaFilter } from "react-icons/fa";
 
 export function Home() {
   const [name, setName] = useState("");
@@ -105,6 +111,10 @@ export function Home() {
   const [status, setStatus] = useState("");
   const [statusStage, setStatusStage] = useState("");
   const [toltalAmount, setToltalAmount] = useState("");
+  const [pageNumber, setPageNumber] = useState(1);
+
+  const [first, setFirst] = useState(1);
+  const [rows, setRows] = useState(200);
 
   let componentRef = useRef();
   let componentRef2 = useRef();
@@ -114,7 +124,7 @@ export function Home() {
   const dispatch = useDispatch();
 
   const tasksList = useSelector((state) => state.tasksList);
-  const { loading, error, tasks } = tasksList;
+  const { loading, error, tasks, count } = tasksList;
 
   const tasksUpdate = useSelector((state) => state.tasksUpdate);
   const {
@@ -210,20 +220,20 @@ export function Home() {
       setIsPrinting(true);
       // console.log(true);
       // if (isPrinting) {
-        dispatch({ type: TASK_CREATE_RESET });
-        setCreate(false);
-        setEdit(false);
-        setKeyword2("");
-        setKeyword("");
-        setName("");
-        setPhone("");
-        setAmount("");
-        setItem("");
-        setProblem("");
-        setComment("");
-        setCustomer("");
-        setDate(new Date());
-        // setNameToPrint("");
+      dispatch({ type: TASK_CREATE_RESET });
+      setCreate(false);
+      setEdit(false);
+      setKeyword2("");
+      setKeyword("");
+      setName("");
+      setPhone("");
+      setAmount("");
+      setItem("");
+      setProblem("");
+      setComment("");
+      setCustomer("");
+      setDate(new Date());
+      // setNameToPrint("");
       // }
     }
 
@@ -249,12 +259,13 @@ export function Home() {
       dispatch({ type: UPDATE_TASKS_STAGE_RESET });
     }
 
-    dispatch(listTasksByRecent(keyword));
+    dispatch(listTasksByRecent(keyword, pageNumber));
     dispatch(listTasksInBin());
   }, [
     dispatch,
     navigate,
     keyword,
+    pageNumber,
     successUpdate,
     userInfo,
     successDelete,
@@ -332,7 +343,7 @@ export function Home() {
           label: "Yes",
           onClick: () => {
             console.log(id);
-            dispatch(updateTasksToBin(id))
+            dispatch(updateTasksToBin(id));
           },
         },
       ],
@@ -401,6 +412,12 @@ export function Home() {
     setTaskId("");
   };
 
+  const onPageChange = (event) => {
+    setFirst(event.first);
+    setRows(event.rows);
+    setPageNumber(event.page + 1);
+  };
+
   const submitSaleHandler = (e) => {
     e.preventDefault();
 
@@ -433,6 +450,8 @@ export function Home() {
     setShowTotal(true);
   };
 
+  console.log(counter);
+
   return (
     <div className="mt-12">
       <div className="mb-12 grid gap-y-10 gap-x-6 md:grid-cols-2 xl:grid-cols-4">
@@ -461,16 +480,16 @@ export function Home() {
                   ? "0"
                   : counter.todayPerc > counter.yesterdayPerc
                   ? "+"
-                  : counter.todayPerc > counter.yesterdayPerc
+                  : counter.todayPerc < counter.yesterdayPerc
                   ? "-"
                   : ""}
                 {counter == null
                   ? "0"
-                  : counter.todayPerc == null
-                  ? 0
-                  : counter.todayPerc < 49.9
-                  ? 100 - counter.todayPerc
-                  : counter.todayPerc}
+                  : counter.todayPerc > counter.yesterdayPerc
+                  ? counter.todayPerc
+                  : counter.todayPerc < counter.yesterdayPerc
+                  ? counter.yesterdayPerc
+                  : 0}
                 %
               </strong>
               &nbsp;
@@ -506,14 +525,16 @@ export function Home() {
                   ? "0"
                   : counterCustomer.todayPerc > counterCustomer.yesterdayPerc
                   ? "+"
-                  : counterCustomer.todayPerc > counterCustomer.yesterdayPerc
+                  : counterCustomer.todayPerc < counterCustomer.yesterdayPerc
                   ? "-"
                   : ""}
                 {counterCustomer == null
                   ? "0"
-                  : counterCustomer.todayPerc == null
-                  ? 0
-                  : counterCustomer.todayPerc}
+                  : counterCustomer.todayPerc > counterCustomer.yesterdayPerc
+                  ? counterCustomer.todayPerc
+                  : counterCustomer.todayPerc < counterCustomer.yesterdayPerc
+                  ? counterCustomer.yesterdayPerc
+                  : 0}
                 %
               </strong>
               &nbsp;
@@ -553,15 +574,19 @@ export function Home() {
                   : counterCustomer.todayCusPerc >
                     counterCustomer.yesterdayCusPerc
                   ? "+"
-                  : counterCustomer.todayCusPerc >
+                  : counterCustomer.todayCusPerc <
                     counterCustomer.yesterdayCusPerc
                   ? "-"
                   : ""}
                 {counterCustomer == null
                   ? "0"
-                  : counterCustomer.todayCusPerc == null
-                  ? 0
-                  : counterCustomer.todayCusPerc}
+                  : counterCustomer.todayCusPerc >
+                    counterCustomer.yesterdayCusPerc
+                  ? counterCustomer.todayCusPerc
+                  : counterCustomer.todayCusPerc <
+                    counterCustomer.yesterdayCusPerc
+                  ? counterCustomer.yesterdayCusPerc
+                  : 0}
                 %
               </strong>
               &nbsp;
@@ -591,11 +616,7 @@ export function Home() {
           }
         />
       </div>
-      <div>
-        <div>
-          <div></div>
-        </div>
-      </div>
+      <div></div>
 
       <div className="mb-4 grid grid-cols-1 gap-2 xl:grid-cols-12">
         <Card className="overflow-hidden xl:col-span-9">
@@ -616,48 +637,102 @@ export function Home() {
                 onChange={(e) => setKeyword(e.target.value)}
               />
             </div>
-            <Menu placement="left-start">
-              <MenuHandler>
-                <IconButton size="sm" variant="text" color="blue-gray">
-                  <EllipsisVerticalIcon
-                    strokeWidth={3}
-                    fill="currenColor"
-                    className="h-6 w-6"
-                  />
-                </IconButton>
-              </MenuHandler>
-              <MenuList>
-                <MenuItem
-                  onClick={() => setCreate(true)}
+            <div>
+              <Menu placement="left-start">
+                <MenuHandler>
+                  <IconButton size="sm" variant="text" color="blue-gray">
+                    <FaFilter title="Filter" />
+                  </IconButton>
+                </MenuHandler>
+                <MenuList>
+                  <MenuItem
+                    onClick={() =>
+                      dispatch(onprecessTasksRecentList(keyword, pageNumber))
+                    }
+                    className=" capitalize"
+                  >
+                    On Process
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() =>
+                      dispatch(finishedTasksRecentList(keyword, pageNumber))
+                    }
+                    className=" capitalize"
+                  >
+                    Finished
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() =>
+                      dispatch(unfinishedTasksRecentList(keyword, pageNumber))
+                    }
+                    className=" capitalize"
+                  >
+                    UnFinished
+                  </MenuItem>
+                  {/* <MenuItem
+                  onClick={()=> {}}
                   className=" capitalize"
                 >
-                  Add New Ticket
-                </MenuItem>
-                <MenuItem
-                  onClick={() => dispatch(listTasksByThisWeek(keyword))}
-                  className=" capitalize"
-                >
-                  Tasks of this Week
-                </MenuItem>
-                <MenuItem
-                  onClick={() => setDateRange(true)}
-                  className=" capitalize"
-                >
-                  Tasks By Date Range
-                </MenuItem>
-                <MenuItem
-                  onClick={() => dispatch(listTasksByRecent(keyword))}
-                  className=" capitalize"
-                >
-                  Recent Tasks
-                </MenuItem>
-                <MenuItem onClick={getTotal}>Get Total Amount</MenuItem>
-              </MenuList>
-            </Menu>
+                  Delivered
+                </MenuItem> */}
+                </MenuList>
+              </Menu>
+              <Menu placement="left-start">
+                <MenuHandler>
+                  <IconButton size="sm" variant="text" color="blue-gray">
+                    <EllipsisVerticalIcon
+                      strokeWidth={3}
+                      fill="currenColor"
+                      className="h-6 w-6"
+                    />
+                  </IconButton>
+                </MenuHandler>
+                <MenuList>
+                  <MenuItem
+                    onClick={() => setCreate(true)}
+                    className=" capitalize"
+                  >
+                    Add New Ticket
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => dispatch(listTasksByThisWeek(keyword))}
+                    className=" capitalize"
+                  >
+                    Tasks of this Week
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => setDateRange(true)}
+                    className=" capitalize"
+                  >
+                    Tasks By Date Range
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => dispatch(listTasksByRecent(keyword))}
+                    className=" capitalize"
+                  >
+                    Recent Tasks
+                  </MenuItem>
+                  <MenuItem className=" capitalize">
+                    <ReactHTMLTableToExcel
+                      id="test-table-xls-button"
+                      className="download-table-xls-button"
+                      table="table-to-xls"
+                      filename="tasks"
+                      sheet="tablexls"
+                      buttonText="Download as XLS"
+                    />
+                  </MenuItem>
+                  <MenuItem onClick={getTotal}>Get Total Amount</MenuItem>
+                </MenuList>
+              </Menu>
+            </div>
           </CardHeader>
 
           <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
-            <table className="w-full min-w-[640px] table-auto">
+            <table
+              id="table-to-xls"
+              className="w-full min-w-[640px] table-auto"
+            >
               <thead className="sticky top-0 z-40 border-b bg-white">
                 <tr>
                   {[
@@ -881,6 +956,12 @@ export function Home() {
                 </tbody>
               )}
             </table>
+            <Paginator
+              first={first}
+              rows={rows}
+              totalRecords={count}
+              onPageChange={onPageChange}
+            />
           </CardBody>
         </Card>
         <Card className="xl:col-span-3">
