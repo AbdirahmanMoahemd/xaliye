@@ -17,7 +17,7 @@ export const getSalesItems = expressAsync(async (req, res) => {
   const salesCount = await Sales.countDocuments({ ...keyword });
   const sales = await Sales.find({ ...keyword })
     .sort({ createdAt: -1 })
-    .populate("item")
+    .populate("orderItems.item")
     .limit(pageSize)
     .skip(pageSize * (page - 1));
 
@@ -28,7 +28,7 @@ export const getRecentSales = expressAsync(async (req, res) => {
   var start = new Date().toDateString();
   const sales = await Sales.find({ date: { $gte: start } })
     .sort({ createdAt: -1 })
-    .populate("item");
+    .populate("orderItems.item");
 
   res.json({ sales });
 });
@@ -36,7 +36,7 @@ export const getRecentSales = expressAsync(async (req, res) => {
 export const getUnPaidSalesItems = expressAsync(async (req, res) => {
   const sales = await Sales.find({ isPaid: false })
     .sort({ createdAt: -1 })
-    .populate("item");
+    .populate("orderItems.item");
 
   res.json({ sales });
 });
@@ -44,7 +44,7 @@ export const getUnPaidSalesItems = expressAsync(async (req, res) => {
 export const getPaidSalesItems = expressAsync(async (req, res) => {
   const sales = await Sales.find({ isPaid: true })
     .sort({ createdAt: -1 })
-    .populate("item");
+    .populate("orderItems.item");
 
   res.json({ sales });
 });
@@ -60,7 +60,7 @@ export const getSalesIByDateRange = expressAsync(async (req, res) => {
   end.toDateString();
   const sales = await Sales.find({ date: { $lte: end, $gte: start } })
     .sort({ createdAt: -1 })
-    .populate("item");
+    .populate("orderItems.item");
 
   res.json({ sales });
 });
@@ -77,33 +77,28 @@ export const getSalesById = expressAsync(async (req, res) => {
 });
 
 export const createSalesItem = expressAsync(async (req, res) => {
-  const { item, customer, phone, quantity, price, date, invoiceId, isPaid } =
+  const {  orderItems, customer, phone, date,totalPrice, invoiceId, isPaid } =
     req.body;
 
-  const store = await Store.findById(item);
-  if (store) {
+  
+  
     const sale = new Sales({
-      item,
-      itemName: item.name,
+      orderItems,
       customer,
       phone,
-      quantity,
-      price,
       date,
+      totalPrice,
       invoiceId,
       isPaid,
     });
     const createdSales = await sale.save();
 
     if (createdSales) {
-      store.countInStock = store.countInStock - quantity;
-      const updatedStoreItem = await store.save();
+      // store.countInStock = store.countInStock - quantity;
+      // const updatedStoreItem = await store.save();
     }
     res.status(201).json(createdSales);
-  } else {
-    res.status(404);
-    throw new Error("Item Not Found");
-  }
+  
 });
 
 export const updateSalesItem = expressAsync(async (req, res) => {

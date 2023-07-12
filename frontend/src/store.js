@@ -22,7 +22,7 @@ import { createStoreItemReducer, storeItemDeleteReducer, storeItemDetailsReducer
 import { createIncomeItemReducer, incomeItemDeleteReducer, incomeItemDetailsReducer, incomeItemListReducer, incomeItemUpdateReducer, totalTasksIncomeReducerCount } from "./reducers/incomeReducers";
 import { blanceReducerCount, createExpenseItemReducer, expenseItemDeleteReducer, expenseItemDetailsReducer, expenseItemListReducer, expenseItemUpdateReducer } from "./reducers/expenseReducers";
 import { createCustomerReducer, customerDeleteReducer, customerDetailsReducer, customerUpdateReducer, customersListReducer, myTasksListReducer, totalCustomerReducerCount } from "./reducers/customerReducer";
-import { createSalesReducer, salesDeleteReducer, salesDetailsReducer, salesListReducer, salesRecentListReducer, salesUpdateBillingReducer, salesUpdateReducer } from "./reducers/salesReducers";
+import { createSalesReducer, orderReducer, salesDeleteReducer, salesDetailsReducer, salesListReducer, salesRecentListReducer, salesUpdateBillingReducer, salesUpdateReducer } from "./reducers/salesReducers";
 import { accountDeleteReducer, accountDetailsReducer, accountUpdateReducer, accountsListReducer, createAccountReducer } from "./reducers/accountReducers";
 import { createSubAccountReducer, subAccountDeleteReducer, subAccountDetailsReducer, subAccountUpdateReducer, subAccountsListReducer } from "./reducers/subaccountReducers";
 import { createTransactionReducer, transactionDeleteReducer, transactionDetailsReducer, transactionUpdateReducer, transactionsListReducer } from "./reducers/transactionReducers";
@@ -97,6 +97,7 @@ const reducer = combineReducers({
   salesDelete:salesDeleteReducer,
   salesUpdateBilling:salesUpdateBillingReducer,
   salesRecentList:salesRecentListReducer,
+  order:orderReducer,
 
 
 

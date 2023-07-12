@@ -2,27 +2,35 @@ import mongoose from "mongoose";
 
 const salesSchema = mongoose.Schema(
   {
-    item: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "store",
-    },
-    itemName: {
-      type: String,
-      required: true,
-    },
+    orderItems: [
+      {
+        item: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "store",
+        },
+        itemName: {
+          type: String,
+        },
+        price: {
+          type: Number,
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+        },
+      }
+    ],
     customer: {
       type: String,
       required: true,
     },
+    totalPrice: {
+      type: Number,
+      required: true,
+      default:0.0
+  },
     phone: {
-      type: Number,
-      required: true,
-    },
-    quantity: {
-      type: Number,
-      required: true,
-    },
-    price: {
       type: Number,
       required: true,
     },

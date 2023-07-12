@@ -15,6 +15,7 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { listStoreItems } from "@/actions/storeActions";
 import {
+  addToOrderItems,
   createNewSales,
   deleteSalesItem,
   listPaidSalesItems,
@@ -24,6 +25,7 @@ import {
   updateSalesBillingItem,
 } from "@/actions/salesActions";
 import {
+  ORDER_REMOVE_ITEM_ALL,
   SALES_CREATE_RESET,
   SALES_UPDATE_BILLING_RESET,
 } from "@/constants/salesConstants";
@@ -38,8 +40,7 @@ import { confirmAlert } from "react-confirm-alert";
 import DatePicker from "react-datepicker";
 import { Button } from "primereact/button";
 import { Paginator } from "primereact/paginator";
-
-
+import { RemoveCartFun } from "@/actions/userActions";
 
 export function SalesScreen() {
   const [keyword, setKeyword] = useState("");
@@ -49,7 +50,7 @@ export function SalesScreen() {
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
   const [date, setDate] = useState(new Date());
-  const [isPaid, setIsPaid] = useState(false);
+  const [isPaid, setIsPaid] = useState(true);
   const [isPaidBilling, setIsPaidBilling] = useState(false);
   const [create, setCreate] = useState(false);
   const [edit, setEdit] = useState(false);
@@ -60,6 +61,10 @@ export function SalesScreen() {
   const [first, setFirst] = useState(1);
   const [rows, setRows] = useState(200);
   const [pageNumber, setPageNumber] = useState(1);
+  const [myOrderItems, setMyOrderItems] = useState([]);
+  const [show, setShow] = useState(false);
+  const [custname, setCustname] = useState("");
+  
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -68,7 +73,12 @@ export function SalesScreen() {
   const { userInfo } = userLogin;
 
   const salesList = useSelector((state) => state.salesList);
-  const { loading: loadingSales, error: errorSales, sales, salesCount } = salesList;
+  const {
+    loading: loadingSales,
+    error: errorSales,
+    sales,
+    salesCount,
+  } = salesList;
 
   const storeItemList = useSelector((state) => state.storeItemList);
   const { loading, error, items } = storeItemList;
@@ -101,7 +111,11 @@ export function SalesScreen() {
     customers,
   } = customersList;
 
+  const order = useSelector(state => state.order)
+    const { orderItems } = order
+
   useEffect(() => {
+    
     if (successUpdate) {
       dispatch({ type: SALES_UPDATE_BILLING_RESET });
       setEdit(false);
@@ -117,7 +131,14 @@ export function SalesScreen() {
     } else {
       dispatch(listSalesItems(keyword, pageNumber));
     }
-  }, [dispatch, successCreate, successUpdate, keyword,pageNumber, successDelete]);
+  }, [
+    dispatch,
+    successCreate,
+    successUpdate,
+    keyword,
+    pageNumber,
+    successDelete,
+  ]);
 
   useEffect(() => {
     dispatch(listStoreItems());
@@ -147,22 +168,27 @@ export function SalesScreen() {
     dispatch(listCustomers());
   }, [dispatch]);
   let invoiceId = Math.floor(10000 + Math.random() * 9000);
+  let totalPrice = orderItems.reduce((acc, item) => acc + item.quantity * item.price, 0);
+
+  const itemqty = orderItems.reduce((acc, item) => acc + item.quantity, 0)
 
   const submitHandler = (e) => {
     e.preventDefault();
-
-    dispatch(
-      createNewSales(
-        item,
-        customer,
-        phone,
-        quantity,
-        price,
-        date,
-        invoiceId,
-        isPaid
-      )
-    );
+    console.log(orderItems);
+    if (orderItems != null) {
+      dispatch(
+        createNewSales(
+          orderItems,
+          customer,
+          phone,
+          date,
+          totalPrice,
+          invoiceId,
+          isPaid
+        )
+      );
+    }
+    
   };
 
   const updateHandler = (e) => {
@@ -173,12 +199,10 @@ export function SalesScreen() {
     }
   };
 
- 
-
   const onPageChange = (event) => {
     setFirst(event.first);
     setRows(event.rows);
-    setPageNumber(event.page +1)
+    setPageNumber(event.page + 1);
   };
 
   const deleteSalesItems = (id) => {
@@ -196,6 +220,9 @@ export function SalesScreen() {
       ],
     });
   };
+
+
+  
 
   return (
     <>
@@ -277,11 +304,10 @@ export function SalesScreen() {
               <thead className="sticky top-0 z-40 border-b bg-white">
                 <tr>
                   {[
-                    "Item Name",
                     "Customer",
                     "Phone",
-                    "Quantity",
-                    "Price",
+                    "Order Items",
+                    "Total Price",
                     "Date",
                     "Billing Status",
                   ].map((el) => (
@@ -318,14 +344,6 @@ export function SalesScreen() {
                             variant="small"
                             className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
-                            {item.item ? item.item.name : item.itemName}
-                          </Typography>
-                        </td>
-                        <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
-                          <Typography
-                            variant="small"
-                            className="text-[11px] font-medium capitalize text-blue-gray-400"
-                          >
                             {item.customer}
                           </Typography>
                         </td>
@@ -342,7 +360,16 @@ export function SalesScreen() {
                             variant="small"
                             className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
-                            ${item.quantity}
+                            <Button
+                            className="z-10 h-8"
+                            label="Show"
+                            icon=""
+                            onClick={() => {
+                              setMyOrderItems(item.orderItems)
+                              setCustname(item.customer)
+                              setShow(true);
+
+                            }}/>
                           </Typography>
                         </td>
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
@@ -350,7 +377,7 @@ export function SalesScreen() {
                             variant="small"
                             className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
-                            ${item.price}
+                            ${item.totalPrice}
                           </Typography>
                         </td>
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
@@ -466,7 +493,7 @@ export function SalesScreen() {
         </div>
       </Dialog>
 
-      {/* Create Inventory */}
+      {/* Create Sale */}
       <Dialog
         blockScroll="false"
         aria-expanded={create ? true : false}
@@ -482,11 +509,13 @@ export function SalesScreen() {
           setPrice("");
           setIsPaid(false);
           setDate(new Date());
+          dispatch({ type: ORDER_REMOVE_ITEM_ALL });
+          
         }}
         style={{ width: "40vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
       >
-        <form onSubmit={submitHandler}>
+        {/* <form onSubmit={submitHandler}> */}
           {loadingCreate && (
             <ProgressSpinner
               style={{ width: "20px", height: "20px" }}
@@ -497,55 +526,170 @@ export function SalesScreen() {
           )}
           {errorCreate && <Message severity="error" text={errorCreate} />}
           <div className="mx-auto space-y-4 p-4">
-            <AutoComplete
-              placeholder="item name"
-              inputClassName="w-full"
-              className=" w-full"
-              field="name"
-              value={item}
-              suggestions={items}
-              completeMethod={() => dispatch(listStoreItems())}
-              onChange={(e) => setItem(e.value)}
-              required
-            />
-
-            <Input
-              type="text"
-              value={customer}
-              label="Customer Name"
-              size="lg"
-              required
-              onChange={(e) => setCustomer(e.target.value)}
-            />
-            <Input
-              type="number"
-              value={phone}
-              label="Phone Number"
-              size="lg"
-              required
-              onChange={(e) => setPhone(e.target.value)}
-            />
-
-            <Input
-              type="number"
-              value={quantity}
-              label="Quantity"
-              size="lg"
-              required
-              onChange={(e) => setQuantity(e.target.value)}
-            />
-
-            <Input
-              type="number"
-              value={price}
-              label="Price"
-              size="lg"
-              required
-              onChange={(e) => setPrice(e.target.value)}
-            />
+            
+              <Input
+                type="text"
+                value={customer}
+                label="Customer Name"
+                inputClassName="w-full"
+                className="w-full"
+                size="lg"
+                required
+                onChange={(e) => setCustomer(e.target.value)}
+              />
+              <div className="w-full gap-2 space-y-4 xl:flex xl:space-y-0 ">
+              <Input
+                type="number"
+                value={phone}
+                inputClassName="w-full"
+                className="w-full"
+                label="Phone Number"
+                size="lg"
+                required
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            
             <div className=" rounded border border-gray-400 py-2 px-2">
               <DatePicker selected={date} onChange={(dt) => setDate(dt)} />
             </div>
+            </div>
+
+            <div className="w-full gap-2 space-y-4 xl:flex  xl:space-y-0">
+              <AutoComplete
+                placeholder="item name"
+                inputClassName="w-full xl:h-11"
+                className="w-full"
+                field="name"
+                size="lg"
+                value={item}
+                suggestions={items}
+                completeMethod={() => dispatch(listStoreItems())}
+                onChange={(e) => setItem(e.value)}
+                required
+              />
+
+              <Input
+                type="number"
+                inputClassName="w-full"
+                value={quantity}
+                label="Quantity"
+                size="lg"
+                required
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+              <Input
+                type="number"
+                value={price}
+                label="Price"
+                size="lg"
+                required
+                onChange={(e) => setPrice(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-between">
+              <div></div>
+              <Button label="Add" onClick={()=>{
+                dispatch(addToOrderItems(item._id, quantity, price))
+                setQuantity("")
+                setPrice("")
+                
+                
+              }}/>
+            </div>
+
+            <table className="w-full space-y-4  xl:space-y-0">
+              <thead className="sticky top-0 z-40 border-b bg-white">
+                <tr>
+                  <th className="w-12 border border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium uppercase text-blue-gray-600"
+                    >
+                      No
+                    </Typography>
+                  </th>
+                  <th className="border border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium uppercase text-blue-gray-600"
+                    >
+                      Item
+                    </Typography>
+                  </th>
+                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium uppercase text-blue-gray-600"
+                    >
+                      Price
+                    </Typography>
+                  </th>
+                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium uppercase text-blue-gray-600"
+                    >
+                      Qty
+                    </Typography>
+                  </th>
+                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium uppercase text-blue-gray-600"
+                    >
+                      Total
+                    </Typography>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+              {orderItems.map((odr, index) => (
+                <tr>
+                  <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium capitalize text-blue-gray-400"
+                    >
+                      {index}
+                    </Typography>
+                  </td>
+                  <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium capitalize text-blue-gray-400"
+                    >
+                      {odr.itemName}
+                    </Typography>
+                  </td>
+                  <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium capitalize text-blue-gray-400"
+                    >
+                      ${odr.price}
+                    </Typography>
+                  </td>
+                  <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium capitalize text-blue-gray-400"
+                    >
+                      {odr.quantity}
+                    </Typography>
+                  </td>
+                  <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium capitalize text-blue-gray-400"
+                    >
+                      ${odr.price * odr.quantity}
+                    </Typography>
+                  </td>
+                </tr>
+              ))}
+              </tbody>
+            </table>
+            <p className="text-left uppercase">Sub Total: ${totalPrice}</p>
 
             <div>
               IsPaid
@@ -559,13 +703,14 @@ export function SalesScreen() {
             <div className="mt-4 flex justify-center">
               <button
                 type="submit"
+                onClick={submitHandler}
                 className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium uppercase text-white transition hover:bg-transparent hover:text-primary"
               >
                 Save
               </button>
             </div>
           </div>
-        </form>
+        {/* </form> */}
       </Dialog>
 
       {/* Edit Inventory */}
@@ -617,6 +762,90 @@ export function SalesScreen() {
           </div>
         </form>
       </Dialog>
+
+
+
+      <Dialog
+        blockScroll="false"
+        aria-expanded={show ? true : false}
+        header={`Order Items For ${custname}`}
+        visible={show}
+        onHide={() => {
+          setShow(false);
+        
+        }}
+        style={{ width: "60vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <Card>
+        <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
+          
+            <table className="w-full min-w-[640px] table-auto">
+              <thead className="sticky top-0 z-40 border-b bg-white">
+                <tr>
+                  {[
+                    "Item NAME",
+                    "Quantity",
+                    "Price",
+                    "Total",
+                  ].map((el) => (
+                    <th className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium uppercase text-blue-gray-600"
+                      >
+                        {el}
+                      </Typography>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+            
+                <tbody className="overflow-y-auto">
+                  {myOrderItems.map((order) => (
+                    <tr id={order._id}>
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        >
+                          {order.itemName}
+                        </Typography>
+                      </td>
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        >
+                          {order.quantity}
+                        </Typography>
+                      </td>
+                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium uppercase text-blue-gray-400"
+                        >
+                          {order.price}
+                        </Typography>
+                      </td>
+                      <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium capitalize text-blue-gray-400"
+                    >
+                      ${order.price * order.quantity}
+                    </Typography>
+                  </td>
+                    </tr>
+                  ))}
+                </tbody>
+              
+            </table>
+          </CardBody>
+        </Card>
+
+      </Dialog>
+
     </>
   );
 }

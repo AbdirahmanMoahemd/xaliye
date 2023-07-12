@@ -1,4 +1,7 @@
 import {
+  ORDER_ADD_ITEM,
+  ORDER_REMOVE_ITEM,
+  ORDER_REMOVE_ITEM_ALL,
   RECENT_SALES_LIST_FAIL,
   RECENT_SALES_LIST_REQUEST,
   RECENT_SALES_LIST_RESET,
@@ -42,8 +45,41 @@ export const createSalesReducer = (state = {}, action) => {
   }
 };
 
+export const orderReducer = (state = { orderItems: [] }, action) => {
+  switch (action.type) {
+    case ORDER_ADD_ITEM:
+      const item = action.payload;
+
+      const existItem = state.orderItems.find((x) => x.item === item.item);
+      if (existItem) {
+        return {
+          ...state,
+          orderItems: state.orderItems.map((x) =>
+            x.item === existItem.item ? item : x
+          ),
+        };
+      } else {
+        return {
+          ...state,
+          orderItems: [...state.orderItems, item],
+        };
+      }
+    case ORDER_REMOVE_ITEM:
+      return {
+        ...state,
+        orderItems: state.orderItems.filter((x) => x.item !== action.payload),
+      };
+    case ORDER_REMOVE_ITEM_ALL:
+      return {
+        state,
+        orderItems: []
+      };
+    default:
+      return state;
+  }
+};
 export const salesListReducer = (
-  state = { sales: [], item: {}, customer: {} },
+  state = { sales: [], orderItems: [], customer: {} },
   action
 ) => {
   switch (action.type) {
@@ -53,7 +89,7 @@ export const salesListReducer = (
       return {
         loading: false,
         sales: action.payload.sales,
-        salesCount:action.payload.salesCount
+        salesCount: action.payload.salesCount,
       };
     case SALES_LIST_FAIL:
       return { loading: false, error: action.payload };
@@ -63,7 +99,6 @@ export const salesListReducer = (
       return state;
   }
 };
-
 
 export const salesRecentListReducer = (
   state = { sales: [], item: {}, customer: {} },

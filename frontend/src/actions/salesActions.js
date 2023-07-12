@@ -1,5 +1,8 @@
 import axios from "axios";
 import {
+  ORDER_ADD_ITEM,
+  ORDER_REMOVE_ITEM,
+  ORDER_REMOVE_ITEM_ALL,
   RECENT_SALES_LIST_FAIL,
   RECENT_SALES_LIST_REQUEST,
   RECENT_SALES_LIST_SUCCESS,
@@ -27,7 +30,7 @@ import {
 } from "../constants/salesConstants";
 
 export const createNewSales =
-  (item, customer,phone, quantity, price, date,invoiceId, isPaid) =>
+  (orderItems, customer,phone, date,totalPrice ,invoiceId, isPaid) =>
   async (dispatch, getState) => {
     try {
       dispatch({
@@ -46,7 +49,7 @@ export const createNewSales =
 
       const { data } = await axios.post(
         "/api/Sales",
-        { item, customer,phone, quantity, price, date,invoiceId, isPaid },
+        { orderItems, customer,phone, date,totalPrice,invoiceId, isPaid },
         config
       );
 
@@ -64,6 +67,52 @@ export const createNewSales =
       });
     }
   };
+
+
+  export const addToOrderItems = (id,quantity, price) => async (dispatch, getState) => {
+    const {
+      userLogin: { userInfo },
+    } = getState();
+
+    const config = {
+      headers: {
+        Authorization: `Bearer ${userInfo.token}`,
+      },
+    };
+    const { data } = await axios.get(`/api/store/${id}`, config)
+  
+    dispatch({
+      type: ORDER_ADD_ITEM,
+      payload: {
+        item: data._id,
+        itemName:data.name,
+        price,
+        quantity,
+      },
+    })
+
+    // localStorage.setItem('orderItems', JSON.stringify(getState().order.orderItems))
+  
+    
+  }
+
+  export const removeFromOrder = (id) => (dispatch, getState) => {
+    dispatch({
+      type: ORDER_REMOVE_ITEM,
+      payload: id,
+    })
+  
+    // localStorage.setItem('orderItems', JSON.stringify(getState().order.orderItems))
+  }
+
+
+  // export const removeFromOrderAll = () => (dispatch, getState) => {
+  //   dispatch({
+  //     type: ORDER_REMOVE_ITEM_ALL,
+  //   })
+  
+  //   localStorage.setItem('orderItems', JSON.stringify(getState().order.orderItems))
+  // }
 
 export const updateSalesItem =
   (id, item, customer, quantity, price, date, isPaid) =>

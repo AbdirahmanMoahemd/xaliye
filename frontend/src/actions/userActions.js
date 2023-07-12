@@ -363,6 +363,11 @@ export const UpdUser = (user) => async (dispatch, getState) => {
   }
 };
 
+export const RemoveCartFun =  () => {
+  localStorage.removeItem('orderItems')
+}
+
+
 export const UpdateUserRole = (id, role) => async (dispatch, getState) => {
   try {
     dispatch({

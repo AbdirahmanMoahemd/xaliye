@@ -1,7 +1,6 @@
 import expressAsync from "express-async-handler";
 import Tasks from "../models/tasksModel.js";
 import Customers from "../models/customersModel.js";
-import moment from "moment";
 import Events from "../models/eventsModel.js";
 
 export const getTasks = expressAsync(async (req, res) => {

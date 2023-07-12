@@ -61,7 +61,7 @@ import DatePicker from "react-datepicker";
 import { getCustomerTotal, listCustomers } from "@/actions/cusomerActions";
 import { confirmAlert } from "react-confirm-alert";
 import moment from "moment";
-import { createNewSales, listRecentSales } from "@/actions/salesActions";
+import { addToOrderItems, createNewSales, listRecentSales } from "@/actions/salesActions";
 import { ScrollPanel } from "primereact/scrollpanel";
 import { Checkbox } from "primereact/checkbox";
 import { listStoreItems } from "@/actions/storeActions";
@@ -96,11 +96,10 @@ export function Home() {
   const [itemsale, setItemSale] = useState("");
   const [customersale, setCustomerSale] = useState();
   const [quantity, setQuantity] = useState("");
-  const [pricesale, setPriceSale] = useState("");
-  const [datesale, setDateSale] = useState(new Date());
+  const [price, setPrice] = useState("");
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
-  const [isPaid, setIsPaid] = useState(false);
+  const [isPaid, setIsPaid] = useState(true);
   const [nameToPrint, setNameToPrint] = useState("");
   const [itemnameToPrint, setItemNameToPrint] = useState("");
   const [isPrinting, setIsPrinting] = useState(false);
@@ -204,6 +203,9 @@ export function Home() {
     success: successSaleCreate,
   } = createSales;
 
+  const order = useSelector(state => state.order)
+    const { orderItems } = order
+
   useEffect(() => {
     dispatch(getTasksTotal());
   }, [dispatch]);
@@ -301,14 +303,16 @@ export function Home() {
   useEffect(() => {
     if (successSaleCreate) {
       setIsSalesPrinting(true);
-      // dispatch({ type: SALES_CREATE_RESET });
-      // setCreateSale(false);
-      // setItemSale("");
-      // setCustomerSale("");
-      // setQuantity("");
-      // setPriceSale("");
-      // setIsPaid(false);
-      // setDateSale(new Date());
+      dispatch({ type: SALES_CREATE_RESET });
+      setCreateSale(false);
+      setItemSale("");
+      setCustomerSale("");
+      setQuantity("");
+      setPrice("");
+      setIsPaid(false);
+      setDate(new Date());
+      dispatch({ type: ORDER_REMOVE_ITEM_ALL });
+
     }
     dispatch(listRecentSales());
   }, [dispatch, successSaleCreate]);
@@ -421,20 +425,21 @@ export function Home() {
   const submitSaleHandler = (e) => {
     e.preventDefault();
 
-    console.log(quantity);
+    if (orderItems != null) {
+      dispatch(
+        createNewSales(
+          orderItems,
+          customer,
+          phone,
+          date,
+          totalPrice,
+          invoiceId,
+          isPaid
+        )
+      );
+    }
 
-    dispatch(
-      createNewSales(
-        itemsale,
-        customersale,
-        phone,
-        quantity,
-        pricesale,
-        datesale,
-        invoiceId,
-        isPaid
-      )
-    );
+   
   };
   let toltal;
   const getTotal = (e) => {
@@ -450,7 +455,11 @@ export function Home() {
     setShowTotal(true);
   };
 
-  console.log(counter);
+  let totalPrice = orderItems.reduce((acc, item) => acc + item.quantity * item.price, 0);
+
+  const itemqty = orderItems.reduce((acc, item) => acc + item.quantity, 0)
+
+  
 
   return (
     <div className="mt-12">
@@ -1639,28 +1648,30 @@ export function Home() {
         {/* </form> */}
       </Dialog>
 
-      {/* Create Inventory */}
-      <Dialog
+       {/* Create Sale */}
+       <Dialog
         blockScroll="false"
         aria-expanded={createSale ? true : false}
         header="New Sale"
         visible={createSale}
         onHide={() => {
-          setCreateSale(false);
-          setIsSalesPrinting(true);
           dispatch({ type: SALES_CREATE_RESET });
-          setItemSale("");
-          setCustomerSale("");
+          setCreateSale(false);
+          setItem("");
+          setCustomer("");
+          setPhone("");
           setQuantity("");
-          setPriceSale("");
+          setPrice("");
           setIsPaid(false);
-          setDateSale(new Date());
+          setDate(new Date());
+          dispatch({ type: ORDER_REMOVE_ITEM_ALL });
+          
         }}
         style={{ width: "40vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
       >
-        <form onSubmit={submitSaleHandler}>
-          {loadingSaleCreate && (
+        {/* <form onSubmit={submitHandler}> */}
+          {loadingCreate && (
             <ProgressSpinner
               style={{ width: "20px", height: "20px" }}
               strokeWidth="6"
@@ -1668,58 +1679,173 @@ export function Home() {
               animationDuration=".5s"
             />
           )}
-          {errorSaleCreate && (
-            <Message severity="error" text={errorSaleCreate} />
-          )}
+          {errorCreate && <Message severity="error" text={errorCreate} />}
           <div className="mx-auto space-y-4 p-4">
-            <AutoComplete
-              placeholder="item name"
-              inputClassName="w-full"
-              className=" w-full"
-              field="name"
-              value={itemsale}
-              suggestions={items}
-              completeMethod={() => dispatch(listStoreItems())}
-              onChange={(e) => {
-                setItemSale(e.target.value);
-              }}
-              required
-            />
+            
+              <Input
+                type="text"
+                value={customer}
+                label="Customer Name"
+                inputClassName="w-full"
+                className="w-full"
+                size="lg"
+                required
+                onChange={(e) => setCustomer(e.target.value)}
+              />
+              <div className="w-full gap-2 space-y-4 xl:flex xl:space-y-0 ">
+              <Input
+                type="number"
+                value={phone}
+                inputClassName="w-full"
+                className="w-full"
+                label="Phone Number"
+                size="lg"
+                required
+                onChange={(e) => setPhone(e.target.value)}
+              />
+            
+            <div className=" rounded border border-gray-400 py-2 px-2">
+              <DatePicker selected={date} onChange={(dt) => setDate(dt)} />
+            </div>
+            </div>
 
-            <Input
-              type="text"
-              value={customersale}
-              label="Customer Name"
-              size="lg"
-              required
-              onChange={(e) => setCustomerSale(e.target.value)}
-            />
-            <Input
-              type="number"
-              value={phone}
-              label="Phone Number"
-              size="lg"
-              required
-              onChange={(e) => setPhone(e.target.value)}
-            />
+            <div className="w-full gap-2 space-y-4 xl:flex  xl:space-y-0">
+              <AutoComplete
+                placeholder="item name"
+                inputClassName="w-full xl:h-11"
+                className="w-full"
+                field="name"
+                size="lg"
+                value={itemsale}
+                suggestions={items}
+                completeMethod={() => dispatch(listStoreItems())}
+                onChange={(e) => setItemSale(e.value)}
+                required
+              />
 
-            <Input
-              type="number"
-              value={quantity}
-              label="Quantity"
-              size="lg"
-              required
-              onChange={(e) => setQuantity(e.target.value)}
-            />
+              <Input
+                type="number"
+                inputClassName="w-full"
+                value={quantity}
+                label="Quantity"
+                size="lg"
+                required
+                onChange={(e) => setQuantity(e.target.value)}
+              />
+              <Input
+                type="number"
+                value={price}
+                label="Price"
+                size="lg"
+                required
+                onChange={(e) => setPrice(e.target.value)}
+              />
+            </div>
+            <div className="flex justify-between">
+              <div></div>
+              <Button label="Add" onClick={()=>{
+                dispatch(addToOrderItems(itemsale._id, quantity, price))
+                setItemSale("")
+                setQuantity("")
+                setPrice("")
+                
+                
+              }}/>
+            </div>
 
-            <Input
-              type="number"
-              value={pricesale}
-              label="Price"
-              size="lg"
-              required
-              onChange={(e) => setPriceSale(e.target.value)}
-            />
+            <table className="w-full space-y-4  xl:space-y-0">
+              <thead className="sticky top-0 z-40 border-b bg-white">
+                <tr>
+                  <th className="w-12 border border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium uppercase text-blue-gray-600"
+                    >
+                      No
+                    </Typography>
+                  </th>
+                  <th className="border border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium uppercase text-blue-gray-600"
+                    >
+                      Item
+                    </Typography>
+                  </th>
+                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium uppercase text-blue-gray-600"
+                    >
+                      Price
+                    </Typography>
+                  </th>
+                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium uppercase text-blue-gray-600"
+                    >
+                      Qty
+                    </Typography>
+                  </th>
+                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium uppercase text-blue-gray-600"
+                    >
+                      Total
+                    </Typography>
+                  </th>
+                </tr>
+              </thead>
+              <tbody>
+              {orderItems.map((odr, index) => (
+                <tr>
+                  <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium capitalize text-blue-gray-400"
+                    >
+                      {index}
+                    </Typography>
+                  </td>
+                  <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium capitalize text-blue-gray-400"
+                    >
+                      {odr.itemName}
+                    </Typography>
+                  </td>
+                  <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium capitalize text-blue-gray-400"
+                    >
+                      ${odr.price}
+                    </Typography>
+                  </td>
+                  <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium capitalize text-blue-gray-400"
+                    >
+                      {odr.quantity}
+                    </Typography>
+                  </td>
+                  <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium capitalize text-blue-gray-400"
+                    >
+                      ${odr.price * odr.quantity}
+                    </Typography>
+                  </td>
+                </tr>
+              ))}
+              </tbody>
+            </table>
+            <p className="text-left uppercase">Sub Total: ${totalPrice}</p>
 
             <div>
               IsPaid
@@ -1730,28 +1856,17 @@ export function Home() {
               ></Checkbox>
             </div>
 
-            <div className="mt-4 flex justify-around">
+            <div className="mt-4 flex justify-center">
               <button
                 type="submit"
+                onClick={submitSaleHandler}
                 className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium uppercase text-white transition hover:bg-transparent hover:text-primary"
               >
                 Save
               </button>
-
-              <ReactToPrint
-                trigger={() =>
-                  isSalesPrinting ? (
-                    <Button>Save & Print</Button>
-                  ) : (
-                    <Button>Save & Print</Button>
-                  )
-                }
-                content={() => (isSalesPrinting ? componentRef3 : "")}
-                onBeforeGetContent={() => submitHandler}
-              />
             </div>
           </div>
-        </form>
+        {/* </form> */}
       </Dialog>
       {/* component to be printed */}
       <div style={{ display: "none" }}>
@@ -1787,8 +1902,7 @@ export function Home() {
           name={customersale}
           phone={phone}
           date={date}
-          amount={pricesale}
-          item={itemsale.name}
+          amount={price}
           quantity={quantity}
         />
       </div>
