@@ -96,7 +96,7 @@ export const createNewSales =
     
   }
 
-  export const removeFromOrder = (id) => (dispatch, getState) => {
+  export const removeFromOrder = (id) => (dispatch) => {
     dispatch({
       type: ORDER_REMOVE_ITEM,
       payload: id,

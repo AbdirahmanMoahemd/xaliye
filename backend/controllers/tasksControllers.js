@@ -21,7 +21,7 @@ export const getTasks = expressAsync(async (req, res) => {
     ...keyword,
     bin: false,
     date: { $lt: date },
-  }).sort({ createdAt: -1 });
+  }).sort({ date: -1 });
 
   res.json({ tasks });
 });
@@ -211,9 +211,6 @@ export const getUnFinishedTasks = expressAsync(async (req, res) => {
 
 
 
-
-
-
 export const getTasksByRange = expressAsync(async (req, res) => {
   try {
     const { startDate, endDate } = req.body;
@@ -240,7 +237,7 @@ export const getTasksByRange = expressAsync(async (req, res) => {
       bin: false,
       date: { $lte: end, $gte: start },
     })
-      .sort({ createdAt: -1 })
+      .sort({ date: -1 })
       .populate("user")
       .populate("customer");
 
@@ -265,7 +262,7 @@ export const getTasksByRecent = expressAsync(async (req, res) => {
       bin: false,
       date: { $gte: start },
     })
-      .sort({ createdAt: -1 })
+      .sort({ date: -1 })
       .populate("user")
       .populate("customer");
 
@@ -292,7 +289,7 @@ export const getOnProcessTasksByRecent = expressAsync(async (req, res) => {
       stage:0,
       date: { $gte: start },
     })
-      .sort({ createdAt: -1 })
+      .sort({ date: -1 })
       .populate("user")
       .populate("customer");
 
@@ -318,7 +315,7 @@ export const getFinishedTasksByRecent = expressAsync(async (req, res) => {
       stage:1,
       date: { $gte: start },
     })
-      .sort({ createdAt: -1 })
+      .sort({ date: -1 })
       .populate("user")
       .populate("customer");
 
@@ -345,7 +342,7 @@ export const getUnFinishedTasksByRecent = expressAsync(async (req, res) => {
       stage:2,
       date: { $gte: start },
     })
-      .sort({ createdAt: -1 })
+      .sort({ date: -1 })
       .populate("user")
       .populate("customer");
 
@@ -372,7 +369,7 @@ export const getTasksByThisWeek = expressAsync(async (req, res) => {
       bin: false,
       date: { $gte: test },
     })
-      .sort({ createdAt: -1 })
+      .sort({ date: -1 })
       .populate("user")
       .populate("customer");
 

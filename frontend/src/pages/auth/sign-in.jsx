@@ -108,7 +108,9 @@ export function SignIn() {
                 Sign In
               </Button>
             </CardFooter>
+
           </form>
+          <div className="flex justify-center pb-2"><p className="cursor-pointer text-black underline text-sm">My Device Status</p></div>
         </Card>
       </div>
     </div>

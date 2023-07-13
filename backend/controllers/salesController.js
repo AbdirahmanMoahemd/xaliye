@@ -16,7 +16,7 @@ export const getSalesItems = expressAsync(async (req, res) => {
 
   const salesCount = await Sales.countDocuments({ ...keyword });
   const sales = await Sales.find({ ...keyword })
-    .sort({ createdAt: -1 })
+    .sort({ date: -1 })
     .populate("orderItems.item")
     .limit(pageSize)
     .skip(pageSize * (page - 1));
@@ -27,7 +27,7 @@ export const getSalesItems = expressAsync(async (req, res) => {
 export const getRecentSales = expressAsync(async (req, res) => {
   var start = new Date().toDateString();
   const sales = await Sales.find({ date: { $gte: start } })
-    .sort({ createdAt: -1 })
+    .sort({ date: -1 })
     .populate("orderItems.item");
 
   res.json({ sales });
@@ -35,7 +35,7 @@ export const getRecentSales = expressAsync(async (req, res) => {
 
 export const getUnPaidSalesItems = expressAsync(async (req, res) => {
   const sales = await Sales.find({ isPaid: false })
-    .sort({ createdAt: -1 })
+    .sort({ date: -1 })
     .populate("orderItems.item");
 
   res.json({ sales });
@@ -43,7 +43,7 @@ export const getUnPaidSalesItems = expressAsync(async (req, res) => {
 
 export const getPaidSalesItems = expressAsync(async (req, res) => {
   const sales = await Sales.find({ isPaid: true })
-    .sort({ createdAt: -1 })
+    .sort({ date: -1 })
     .populate("orderItems.item");
 
   res.json({ sales });
@@ -59,7 +59,7 @@ export const getSalesIByDateRange = expressAsync(async (req, res) => {
   end.setDate(end.getDate() + 1);
   end.toDateString();
   const sales = await Sales.find({ date: { $lte: end, $gte: start } })
-    .sort({ createdAt: -1 })
+    .sort({ date: -1 })
     .populate("orderItems.item");
 
   res.json({ sales });

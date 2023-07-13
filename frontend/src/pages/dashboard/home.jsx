@@ -61,11 +61,11 @@ import DatePicker from "react-datepicker";
 import { getCustomerTotal, listCustomers } from "@/actions/cusomerActions";
 import { confirmAlert } from "react-confirm-alert";
 import moment from "moment";
-import { addToOrderItems, createNewSales, listRecentSales } from "@/actions/salesActions";
+import { addToOrderItems, createNewSales, listRecentSales, removeFromOrder } from "@/actions/salesActions";
 import { ScrollPanel } from "primereact/scrollpanel";
 import { Checkbox } from "primereact/checkbox";
 import { listStoreItems } from "@/actions/storeActions";
-import { SALES_CREATE_RESET } from "@/constants/salesConstants";
+import { ORDER_REMOVE_ITEM_ALL, SALES_CREATE_RESET } from "@/constants/salesConstants";
 import ReactToPrint from "react-to-print";
 import { Button } from "primereact/button";
 import ReactHTMLTableToExcel from "react-html-table-to-excel";
@@ -104,6 +104,8 @@ export function Home() {
   const [itemnameToPrint, setItemNameToPrint] = useState("");
   const [isPrinting, setIsPrinting] = useState(false);
   const [isSalesPrinting, setIsSalesPrinting] = useState(false);
+  const [salesPrint, setSalesPrint] = useState(false);
+  const [ordersSalesPrint, setOrdersSalesPrint] = useState(false);
   const [onPrint, setOnPrint] = useState(false);
   const [dateRange, setDateRange] = useState(false);
   const [showTotal, setShowTotal] = useState(false);
@@ -111,6 +113,9 @@ export function Home() {
   const [statusStage, setStatusStage] = useState("");
   const [toltalAmount, setToltalAmount] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
+  const [myOrderItems, setMyOrderItems] = useState([]);
+  const [show, setShow] = useState(false);
+  const [custname, setCustname] = useState("");
 
   const [first, setFirst] = useState(1);
   const [rows, setRows] = useState(200);
@@ -628,7 +633,7 @@ export function Home() {
       <div></div>
 
       <div className="mb-4 grid grid-cols-1 gap-2 xl:grid-cols-12">
-        <Card className="overflow-hidden xl:col-span-9">
+        <Card className="overflow-hidden xl:col-span-8">
           <CardHeader
             floated={false}
             shadow={false}
@@ -759,7 +764,7 @@ export function Home() {
                     "",
                     "",
                   ].map((el) => (
-                    <th className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                    <th className="border-b border-blue-gray-50 py-3 px-3 text-left">
                       <Typography
                         variant="small"
                         className="text-[11px] font-medium uppercase text-blue-gray-600"
@@ -789,7 +794,7 @@ export function Home() {
                           className="text-[11px] font-medium uppercase text-blue-gray-400"
                         >
                           {task.customer ? (
-                            `XRC- ${task.customer.custID}`
+                            `${task.customer.custID}`
                           ) : (
                             <p className=" text-red-700">Not Found</p>
                           )}
@@ -973,7 +978,7 @@ export function Home() {
             />
           </CardBody>
         </Card>
-        <Card className="xl:col-span-3">
+        <Card className="xl:col-span-4">
           <CardHeader
             floated={false}
             shadow={false}
@@ -1001,8 +1006,29 @@ export function Home() {
               </MenuList>
             </Menu>
           </CardHeader>
-          <ScrollPanel className="max-h-[34rem]">
-            <CardBody className="pt-0">
+          <CardBody className="table-wrp block max-h-screen  overflow-x-scroll px-0 pt-0 pb-2">
+            <table className="w-full table-auto">
+          <thead className="sticky top-0 z-40 border-b bg-white">
+                <tr>
+                  {[
+                    "Customer",
+                    "Order Items",
+                    "",
+                  ].map((el) => (
+                    <th
+                      key={el}
+                      className="border-b border-blue-gray-50 py-3 px-4 text-left"
+                    >
+                      <Typography
+                        variant="small"
+                        className="text-[12px] font-medium uppercase text-blue-gray-600"
+                      >
+                        {el}
+                      </Typography>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
               {loadingSales ? (
                 <ProgressSpinner
                   style={{ width: "20px", height: "20px" }}
@@ -1013,51 +1039,136 @@ export function Home() {
               ) : errorSales ? (
                 <Message severity="error" text={errorSales} />
               ) : (
-                <>
-                  {sales.map((sale) => (
-                    <div className="flex items-start gap-4 py-3">
-                      <div className="relative p-1 after:absolute after:-bottom-6 after:left-2/4 after:w-0.5 after:-translate-x-2/4 after:bg-blue-gray-50 ">
-                        <AiFillBell color="#E02B6B" />
-                      </div>
-                      <div>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="block font-medium"
-                        >
-                          New Sale For{" "}
-                          {sale.item ? sale.item.name : sale.itemName}
-                        </Typography>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="block font-medium"
-                        >
-                          Price: ${sale.price}
-                        </Typography>
-                        <Typography
-                          variant="small"
-                          color="blue-gray"
-                          className="block font-medium"
-                        >
-                          Paid: {sale.isPaid ? "YES" : "NO"}
-                        </Typography>
-                        <Typography
-                          as="span"
-                          variant="small"
-                          className="text-xs font-medium text-blue-gray-500"
-                        >
-                          Date: {sale.date && sale.date.substring(0, 10)}
-                        </Typography>
-                      </div>
-                    </div>
-                  ))}
-                </>
+                
+                 <tbody className="overflow-y-auto">
+                  {sales.map((sale) => 
+                     <tr key={sale._id}>
+                     <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                       <Typography
+                         variant="small"
+                         className="text-[12px] font-medium capitalize text-blue-gray-400"
+                       >
+                         Name:{sale.customer}
+                         <p>Phone:{sale.phone}</p>
+                       </Typography>
+                     </td>
+                     <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                       <Typography
+                         variant="small"
+                         className="text-[11px] font-medium capitalize text-blue-gray-400"
+                       >
+                          <Button
+                              className="z-10 h-8"
+                              label="Show"
+                              icon=""
+                              onClick={() => {
+                                setMyOrderItems(sale.orderItems);
+                                setCustname(sale.customer);
+                                setShow(true);
+                              }}
+                            />
+                       </Typography>
+                     </td >
+                     <td  className="border-b border-blue-gray-50 text-center">
+                      <i onClick={()=> {
+                        setOrdersSalesPrint(sale.orderItems)
+                        setSalesPrint(sale)
+                        setIsSalesPrinting(true)
+                      }}><ReactToPrint
+                      color=" blue"
+                      trigger={() =>  <i className="pi pi-print cursor-pointer"/>}
+                      content={() => componentRef2}
+                    /></i>
+                     </td>
+                     </tr>
+                  
+                  )}
+                 </tbody>
               )}
-            </CardBody>
+              </table>
+          </CardBody>
+          <ScrollPanel className="max-h-[34rem]">
+           
           </ScrollPanel>
         </Card>
       </div>
+
+
+      <Dialog
+        blockScroll="false"
+        aria-expanded={show ? true : false}
+        header={`Order Items For ${custname}`}
+        visible={show}
+        onHide={() => {
+          setShow(false);
+        }}
+        style={{ width: "60vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <Card>
+          <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
+            <table className="w-full min-w-[640px] table-auto">
+              <thead className="sticky top-0 z-40 border-b bg-white">
+                <tr>
+                  {["Item NAME", "Quantity", "Price", "Total"].map((el) => (
+                    <th className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium uppercase text-blue-gray-600"
+                      >
+                        {el}
+                      </Typography>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+
+              <tbody className="overflow-y-auto">
+                {myOrderItems.map((order) => (
+                  <tr id={order._id}>
+                    <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                      >
+                        {order.itemName}
+                      </Typography>
+                    </td>
+                    <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                      >
+                        {order.quantity}
+                      </Typography>
+                    </td>
+                    <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                      >
+                        {order.price}
+                      </Typography>
+                    </td>
+                    <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium capitalize text-blue-gray-400"
+                      >
+                        ${order.price * order.quantity}
+                      </Typography>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </CardBody>
+        </Card>
+      </Dialog>
+
+
+
+
       <Dialog
         header="Comment"
         visible={message}
@@ -1657,12 +1768,12 @@ export function Home() {
         onHide={() => {
           dispatch({ type: SALES_CREATE_RESET });
           setCreateSale(false);
-          setItem("");
+          setItemSale("");
           setCustomer("");
           setPhone("");
           setQuantity("");
           setPrice("");
-          setIsPaid(false);
+          setIsPaid(true);
           setDate(new Date());
           dispatch({ type: ORDER_REMOVE_ITEM_ALL });
           
@@ -1744,10 +1855,14 @@ export function Home() {
             <div className="flex justify-between">
               <div></div>
               <Button label="Add" onClick={()=>{
-                dispatch(addToOrderItems(itemsale._id, quantity, price))
-                setItemSale("")
-                setQuantity("")
-                setPrice("")
+                if (itemsale != "" && quantity != "" && price != "") {
+                  console.log(quantity);
+                  console.log(itemsale);
+                  dispatch(addToOrderItems(itemsale._id, quantity, price))
+                  setItemSale("")
+                  setQuantity("")
+                  setPrice("")
+                }
                 
                 
               }}/>
@@ -1796,6 +1911,14 @@ export function Home() {
                       Total
                     </Typography>
                   </th>
+                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium uppercase text-blue-gray-600"
+                    >
+                      
+                    </Typography>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -1841,6 +1964,14 @@ export function Home() {
                       ${odr.price * odr.quantity}
                     </Typography>
                   </td>
+                  <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium capitalize text-blue-gray-400"
+                    >
+                      <i className="pi pi-delete-left cursor-pointer" onClick={()=> dispatch(removeFromOrder(odr.item))}/>
+                    </Typography>
+                  </td>
                 </tr>
               ))}
               </tbody>
@@ -1853,6 +1984,7 @@ export function Home() {
               <Checkbox
                 onChange={(e) => setIsPaid(e.checked)}
                 checked={isPaid}
+                defaultValue={isPaid}
               ></Checkbox>
             </div>
 
@@ -1882,7 +2014,7 @@ export function Home() {
         />
       </div>
 
-      <div style={{ display: "none" }}>
+      {/* <div style={{ display: "none" }}>
         <ComponentToPrint
           ref={(el) => (componentRef2 = el)}
           invoiceId={invoiceId}
@@ -1893,17 +2025,14 @@ export function Home() {
           item={item}
           problem={problem}
         />
-      </div>
+      </div> */}
 
       <div style={{ display: "none" }}>
         <ComponentToPrint2
-          ref={(el) => (componentRef3 = el)}
-          invoiceId={invoiceId}
-          name={customersale}
-          phone={phone}
-          date={date}
-          amount={price}
-          quantity={quantity}
+          ref={(el) => (componentRef2 = el)}
+          sales={salesPrint}
+          orderItems={ordersSalesPrint}
+          
         />
       </div>
     </div>
@@ -2173,13 +2302,10 @@ class ComponentToPrint extends React.Component {
 
 class ComponentToPrint2 extends React.Component {
   render() {
-    const { invoiceId } = this.props;
-    const { name } = this.props;
-    const { phone } = this.props;
-    const { item } = this.props;
-    const { quantity } = this.props;
-    const { date } = this.props;
-    const { amount } = this.props;
+    const { sales } = this.props;
+    const { orderItems } = this.props;
+   
+   
 
     return (
       <>
@@ -2219,48 +2345,57 @@ class ComponentToPrint2 extends React.Component {
           <div className=" mx-14 mt-4 grid grid-cols-3 gap-4">
             <div className="col-span-2">
               <p className="text-2xl font-normal">Invoice to:</p>
-              <p className="text-xl">{name}</p>
-              <p className="text-xl">{phone}</p>
+              <p className="text-xl">Name: {sales && sales.customer}</p>
+              <p className="text-xl">Phone: {sales && sales.phone}</p>
             </div>
             <div className="">
               <div className=" flex items-center">
                 <p className=" text-2xl font-normal">Invoice ID:</p>
-                <span className="pl-2 text-xl">#{invoiceId}</span>
+                <span className="pl-2 text-xl">#{sales && sales.invoiceId}</span>
               </div>
               <div className=" flex items-center">
                 <p className=" text-2xl font-normal">Amount: </p>
-                <span className="pl-2 text-xl">${amount}</span>
+                <span className="pl-2 text-xl">${sales && sales.totalPrice}</span>
               </div>
               <div className=" flex items-center">
                 <p p className="text-2xl font-normal">
                   Date:
                 </p>
                 <p className="pl-2 text-xl">
-                  {moment(date).toString().substring(0, 15)}
+                {sales && moment( sales.date).toString().substring(0, 15)}
                 </p>
               </div>
             </div>
           </div>
 
           <div className="mx-14 mt-4">
-            <table className="w-full table-auto">
-              <thead className=" bg-blue-500 text-white">
+            <table className="w-full table-auto ">
+              <thead className="border border-blue-500 bg-blue-500 text-white">
                 <tr className="text-xl font-normal">
+                  <td>No</td>
                   <td>Item</td>
                   <td>Quantity</td>
+                  <td>Price</td>
                   <td>Total Price</td>
                 </tr>
               </thead>
-              <tbody>
-                <tr className=" h-12 border border-blue-500">
-                  <td className="border border-blue-500 py-1 pl-1 ">{item}</td>
-                  <td className="border border-blue-500 py-1 pl-1">
-                    {quantity}
-                  </td>
-                  <td className="border border-blue-500 py-1 pl-1">
-                    ${amount}
-                  </td>
-                </tr>
+              <tbody className="border border-blue-500">
+                {orderItems && orderItems.map((item, index)=> 
+                <tr className="">
+                <td className="py-1 px-2 border border-blue-500">{index+1}</td>
+                <td className="py-1 px-2 border border-blue-500">{item.itemName}</td>
+                <td className="py-1 px-2 border border-blue-500">
+                  {item.quantity}
+                </td>
+                <td className="py-1 px-2 border border-blue-500">
+                ${item.price}
+                </td>
+                <td className="py-1 px-2 border border-blue-500">
+                ${item.price * item.quantity} 
+                </td>
+              </tr>
+                )}
+                
               </tbody>
             </table>
           </div>
@@ -2335,51 +2470,60 @@ class ComponentToPrint2 extends React.Component {
           </div>
           <div className="mx-14 border border-blue-500 bg-blue-500"></div>
 
-          <div className=" mx-14 mt-5 grid grid-cols-3 gap-4">
+          <div className=" mx-14 mt-4 grid grid-cols-3 gap-4">
             <div className="col-span-2">
               <p className="text-2xl font-normal">Invoice to:</p>
-              <p className="text-xl">{name}</p>
-              <p className="text-xl">{phone}</p>
+              <p className="text-xl">Name: {sales && sales.customer}</p>
+              <p className="text-xl">Phone: {sales && sales.phone}</p>
             </div>
             <div className="">
               <div className=" flex items-center">
                 <p className=" text-2xl font-normal">Invoice ID:</p>
-                <span className="pl-2 text-xl">#{invoiceId}</span>
+                <span className="pl-2 text-xl">#{sales && sales.invoiceId}</span>
               </div>
               <div className=" flex items-center">
                 <p className=" text-2xl font-normal">Amount: </p>
-                <span className="pl-2 text-xl">${amount}</span>
+                <span className="pl-2 text-xl">${sales && sales.totalPrice}</span>
               </div>
               <div className=" flex items-center">
                 <p p className="text-2xl font-normal">
                   Date:
                 </p>
                 <p className="pl-2 text-xl">
-                  {moment(date).toString().substring(0, 15)}
+                {sales && moment( sales.date).toString().substring(0, 15)}
                 </p>
               </div>
             </div>
           </div>
 
           <div className="mx-14 mt-4">
-            <table className="w-full table-auto">
-              <thead className=" bg-blue-500 text-white">
+            <table className="w-full table-auto ">
+              <thead className="border border-blue-500 bg-blue-500 text-white">
                 <tr className="text-xl font-normal">
+                  <td>No</td>
                   <td>Item</td>
                   <td>Quantity</td>
+                  <td>Price</td>
                   <td>Total Price</td>
                 </tr>
               </thead>
-              <tbody>
-                <tr className=" h-12 border border-blue-500">
-                  <td className="border border-blue-500 py-1 pl-1 ">{item}</td>
-                  <td className="border border-blue-500 py-1 pl-1">
-                    {quantity}
-                  </td>
-                  <td className="border border-blue-500 py-1 pl-1">
-                    ${amount}
-                  </td>
-                </tr>
+              <tbody className="border border-blue-500">
+                {orderItems && orderItems.map((item, index)=> 
+                <tr className="">
+                <td className="py-1 px-2 border border-blue-500">{index+1}</td>
+                <td className="py-1 px-2 border border-blue-500">{item.itemName}</td>
+                <td className="py-1 px-2 border border-blue-500">
+                  {item.quantity}
+                </td>
+                <td className="py-1 px-2 border border-blue-500">
+                ${item.price}
+                </td>
+                <td className="py-1 px-2 border border-blue-500">
+                ${item.price * item.quantity} 
+                </td>
+              </tr>
+                )}
+                
               </tbody>
             </table>
           </div>

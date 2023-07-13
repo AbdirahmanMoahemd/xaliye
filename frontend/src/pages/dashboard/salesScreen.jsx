@@ -11,7 +11,7 @@ import {
   Input,
 } from "@material-tailwind/react";
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { listStoreItems } from "@/actions/storeActions";
 import {
@@ -40,7 +40,7 @@ import { confirmAlert } from "react-confirm-alert";
 import DatePicker from "react-datepicker";
 import { Button } from "primereact/button";
 import { Paginator } from "primereact/paginator";
-import { RemoveCartFun } from "@/actions/userActions";
+import { Toast } from 'primereact/toast';
 
 export function SalesScreen() {
   const [keyword, setKeyword] = useState("");
@@ -64,10 +64,16 @@ export function SalesScreen() {
   const [myOrderItems, setMyOrderItems] = useState([]);
   const [show, setShow] = useState(false);
   const [custname, setCustname] = useState("");
-  
+  const toastBottomCenter = useRef(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const showMessage = (ref, severity) => {
+    const label = 'All fields are required';
+
+    ref.current.show({ severity: severity, summary: 'Error', detail: label, life: 3000 });
+};
 
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
@@ -79,6 +85,8 @@ export function SalesScreen() {
     sales,
     salesCount,
   } = salesList;
+
+
 
   const storeItemList = useSelector((state) => state.storeItemList);
   const { loading, error, items } = storeItemList;
@@ -111,11 +119,10 @@ export function SalesScreen() {
     customers,
   } = customersList;
 
-  const order = useSelector(state => state.order)
-    const { orderItems } = order
+  const order = useSelector((state) => state.order);
+  const { orderItems } = order;
 
   useEffect(() => {
-    
     if (successUpdate) {
       dispatch({ type: SALES_UPDATE_BILLING_RESET });
       setEdit(false);
@@ -168,9 +175,12 @@ export function SalesScreen() {
     dispatch(listCustomers());
   }, [dispatch]);
   let invoiceId = Math.floor(10000 + Math.random() * 9000);
-  let totalPrice = orderItems.reduce((acc, item) => acc + item.quantity * item.price, 0);
+  let totalPrice = orderItems.reduce(
+    (acc, item) => acc + item.quantity * item.price,
+    0
+  );
 
-  const itemqty = orderItems.reduce((acc, item) => acc + item.quantity, 0)
+  const itemqty = orderItems.reduce((acc, item) => acc + item.quantity, 0);
 
   const submitHandler = (e) => {
     e.preventDefault();
@@ -188,7 +198,6 @@ export function SalesScreen() {
         )
       );
     }
-    
   };
 
   const updateHandler = (e) => {
@@ -220,9 +229,6 @@ export function SalesScreen() {
       ],
     });
   };
-
-
-  
 
   return (
     <>
@@ -361,15 +367,15 @@ export function SalesScreen() {
                             className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
                             <Button
-                            className="z-10 h-8"
-                            label="Show"
-                            icon=""
-                            onClick={() => {
-                              setMyOrderItems(item.orderItems)
-                              setCustname(item.customer)
-                              setShow(true);
-
-                            }}/>
+                              className="z-10 h-8"
+                              label="Show"
+                              icon=""
+                              onClick={() => {
+                                setMyOrderItems(item.orderItems);
+                                setCustname(item.customer);
+                                setShow(true);
+                              }}
+                            />
                           </Typography>
                         </td>
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
@@ -507,142 +513,145 @@ export function SalesScreen() {
           setPhone("");
           setQuantity("");
           setPrice("");
-          setIsPaid(false);
+          setIsPaid(true);
           setDate(new Date());
           dispatch({ type: ORDER_REMOVE_ITEM_ALL });
-          
         }}
         style={{ width: "40vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
       >
         {/* <form onSubmit={submitHandler}> */}
-          {loadingCreate && (
-            <ProgressSpinner
-              style={{ width: "20px", height: "20px" }}
-              strokeWidth="6"
-              fill="var(--surface-ground)"
-              animationDuration=".5s"
+        {loadingCreate && (
+          <ProgressSpinner
+            style={{ width: "20px", height: "20px" }}
+            strokeWidth="6"
+            fill="var(--surface-ground)"
+            animationDuration=".5s"
+          />
+        )}
+        {errorCreate && <Message severity="error" text={errorCreate} />}
+        <div className="mx-auto space-y-4 p-4">
+        <Toast ref={toastBottomCenter} position="bottom-center" />
+          <Input
+            type="text"
+            value={customer}
+            label="Customer Name"
+            inputClassName="w-full"
+            className="w-full"
+            size="lg"
+            required
+            onChange={(e) => setCustomer(e.target.value)}
+          />
+          <div className="w-full gap-2 space-y-4 xl:flex xl:space-y-0 ">
+            <Input
+              type="number"
+              value={phone}
+              inputClassName="w-full"
+              className="w-full"
+              label="Phone Number"
+              size="lg"
+              required
+              onChange={(e) => setPhone(e.target.value)}
             />
-          )}
-          {errorCreate && <Message severity="error" text={errorCreate} />}
-          <div className="mx-auto space-y-4 p-4">
-            
-              <Input
-                type="text"
-                value={customer}
-                label="Customer Name"
-                inputClassName="w-full"
-                className="w-full"
-                size="lg"
-                required
-                onChange={(e) => setCustomer(e.target.value)}
-              />
-              <div className="w-full gap-2 space-y-4 xl:flex xl:space-y-0 ">
-              <Input
-                type="number"
-                value={phone}
-                inputClassName="w-full"
-                className="w-full"
-                label="Phone Number"
-                size="lg"
-                required
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            
+
             <div className=" rounded border border-gray-400 py-2 px-2">
               <DatePicker selected={date} onChange={(dt) => setDate(dt)} />
             </div>
-            </div>
+          </div>
 
-            <div className="w-full gap-2 space-y-4 xl:flex  xl:space-y-0">
-              <AutoComplete
-                placeholder="item name"
-                inputClassName="w-full xl:h-11"
-                className="w-full"
-                field="name"
-                size="lg"
-                value={item}
-                suggestions={items}
-                completeMethod={() => dispatch(listStoreItems())}
-                onChange={(e) => setItem(e.value)}
-                required
-              />
+          <div className="w-full gap-2 space-y-4 xl:flex  xl:space-y-0">
+            <AutoComplete
+              placeholder="item name"
+              inputClassName="w-full xl:h-11"
+              className="w-full"
+              field="name"
+              size="lg"
+              value={item}
+              suggestions={items}
+              completeMethod={() => dispatch(listStoreItems())}
+              onChange={(e) => setItem(e.value)}
+              required
+            />
 
-              <Input
-                type="number"
-                inputClassName="w-full"
-                value={quantity}
-                label="Quantity"
-                size="lg"
-                required
-                onChange={(e) => setQuantity(e.target.value)}
-              />
-              <Input
-                type="number"
-                value={price}
-                label="Price"
-                size="lg"
-                required
-                onChange={(e) => setPrice(e.target.value)}
-              />
-            </div>
-            <div className="flex justify-between">
-              <div></div>
-              <Button label="Add" onClick={()=>{
-                dispatch(addToOrderItems(item._id, quantity, price))
-                setQuantity("")
-                setPrice("")
-                
-                
-              }}/>
-            </div>
+            <Input
+              type="number"
+              inputClassName="w-full"
+              value={quantity}
+              label="Quantity"
+              size="lg"
+              required
+              onChange={(e) => setQuantity(e.target.value)}
+            />
+            <Input
+              type="number"
+              value={price}
+              label="Price"
+              size="lg"
+              required
+              onChange={(e) => setPrice(e.target.value)}
+            />
+          </div>
+          <div className="flex justify-between">
+            <div></div>
+            <Button
+              label="Add"
+              onClick={() => {
+                if (item != "" && quantity != "" && price != "") {
+                  dispatch(addToOrderItems(item._id, quantity, price));
+                  setItem("");
+                  setQuantity("");
+                  setPrice("");
+                }
+              }}
+            />
+          </div>
 
-            <table className="w-full space-y-4  xl:space-y-0">
-              <thead className="sticky top-0 z-40 border-b bg-white">
-                <tr>
-                  <th className="w-12 border border-blue-gray-50 py-3 px-2 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-medium uppercase text-blue-gray-600"
-                    >
-                      No
-                    </Typography>
-                  </th>
-                  <th className="border border-blue-gray-50 py-3 px-2 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-medium uppercase text-blue-gray-600"
-                    >
-                      Item
-                    </Typography>
-                  </th>
-                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-medium uppercase text-blue-gray-600"
-                    >
-                      Price
-                    </Typography>
-                  </th>
-                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-medium uppercase text-blue-gray-600"
-                    >
-                      Qty
-                    </Typography>
-                  </th>
-                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-medium uppercase text-blue-gray-600"
-                    >
-                      Total
-                    </Typography>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
+          <table className="w-full space-y-4  xl:space-y-0">
+            <thead className="sticky top-0 z-40 border-b bg-white">
+              <tr>
+                <th className="w-12 border border-blue-gray-50 py-3 px-2 text-left">
+                  <Typography
+                    variant="small"
+                    className="text-[11px] font-medium uppercase text-blue-gray-600"
+                  >
+                    No
+                  </Typography>
+                </th>
+                <th className="border border-blue-gray-50 py-3 px-2 text-left">
+                  <Typography
+                    variant="small"
+                    className="text-[11px] font-medium uppercase text-blue-gray-600"
+                  >
+                    Item
+                  </Typography>
+                </th>
+                <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                  <Typography
+                    variant="small"
+                    className="text-[11px] font-medium uppercase text-blue-gray-600"
+                  >
+                    Price
+                  </Typography>
+                </th>
+                <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                  <Typography
+                    variant="small"
+                    className="text-[11px] font-medium uppercase text-blue-gray-600"
+                  >
+                    Qty
+                  </Typography>
+                </th>
+                <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                  <Typography
+                    variant="small"
+                    className="text-[11px] font-medium uppercase text-blue-gray-600"
+                  >
+                    Total
+                  </Typography>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
               {orderItems.map((odr, index) => (
                 <tr>
                   <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
@@ -687,29 +696,36 @@ export function SalesScreen() {
                   </td>
                 </tr>
               ))}
-              </tbody>
-            </table>
-            <p className="text-left uppercase">Sub Total: ${totalPrice}</p>
+            </tbody>
+          </table>
+          <p className="text-left uppercase">Sub Total: ${totalPrice}</p>
 
-            <div>
-              IsPaid
-              <span className="px-2"></span>
-              <Checkbox
-                onChange={(e) => setIsPaid(e.checked)}
-                checked={isPaid}
-              ></Checkbox>
-            </div>
-
-            <div className="mt-4 flex justify-center">
-              <button
-                type="submit"
-                onClick={submitHandler}
-                className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium uppercase text-white transition hover:bg-transparent hover:text-primary"
-              >
-                Save
-              </button>
-            </div>
+          <div>
+            IsPaid
+            <span className="px-2"></span>
+            <Checkbox
+              onChange={(e) => setIsPaid(e.checked)}
+              checked={isPaid}
+              defaultValue={isPaid}
+            ></Checkbox>
           </div>
+
+          <div className="mt-4 flex justify-center">
+            <button
+              type="submit"
+              onClick={(e) => {
+                if (orderItems.length != 0) {
+                  submitHandler(e)
+                } else {
+                  showMessage(toastBottomCenter, 'error')
+                }
+              }}
+              className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium uppercase text-white transition hover:bg-transparent hover:text-primary"
+            >
+              Save
+            </button>
+          </div>
+        </div>
         {/* </form> */}
       </Dialog>
 
@@ -763,8 +779,6 @@ export function SalesScreen() {
         </form>
       </Dialog>
 
-
-
       <Dialog
         blockScroll="false"
         aria-expanded={show ? true : false}
@@ -772,23 +786,16 @@ export function SalesScreen() {
         visible={show}
         onHide={() => {
           setShow(false);
-        
         }}
         style={{ width: "60vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
       >
         <Card>
-        <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
-          
+          <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
             <table className="w-full min-w-[640px] table-auto">
               <thead className="sticky top-0 z-40 border-b bg-white">
                 <tr>
-                  {[
-                    "Item NAME",
-                    "Quantity",
-                    "Price",
-                    "Total",
-                  ].map((el) => (
+                  {["Item NAME", "Quantity", "Price", "Total"].map((el) => (
                     <th className="border-b border-blue-gray-50 py-3 px-4 text-left">
                       <Typography
                         variant="small"
@@ -800,52 +807,49 @@ export function SalesScreen() {
                   ))}
                 </tr>
               </thead>
-            
-                <tbody className="overflow-y-auto">
-                  {myOrderItems.map((order) => (
-                    <tr id={order._id}>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          {order.itemName}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          {order.quantity}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          {order.price}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-medium capitalize text-blue-gray-400"
-                    >
-                      ${order.price * order.quantity}
-                    </Typography>
-                  </td>
-                    </tr>
-                  ))}
-                </tbody>
-              
+
+              <tbody className="overflow-y-auto">
+                {myOrderItems.map((order) => (
+                  <tr id={order._id}>
+                    <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                      >
+                        {order.itemName}
+                      </Typography>
+                    </td>
+                    <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                      >
+                        {order.quantity}
+                      </Typography>
+                    </td>
+                    <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                      >
+                        {order.price}
+                      </Typography>
+                    </td>
+                    <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium capitalize text-blue-gray-400"
+                      >
+                        ${order.price * order.quantity}
+                      </Typography>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
             </table>
           </CardBody>
         </Card>
-
       </Dialog>
-
     </>
   );
 }
