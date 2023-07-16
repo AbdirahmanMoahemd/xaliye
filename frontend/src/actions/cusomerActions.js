@@ -41,7 +41,7 @@ export const createNewCustomer =
   };
 
 
-  export const updateCustomer = (id,name, phone) => async (dispatch, getState) => {
+  export const updateCustomer = (id,custID,name, phone) => async (dispatch, getState) => {
     try {
       dispatch({
         type: CUSTOMER_UPDATE_REQUEST,
@@ -60,7 +60,7 @@ export const createNewCustomer =
   
       const { data } = await axios.put(
         `/api/customers/${id}`,
-        {name, phone, tasks:[]},
+        {custID,name, phone, tasks:[]},
         config
       );
   

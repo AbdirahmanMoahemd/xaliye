@@ -18,7 +18,7 @@ export const getCustomers = expressAsync(async (req, res) => {
 
     const customerCount = await Customers.countDocuments({ ...keyword2 });  
     const customers = await Customers.find({ ...keyword2 }).sort({
-      createdAt: 1,
+      createdAt: -1,
     }).limit(pageSize)
     .skip(pageSize * (page - 1));;
 
@@ -231,18 +231,29 @@ export const createCustomers = expressAsync(async (req, res) => {
 });
 
 export const updateCustomers = expressAsync(async (req, res) => {
-  const { name, phone } = req.body;
+  const { custID, name, phone } = req.body;
 
   const customer = await Customers.findById(req.params.id);
 
+  
+
   if (customer) {
+   
+    customer.custID = custID
     customer.name = name;
     customer.phone = phone;
 
-    const updatedCustomers = await customer.save();
-    res.json({
-      updatedCustomers,
-    });
+    const excustomer = await Customers.findOne({custID});
+    if (excustomer  &&  !excustomer._id.equals(customer._id)) {
+      res.status(400);
+    throw new Error("Duplicate Id Not Allowed");
+    }else{
+      const updatedCustomers = await customer.save();
+      res.json({
+        updatedCustomers,
+      });
+    }
+    
   } else {
     res.status(404);
     throw new Error("Customers Not Found");

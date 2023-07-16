@@ -43,6 +43,7 @@ export function CustomersScreen() {
   const [create, setCreate] = useState(false);
   const [edit, setEdit] = useState(false);
   const [show, setShow] = useState(false);
+  const [custID, setCustID] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [id, setId] = useState("");
@@ -128,6 +129,7 @@ export function CustomersScreen() {
         if (!customer.name || customer._id !== id) {
           dispatch(listCustomerDetails(id));
         } else {
+          setCustID(customer.custID)
           setName(customer.name);
           setPhone(customer.phone);
         }
@@ -144,7 +146,7 @@ export function CustomersScreen() {
 
   const updateHandler = (e) => {
     e.preventDefault();
-    dispatch(updateCustomer(id, name, phone));
+    dispatch(updateCustomer(id,custID, name, phone));
   };
 
   const getMyTasks = (id) => {
@@ -398,7 +400,7 @@ export function CustomersScreen() {
       <Dialog
         blockScroll="false"
         aria-expanded={create ? true : false}
-        header="Add New Ticket"
+        header="Add New Customer"
         visible={create}
         onHide={() => {
           setCreate(false)
@@ -453,7 +455,7 @@ export function CustomersScreen() {
       <Dialog
         blockScroll="false"
         aria-expanded={edit ? true : false}
-        header="Update Ticket"
+        header="Edit Customer Info"
         visible={edit}
         onHide={() => {
           setEdit(false);
@@ -486,8 +488,16 @@ export function CustomersScreen() {
             <div className="mx-auto space-y-4 p-4">
               <Input
                 type="text"
+                value={custID}
+                label="Customer Id"
+                size="lg"
+                required
+                onChange={(e) => setCustID(e.target.value)}
+              />
+              <Input
+                type="text"
                 value={name}
-                label="Customer Number"
+                label="Customer Name"
                 size="lg"
                 required
                 onChange={(e) => setName(e.target.value)}

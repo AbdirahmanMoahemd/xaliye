@@ -1,4 +1,4 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Card,
   CardHeader,
@@ -110,7 +110,7 @@ export function SignIn() {
             </CardFooter>
 
           </form>
-          <div className="flex justify-center pb-2"><p className="cursor-pointer text-black underline text-sm">My Device Status</p></div>
+          <div className="flex justify-center pb-2"><Link to='/my-device-status' className=" text-black underline text-sm">My Device Status</Link></div>
         </Card>
       </div>
     </div>
