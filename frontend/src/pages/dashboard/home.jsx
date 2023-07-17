@@ -64,7 +64,7 @@ import moment from "moment";
 import { addToOrderItems, createNewSales, listRecentSales, removeFromOrder } from "@/actions/salesActions";
 import { ScrollPanel } from "primereact/scrollpanel";
 import { Checkbox } from "primereact/checkbox";
-import { listStoreItems } from "@/actions/storeActions";
+import { listStoreItems, updateStoreItemCountInStock } from "@/actions/storeActions";
 import { ORDER_REMOVE_ITEM_ALL, SALES_CREATE_RESET } from "@/constants/salesConstants";
 import ReactToPrint from "react-to-print";
 import { Button } from "primereact/button";
@@ -116,6 +116,7 @@ export function Home() {
   const [myOrderItems, setMyOrderItems] = useState([]);
   const [show, setShow] = useState(false);
   const [custname, setCustname] = useState("");
+  const [countInStockError, setCountInStockError] = useState(false);
 
   const [first, setFirst] = useState(1);
   const [rows, setRows] = useState(200);
@@ -316,6 +317,8 @@ export function Home() {
       setPrice("");
       setIsPaid(false);
       setDate(new Date());
+      setCountInStockError(false)
+      countInStockHandler()
       dispatch({ type: ORDER_REMOVE_ITEM_ALL });
 
     }
@@ -330,6 +333,14 @@ export function Home() {
     if (stage !== "") {
       dispatch(updateTasksStage(id, stage));
       setVisible(false);
+    }
+  };
+
+  const countInStockHandler = () => {
+    for (let index = 0; index < orderItems.length; index++) {
+      const element = orderItems[index];
+
+      dispatch(updateStoreItemCountInStock(element.item, element.quantity));
     }
   };
 
@@ -1775,6 +1786,7 @@ export function Home() {
           setPrice("");
           setIsPaid(true);
           setDate(new Date());
+          setCountInStockError(false)
           dispatch({ type: ORDER_REMOVE_ITEM_ALL });
           
         }}
@@ -1790,7 +1802,8 @@ export function Home() {
               animationDuration=".5s"
             />
           )}
-          {errorCreate && <Message severity="error" text={errorCreate} />}
+          {errorSaleCreate && <Message severity="error" text={errorSaleCreate} />}
+          {countInStockError && <Message severity="error" text={'This Item Not Available in the store'} />}
           <div className="mx-auto space-y-4 p-4">
             
               <Input
@@ -1856,13 +1869,16 @@ export function Home() {
               <div></div>
               <Button label="Add" onClick={()=>{
                 if (itemsale != "" && quantity != "" && price != "") {
-                  console.log(quantity);
-                  console.log(itemsale);
+                  if (itemsale.countInStock > 0) {
+                    setCountInStockError(false)
                   dispatch(addToOrderItems(itemsale._id, quantity, price))
                   setItemSale("")
                   setQuantity("")
                   setPrice("")
+                }else{
+                  setCountInStockError(true)
                 }
+              }
                 
                 
               }}/>

@@ -13,7 +13,10 @@ import {
 import { EllipsisVerticalIcon } from "@heroicons/react/24/outline";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { listStoreItems } from "@/actions/storeActions";
+import {
+  listStoreItems,
+  updateStoreItemCountInStock,
+} from "@/actions/storeActions";
 import {
   addToOrderItems,
   createNewSales,
@@ -40,7 +43,7 @@ import { confirmAlert } from "react-confirm-alert";
 import DatePicker from "react-datepicker";
 import { Button } from "primereact/button";
 import { Paginator } from "primereact/paginator";
-import { Toast } from 'primereact/toast';
+import { Toast } from "primereact/toast";
 
 export function SalesScreen() {
   const [keyword, setKeyword] = useState("");
@@ -64,16 +67,22 @@ export function SalesScreen() {
   const [myOrderItems, setMyOrderItems] = useState([]);
   const [show, setShow] = useState(false);
   const [custname, setCustname] = useState("");
+  const [countInStockError, setCountInStockError] = useState(false);
   const toastBottomCenter = useRef(null);
 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const showMessage = (ref, severity) => {
-    const label = 'All fields are required';
+    const label = "All fields are required";
 
-    ref.current.show({ severity: severity, summary: 'Error', detail: label, life: 3000 });
-};
+    ref.current.show({
+      severity: severity,
+      summary: "Error",
+      detail: label,
+      life: 3000,
+    });
+  };
 
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
@@ -85,8 +94,6 @@ export function SalesScreen() {
     sales,
     salesCount,
   } = salesList;
-
-
 
   const storeItemList = useSelector((state) => state.storeItemList);
   const { loading, error, items } = storeItemList;
@@ -156,10 +163,6 @@ export function SalesScreen() {
   useEffect(() => {
     if (successCreate) {
       dispatch({ type: SALES_CREATE_RESET });
-    }
-
-    if (successCreate) {
-      dispatch({ type: SALES_CREATE_RESET });
       setCreate(false);
       setItem("");
       setCustomer("");
@@ -168,6 +171,8 @@ export function SalesScreen() {
       setPrice("");
       setIsPaid(false);
       setDate(new Date());
+      countInStockHandler();
+      dispatch({ type: ORDER_REMOVE_ITEM_ALL });
     }
   }, [dispatch, successCreate]);
 
@@ -199,6 +204,18 @@ export function SalesScreen() {
       );
     }
   };
+
+
+
+  const countInStockHandler = () => {
+    for (let index = 0; index < orderItems.length; index++) {
+      const element = orderItems[index];
+
+      dispatch(updateStoreItemCountInStock(element.item, element.quantity));
+    }
+  };
+
+
 
   const updateHandler = (e) => {
     e.preventDefault();
@@ -515,6 +532,7 @@ export function SalesScreen() {
           setPrice("");
           setIsPaid(true);
           setDate(new Date());
+          setCountInStockError(false)
           dispatch({ type: ORDER_REMOVE_ITEM_ALL });
         }}
         style={{ width: "40vw" }}
@@ -530,8 +548,9 @@ export function SalesScreen() {
           />
         )}
         {errorCreate && <Message severity="error" text={errorCreate} />}
+        {countInStockError && <Message severity="error" text={'This Item Not Available in the store'} />}
         <div className="mx-auto space-y-4 p-4">
-        <Toast ref={toastBottomCenter} position="bottom-center" />
+          <Toast ref={toastBottomCenter} position="bottom-center" />
           <Input
             type="text"
             value={customer}
@@ -597,10 +616,16 @@ export function SalesScreen() {
               label="Add"
               onClick={() => {
                 if (item != "" && quantity != "" && price != "") {
-                  dispatch(addToOrderItems(item._id, quantity, price));
-                  setItem("");
-                  setQuantity("");
-                  setPrice("");
+                  if (item.countInStock > 0) {
+                    setCountInStockError(false)
+                    dispatch(addToOrderItems(item._id, quantity, price));
+                    setItem("");
+                    setQuantity("");
+                    setPrice("");
+                  }else{
+                    setCountInStockError(true)
+                  }
+                 
                 }
               }}
             />
@@ -715,9 +740,9 @@ export function SalesScreen() {
               type="submit"
               onClick={(e) => {
                 if (orderItems.length != 0) {
-                  submitHandler(e)
+                  submitHandler(e);
                 } else {
-                  showMessage(toastBottomCenter, 'error')
+                  showMessage(toastBottomCenter, "error");
                 }
               }}
               className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium uppercase text-white transition hover:bg-transparent hover:text-primary"

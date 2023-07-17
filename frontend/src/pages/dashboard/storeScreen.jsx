@@ -274,10 +274,10 @@ export function StoreScreen() {
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Typography
                             variant="small"
-                            className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            className={`text-[11px] font-medium capitalize  ${item.countInStock > 0 ? 'text-blue-gray-400' :' text-red-600'}`}
                           >
                             {item.countInStock}
-                          </Typography>
+                          </Typography> 
                         </td>
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Button

@@ -94,10 +94,11 @@ export const createSalesItem = expressAsync(async (req, res) => {
     const createdSales = await sale.save();
 
     if (createdSales) {
-      // store.countInStock = store.countInStock - quantity;
-      // const updatedStoreItem = await store.save();
+      
+      
+     
     }
-    res.status(201).json(createdSales);
+    res.status(201).json(orderItems);
   
 });
 
@@ -108,7 +109,7 @@ export const updateSalesItem = expressAsync(async (req, res) => {
 
   if (sale) {
     sale.item = item;
-    sale.customer = customer;
+    sale.customer = customer; 
     sale.quantity = quantity;
     sale.price = price;
     sale.date = date;

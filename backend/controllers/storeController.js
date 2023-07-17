@@ -65,6 +65,25 @@ export const updateStoreItem = expressAsync(async (req, res) => {
   }
 });
 
+
+export const updateStoreItemCountStck = expressAsync(async (req, res) => {
+  const { countInStock } = req.body;
+
+  const item = await Store.findById(req.params.id);
+
+  if (item) {
+    item.countInStock = item.countInStock - countInStock;
+
+    const updatedStoreItem = await item.save();
+    res.json({
+      updatedStoreItem,
+    });
+  } else {
+    res.status(404);
+    throw new Error("Store item Not Found");
+  }
+});
+
 export const deleteStoreItemById = expressAsync(async (req, res) => {
   try {
     const item = await Store.findByIdAndDelete(req.params.id);
