@@ -3,12 +3,14 @@ import { Dashboard, Auth } from "./layouts";
 import { SignIn, SignUp } from "./pages/auth";
 import BinTasksScreen from "./pages/dashboard/binTasksScreen";
 import MyDeviceStatus from "./pages/dashboard/mydevice";
+import HomeScreen from "./pages/home";
 
 function App() {
   return (
     <Routes>
       <Route path="/dashboard/*" element={<Dashboard />} />
       <Route path="/dashboard/bin" element={<BinTasksScreen />} />
+      <Route path="/home" element={<HomeScreen/>} />
       <Route path="/my-device-status" element={<MyDeviceStatus />} />
       <Route path="/sign-in" element={<SignIn />} />
       <Route path="/sign-up" element={<SignUp />} />

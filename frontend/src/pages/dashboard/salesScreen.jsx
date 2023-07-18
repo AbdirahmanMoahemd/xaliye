@@ -719,6 +719,14 @@ export function SalesScreen() {
                       ${odr.price * odr.quantity}
                     </Typography>
                   </td>
+                  <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                    <Typography
+                      variant="small"
+                      className="text-[11px] font-medium capitalize text-blue-gray-400"
+                    >
+                      <i className="pi pi-delete-left cursor-pointer" onClick={()=> dispatch(removeFromOrder(odr.item))}/>
+                    </Typography>
+                  </td>
                 </tr>
               ))}
             </tbody>

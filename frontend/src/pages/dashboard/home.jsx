@@ -1805,7 +1805,7 @@ export function Home() {
           {errorSaleCreate && <Message severity="error" text={errorSaleCreate} />}
           {countInStockError && <Message severity="error" text={'This Item Not Available in the store'} />}
           <div className="mx-auto space-y-4 p-4">
-            
+          
               <Input
                 type="text"
                 value={customer}
