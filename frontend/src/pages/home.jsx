@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import second from "../data/images/bg.jpg";
 import repairing from "../data/images/repairing.png";
 import gadgets from "../data/images/gadgets.png";
-import { Button, Card, CardBody, CardFooter, CardHeader, Typography } from "@material-tailwind/react";
+import { Button, Card, CardBody, CardFooter } from "@material-tailwind/react";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
