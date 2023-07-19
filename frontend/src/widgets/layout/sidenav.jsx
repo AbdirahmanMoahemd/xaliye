@@ -34,6 +34,7 @@ export function Sidenav({ brandName, routes }) {
         <Link to="/" className="flex items-center gap-4 py-6 px-6">
           <Typography
             variant="h6"
+            className='uppercase'
             color={sidenavType === "dark" ? "white" : "blue-gray"}
           >
             {brandName}

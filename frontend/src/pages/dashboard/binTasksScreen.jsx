@@ -23,8 +23,8 @@ import { confirmAlert } from "react-confirm-alert";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { Sidenav, DashboardNavbar, Configurator } from "@/widgets/layout";
-import routes from "@/routes";
 import { useMaterialTailwindController } from "@/context";
+import { routes } from "@/routes";
 
 const BinTasksScreen = () => {
   const navigate = useNavigate();

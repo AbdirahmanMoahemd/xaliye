@@ -11,6 +11,8 @@ import { HiUserGroup } from "react-icons/hi";
 import { BsPersonLinesFill } from "react-icons/bs";
 import UsersScreen from "./pages/dashboard/usersScreen";
 import EventsScreen from "./pages/dashboard/EventsScreen";
+import HomeScreen from "./pages/dashboard2/homeScreen";
+
 
 
 const icon = { 
@@ -81,4 +83,64 @@ export const routes = [
   
 ];
 
-export default routes;
+
+
+export const electronicRoutes = [
+  {
+    layout: "electronics",
+    pages: [
+      {
+        icon: <HomeIcon {...icon} />,
+        name: "dashboard",
+        path: "/home",
+        element: <HomeScreen />,
+      },
+      {
+        icon: <AiTwotoneAppstore {...icon} />,
+        name: "Inventory",
+        path: "/inventory",
+        element: <></>,
+      },
+      {
+        icon: <FcSalesPerformance  {...icon}/>,
+        name: "Sales",
+        path: "/sales",
+        element: <></>,
+      },
+      {
+        icon: <MdOutlineEventRepeat {...icon} />,
+        name: "Events",
+        path: "/events",
+        element: <></>,
+      },
+      {
+        icon: <HiUserGroup {...icon} />,
+        name: "Customers",
+        path: "/customers",
+        element: <></>,
+      },
+      {
+        icon: <BsPersonLinesFill {...icon} />,
+        name: "Users",
+        path: "/users",
+        element: <></>,
+      },
+      {
+        icon: <MdAccountBalanceWallet {...icon} />,
+        name: "Accounts",
+        path: "/account",
+        element: <></>,
+      },
+      {
+        icon: <BiTransfer   {...icon} />,
+        name: "Sales Transactions",
+        path: "/transactions",
+        element: <></>,
+      },
+    ],
+  },
+  
+  
+];
+
+

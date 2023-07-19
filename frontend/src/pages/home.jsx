@@ -6,7 +6,7 @@ import { Button, Card, CardBody, CardFooter, CardHeader, Typography } from "@mat
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 
-const HomeScreen = () => {
+const HomePage = () => {
 
     const navigate = useNavigate();
 
@@ -16,6 +16,12 @@ const HomeScreen = () => {
     const navigateToRepairing =(e)=>{
         e.preventDefault()
         navigate('/dashboard/home')
+        
+    }
+
+    const navigateToElectronics =(e)=>{
+        e.preventDefault()
+        navigate('/electronics/home')
         
     }
 
@@ -50,7 +56,7 @@ const HomeScreen = () => {
       
       </CardBody>
       <CardFooter className="pt-0">
-        <Button className="w-full">Electronics</Button>
+        <Button onClick={navigateToElectronics} className="w-full">Electronics</Button>
       </CardFooter>
         </Card>
         </div>
@@ -60,4 +66,4 @@ const HomeScreen = () => {
   );
 };
 
-export default HomeScreen;
+export default HomePage;

@@ -1,23 +1,21 @@
 import { Routes, Route } from "react-router-dom";
-import { Cog6ToothIcon } from "@heroicons/react/24/solid";
-import { IconButton } from "@material-tailwind/react";
 import {
   Sidenav,
   DashboardNavbar,
   Configurator,
-  Footer,
 } from "@/widgets/layout";
-import {routes} from "@/routes";
+import {electronicRoutes}  from "@/routes";
 import { useMaterialTailwindController } from "@/context";
 
-export function Dashboard() {
-  const [controller, dispatch] = useMaterialTailwindController();
+export function Dashboard2() {
+  const [controller] = useMaterialTailwindController();
   const { sidenavType } = controller;
 
   return (
     <div className="min-h-screen bg-blue-gray-50/50">
       <Sidenav
-        routes={routes}
+        routes={electronicRoutes}
+        brandName="  Xaliye computers"
         brandImg={
           sidenavType === "dark" ? "/img/logo-ct.png" : "/img/logo-ct-dark.png"
         }
@@ -26,9 +24,9 @@ export function Dashboard() {
         <DashboardNavbar />
         <Configurator />
         <Routes>
-          {routes.map(
+          {electronicRoutes.map(
             ({ layout, pages }) =>
-              layout === 'dashboard' &&
+              layout === 'electronics' &&
               pages.map(({ path, element }) => (
                 <Route exact path={path} element={element} />
               ))
@@ -40,6 +38,6 @@ export function Dashboard() {
   );
 }
 
-Dashboard.displayName = "/src/layout/dashboard.jsx";
+Dashboard2.displayName = "/src/layout/dashboard2.jsx";
 
-export default Dashboard;
+export default Dashboard2;
