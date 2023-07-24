@@ -15,11 +15,12 @@ export function Dashboard2() {
     <div className="min-h-screen bg-blue-gray-50/50">
       <Sidenav
         routes={electronicRoutes}
-        brandName="  Xaliye computers"
+        brandName="Xaliye Computers & gadgets"
         brandImg={
           sidenavType === "dark" ? "/img/logo-ct.png" : "/img/logo-ct-dark.png"
         }
       />
+    
       <div className="p-4 xl:ml-80">
         <DashboardNavbar />
         <Configurator />

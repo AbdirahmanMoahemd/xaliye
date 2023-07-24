@@ -31,10 +31,10 @@ export function Sidenav({ brandName, routes }) {
           sidenavType === "dark" ? "border-white/20" : "border-blue-gray-50"
         }`}
       >
-        <Link to="/" className="flex items-center gap-4 py-6 px-6">
+        <Link to="/" className="flex justify-center py-6">
           <Typography
-            variant="h6"
-            className='uppercase'
+            variant="md"
+            className='uppercase font-bold'
             color={sidenavType === "dark" ? "white" : "blue-gray"}
           >
             {brandName}
@@ -105,7 +105,7 @@ export function Sidenav({ brandName, routes }) {
 
 Sidenav.defaultProps = {
   brandImg: "",
-  brandName: "XALIYE COMPUTER REPAIRING",
+  brandName: "REPAIRING",
 };
 
 Sidenav.propTypes = {

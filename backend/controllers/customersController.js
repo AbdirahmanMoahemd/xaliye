@@ -117,12 +117,6 @@ export const getTotalCustomersAndSales = expressAsync(async (req, res) => {
       yesterdayPerc = yesterdaySalesTotal == 0 ? 0 :100
     }
 
-   
-
-
-
-
-
 
     if (todayCustomersTotal != 0 && yesterdayCustomersTotal != 0) {
       if (todayCustomersTotal > yesterdayCustomersTotal ) {
@@ -153,7 +147,7 @@ export const getTotalCustomersAndSales = expressAsync(async (req, res) => {
     const sales = (await Sales.find()).length;
 
     function kFormatter(num) {
-      return Math.abs(num) > 999
+      return Math.abs(num) > 999 
         ? Math.sign(num) * (Math.abs(num) / 1000).toFixed(3) + "k"
         : Math.sign(num) * Math.abs(num);
     }

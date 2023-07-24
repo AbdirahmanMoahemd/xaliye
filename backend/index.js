@@ -6,17 +6,17 @@ import connectDB from "./config/db.js";
 import userRoutes from "../backend/routes/userRoutes.js";
 import tasksRoutes from "../backend/routes/tasksRoutes.js";
 import storeRoutes from "../backend/routes/storeRoutes.js";
-// import incomeRoutes from '../backend/routes/incomeRoutes.js'
-// import expenseRoutes from '../backend/routes/expenseRoutes.js'
 import customerRoutes from "../backend/routes/customerRoutes.js";
 import salesRoute from "../backend/routes/salesRoute.js";
 import accountRoutes from "../backend/routes/accountRoutes.js";
 import subAccountRoutes from "../backend/routes/subAccountRoutes.js";
 import transactionRoutes from "../backend/routes/transactionRoutes.js";
 import eventsRouets from "../backend/routes/eventsRouets.js";
+import store2Routes from "../backend/routes/store2Routes.js";
+import sales2Routes from "../backend/routes/sales2Routes.js";
 import { errorHandler, notFound } from "./middlewares/errorMidlleware.js";
 
-dotenv.config();
+dotenv.config(); 
 connectDB();
 const app = express();
 
@@ -28,10 +28,10 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/tasks", tasksRoutes);
 app.use("/api/store", storeRoutes);  
-// app.use('/api/income', incomeRoutes)
-// app.use('/api/expense', expenseRoutes)
+app.use("/api/store2", store2Routes);  
 app.use("/api/customers", customerRoutes);
 app.use("/api/Sales", salesRoute);
+app.use("/api/Sales2", sales2Routes);
 app.use("/api/account", accountRoutes); 
 app.use("/api/subaccount", subAccountRoutes);
 app.use("/api/transaction", transactionRoutes);

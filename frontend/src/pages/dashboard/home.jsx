@@ -61,11 +61,22 @@ import DatePicker from "react-datepicker";
 import { getCustomerTotal, listCustomers } from "@/actions/cusomerActions";
 import { confirmAlert } from "react-confirm-alert";
 import moment from "moment";
-import { addToOrderItems, createNewSales, listRecentSales, removeFromOrder } from "@/actions/salesActions";
+import {
+  addToOrderItems,
+  createNewSales,
+  listRecentSales,
+  removeFromOrder,
+} from "@/actions/salesActions";
 import { ScrollPanel } from "primereact/scrollpanel";
 import { Checkbox } from "primereact/checkbox";
-import { listStoreItems, updateStoreItemCountInStock } from "@/actions/storeActions";
-import { ORDER_REMOVE_ITEM_ALL, SALES_CREATE_RESET } from "@/constants/salesConstants";
+import {
+  listStoreItems,
+  updateStoreItemCountInStock,
+} from "@/actions/storeActions";
+import {
+  ORDER_REMOVE_ITEM_ALL,
+  SALES_CREATE_RESET,
+} from "@/constants/salesConstants";
 import ReactToPrint from "react-to-print";
 import { Button } from "primereact/button";
 import ReactHTMLTableToExcel from "react-html-table-to-excel";
@@ -209,8 +220,8 @@ export function Home() {
     success: successSaleCreate,
   } = createSales;
 
-  const order = useSelector(state => state.order)
-    const { orderItems } = order
+  const order = useSelector((state) => state.order);
+  const { orderItems } = order;
 
   useEffect(() => {
     dispatch(getTasksTotal());
@@ -317,10 +328,9 @@ export function Home() {
       setPrice("");
       setIsPaid(false);
       setDate(new Date());
-      setCountInStockError(false)
-      countInStockHandler()
+      setCountInStockError(false);
+      countInStockHandler();
       dispatch({ type: ORDER_REMOVE_ITEM_ALL });
-
     }
     dispatch(listRecentSales());
   }, [dispatch, successSaleCreate]);
@@ -454,8 +464,6 @@ export function Home() {
         )
       );
     }
-
-   
   };
   let toltal;
   const getTotal = (e) => {
@@ -471,11 +479,12 @@ export function Home() {
     setShowTotal(true);
   };
 
-  let totalPrice = orderItems.reduce((acc, item) => acc + item.quantity * item.price, 0);
+  let totalPrice = orderItems.reduce(
+    (acc, item) => acc + item.quantity * item.price,
+    0
+  );
 
-  const itemqty = orderItems.reduce((acc, item) => acc + item.quantity, 0)
-
-  
+  const itemqty = orderItems.reduce((acc, item) => acc + item.quantity, 0);
 
   return (
     <div className="mt-12">
@@ -1019,13 +1028,9 @@ export function Home() {
           </CardHeader>
           <CardBody className="table-wrp block max-h-screen  overflow-x-scroll px-0 pt-0 pb-2">
             <table className="w-full table-auto">
-          <thead className="sticky top-0 z-40 border-b bg-white">
+              <thead className="sticky top-0 z-40 border-b bg-white">
                 <tr>
-                  {[
-                    "Customer",
-                    "Order Items",
-                    "",
-                  ].map((el) => (
+                  {["Customer", "Order Items", ""].map((el) => (
                     <th
                       key={el}
                       className="border-b border-blue-gray-50 py-3 px-4 text-left"
@@ -1050,60 +1055,61 @@ export function Home() {
               ) : errorSales ? (
                 <Message severity="error" text={errorSales} />
               ) : (
-                
-                 <tbody className="overflow-y-auto">
-                  {sales.map((sale) => 
-                     <tr key={sale._id}>
-                     <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
-                       <Typography
-                         variant="small"
-                         className="text-[12px] font-medium capitalize text-blue-gray-400"
-                       >
-                         Name:{sale.customer}
-                         <p>Phone:{sale.phone}</p>
-                       </Typography>
-                     </td>
-                     <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
-                       <Typography
-                         variant="small"
-                         className="text-[11px] font-medium capitalize text-blue-gray-400"
-                       >
+                <tbody className="overflow-y-auto">
+                  {sales.map((sale) => (
+                    <tr key={sale._id}>
+                      <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[12px] font-medium capitalize text-blue-gray-400"
+                        >
+                          Name:{sale.customer}
+                          <p>Phone:{sale.phone}</p>
+                        </Typography>
+                      </td>
+                      <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                        <Typography
+                          variant="small"
+                          className="text-[11px] font-medium capitalize text-blue-gray-400"
+                        >
                           <Button
-                              className="z-10 h-8"
-                              label="Show"
-                              icon=""
-                              onClick={() => {
-                                setMyOrderItems(sale.orderItems);
-                                setCustname(sale.customer);
-                                setShow(true);
-                              }}
-                            />
-                       </Typography>
-                     </td >
-                     <td  className="border-b border-blue-gray-50 text-center">
-                      <i onClick={()=> {
-                        setOrdersSalesPrint(sale.orderItems)
-                        setSalesPrint(sale)
-                        setIsSalesPrinting(true)
-                      }}><ReactToPrint
-                      color=" blue"
-                      trigger={() =>  <i className="pi pi-print cursor-pointer"/>}
-                      content={() => componentRef2}
-                    /></i>
-                     </td>
-                     </tr>
-                  
-                  )}
-                 </tbody>
+                            className="z-10 h-8"
+                            label="Show"
+                            icon=""
+                            onClick={() => {
+                              setMyOrderItems(sale.orderItems);
+                              setCustname(sale.customer);
+                              setShow(true);
+                            }}
+                          />
+                        </Typography>
+                      </td>
+                      <td className="border-b border-blue-gray-50 text-center">
+                        <i
+                          onClick={() => {
+                            setOrdersSalesPrint(sale.orderItems);
+                            setSalesPrint(sale);
+                            setIsSalesPrinting(true);
+                          }}
+                        >
+                          <ReactToPrint
+                            color=" blue"
+                            trigger={() => (
+                              <i className="pi pi-print cursor-pointer" />
+                            )}
+                            content={() => componentRef2}
+                          />
+                        </i>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
               )}
-              </table>
+            </table>
           </CardBody>
-          <ScrollPanel className="max-h-[34rem]">
-           
-          </ScrollPanel>
+          <ScrollPanel className="max-h-[34rem]"></ScrollPanel>
         </Card>
       </div>
-
 
       <Dialog
         blockScroll="false"
@@ -1176,9 +1182,6 @@ export function Home() {
           </CardBody>
         </Card>
       </Dialog>
-
-
-
 
       <Dialog
         header="Comment"
@@ -1770,8 +1773,8 @@ export function Home() {
         {/* </form> */}
       </Dialog>
 
-       {/* Create Sale */}
-       <Dialog
+      {/* Create Sale */}
+      <Dialog
         blockScroll="false"
         aria-expanded={createSale ? true : false}
         header="New Sale"
@@ -1786,158 +1789,162 @@ export function Home() {
           setPrice("");
           setIsPaid(true);
           setDate(new Date());
-          setCountInStockError(false)
+          setCountInStockError(false);
           dispatch({ type: ORDER_REMOVE_ITEM_ALL });
-          
         }}
         style={{ width: "40vw" }}
         breakpoints={{ "960px": "75vw", "641px": "100vw" }}
       >
         {/* <form onSubmit={submitHandler}> */}
-          {loadingCreate && (
-            <ProgressSpinner
-              style={{ width: "20px", height: "20px" }}
-              strokeWidth="6"
-              fill="var(--surface-ground)"
-              animationDuration=".5s"
+        {loadingSaleCreate && (
+          <ProgressSpinner
+            style={{ width: "20px", height: "20px" }}
+            strokeWidth="6"
+            fill="var(--surface-ground)"
+            animationDuration=".5s"
+          />
+        )}
+        {errorSaleCreate && <Message severity="error" text={errorSaleCreate} />}
+        {countInStockError && (
+          <Message
+            severity="error"
+            text={"This Item Not Available in the store"}
+          />
+        )}
+        <div className="mx-auto space-y-4 p-4">
+          <Input
+            type="text"
+            value={customer}
+            label="Customer Name"
+            inputClassName="w-full"
+            className="w-full"
+            size="lg"
+            required
+            onChange={(e) => setCustomer(e.target.value)}
+          />
+          <div className="w-full gap-2 space-y-4 xl:flex xl:space-y-0 ">
+            <Input
+              type="number"
+              value={phone}
+              inputClassName="w-full"
+              className="w-full"
+              label="Phone Number"
+              size="lg"
+              required
+              onChange={(e) => setPhone(e.target.value)}
             />
-          )}
-          {errorSaleCreate && <Message severity="error" text={errorSaleCreate} />}
-          {countInStockError && <Message severity="error" text={'This Item Not Available in the store'} />}
-          <div className="mx-auto space-y-4 p-4">
-          
-              <Input
-                type="text"
-                value={customer}
-                label="Customer Name"
-                inputClassName="w-full"
-                className="w-full"
-                size="lg"
-                required
-                onChange={(e) => setCustomer(e.target.value)}
-              />
-              <div className="w-full gap-2 space-y-4 xl:flex xl:space-y-0 ">
-              <Input
-                type="number"
-                value={phone}
-                inputClassName="w-full"
-                className="w-full"
-                label="Phone Number"
-                size="lg"
-                required
-                onChange={(e) => setPhone(e.target.value)}
-              />
-            
+
             <div className=" rounded border border-gray-400 py-2 px-2">
               <DatePicker selected={date} onChange={(dt) => setDate(dt)} />
             </div>
-            </div>
+          </div>
 
-            <div className="w-full gap-2 space-y-4 xl:flex  xl:space-y-0">
-              <AutoComplete
-                placeholder="item name"
-                inputClassName="w-full xl:h-11"
-                className="w-full"
-                field="name"
-                size="lg"
-                value={itemsale}
-                suggestions={items}
-                completeMethod={() => dispatch(listStoreItems())}
-                onChange={(e) => setItemSale(e.value)}
-                required
-              />
+          <div className="w-full grid grid-cols-1 gap-2 xl:grid-cols-12  xl:space-y-0">
+            <AutoComplete
+              placeholder="item name"
+              inputClassName="w-full xl:h-11"
+              className="xl:col-span-6"
+              field="name"
+              size="lg"
+              value={itemsale}
+              suggestions={items}
+              completeMethod={() => dispatch(listStoreItems())}
+              onChange={(e) => setItemSale(e.value)}
+              required
+            />
 
-              <Input
-                type="number"
-                inputClassName="w-full"
-                value={quantity}
-                label="Quantity"
-                size="lg"
-                required
-                onChange={(e) => setQuantity(e.target.value)}
-              />
-              <Input
-                type="number"
-                value={price}
-                label="Price"
-                size="lg"
-                required
-                onChange={(e) => setPrice(e.target.value)}
-              />
-            </div>
-            <div className="flex justify-between">
-              <div></div>
-              <Button label="Add" onClick={()=>{
+            <InputText
+              type="number"
+              className="p-inputtext-sm xl:col-span-3"
+              value={quantity}
+              placeholder="Quantity"
+              size="lg"
+              required
+              onChange={(e) => setQuantity(e.target.value)}
+            />
+
+            <InputText
+              type="number"
+              className="p-inputtext-sm xl:col-span-3"
+              value={price}
+              placeholder="Price"
+              size="lg"
+              required
+              onChange={(e) => setPrice(e.target.value)}
+            />
+          </div>
+          <div className="flex justify-between">
+            <div></div>
+            <Button
+              label="Add"
+              onClick={() => {
                 if (itemsale != "" && quantity != "" && price != "") {
                   if (itemsale.countInStock > 0) {
-                    setCountInStockError(false)
-                  dispatch(addToOrderItems(itemsale._id, quantity, price))
-                  setItemSale("")
-                  setQuantity("")
-                  setPrice("")
-                }else{
-                  setCountInStockError(true)
+                    setCountInStockError(false);
+                    dispatch(addToOrderItems(itemsale._id, quantity, price));
+                    setItemSale("");
+                    setQuantity("");
+                    setPrice("");
+                  } else {
+                    setCountInStockError(true);
+                  }
                 }
-              }
-                
-                
-              }}/>
-            </div>
+              }}
+            />
+          </div>
 
-            <table className="w-full space-y-4  xl:space-y-0">
-              <thead className="sticky top-0 z-40 border-b bg-white">
-                <tr>
-                  <th className="w-12 border border-blue-gray-50 py-3 px-2 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-medium uppercase text-blue-gray-600"
-                    >
-                      No
-                    </Typography>
-                  </th>
-                  <th className="border border-blue-gray-50 py-3 px-2 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-medium uppercase text-blue-gray-600"
-                    >
-                      Item
-                    </Typography>
-                  </th>
-                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-medium uppercase text-blue-gray-600"
-                    >
-                      Price
-                    </Typography>
-                  </th>
-                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-medium uppercase text-blue-gray-600"
-                    >
-                      Qty
-                    </Typography>
-                  </th>
-                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-medium uppercase text-blue-gray-600"
-                    >
-                      Total
-                    </Typography>
-                  </th>
-                  <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
-                    <Typography
-                      variant="small"
-                      className="text-[11px] font-medium uppercase text-blue-gray-600"
-                    >
-                      
-                    </Typography>
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
+          <table className="w-full space-y-4  xl:space-y-0">
+            <thead className="sticky top-0 z-40 border-b bg-white">
+              <tr>
+                <th className="w-12 border border-blue-gray-50 py-3 px-2 text-left">
+                  <Typography
+                    variant="small"
+                    className="text-[11px] font-medium uppercase text-blue-gray-600"
+                  >
+                    No
+                  </Typography>
+                </th>
+                <th className="border border-blue-gray-50 py-3 px-2 text-left">
+                  <Typography
+                    variant="small"
+                    className="text-[11px] font-medium uppercase text-blue-gray-600"
+                  >
+                    Item
+                  </Typography>
+                </th>
+                <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                  <Typography
+                    variant="small"
+                    className="text-[11px] font-medium uppercase text-blue-gray-600"
+                  >
+                    Price
+                  </Typography>
+                </th>
+                <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                  <Typography
+                    variant="small"
+                    className="text-[11px] font-medium uppercase text-blue-gray-600"
+                  >
+                    Qty
+                  </Typography>
+                </th>
+                <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                  <Typography
+                    variant="small"
+                    className="text-[11px] font-medium uppercase text-blue-gray-600"
+                  >
+                    Total
+                  </Typography>
+                </th>
+                <th className="w-24 border border-blue-gray-50 py-3 px-2 text-left">
+                  <Typography
+                    variant="small"
+                    className="text-[11px] font-medium uppercase text-blue-gray-600"
+                  ></Typography>
+                </th>
+              </tr>
+            </thead>
+            <tbody>
               {orderItems.map((odr, index) => (
                 <tr>
                   <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
@@ -1985,35 +1992,38 @@ export function Home() {
                       variant="small"
                       className="text-[11px] font-medium capitalize text-blue-gray-400"
                     >
-                      <i className="pi pi-delete-left cursor-pointer" onClick={()=> dispatch(removeFromOrder(odr.item))}/>
+                      <i
+                        className="pi pi-delete-left cursor-pointer"
+                        onClick={() => dispatch(removeFromOrder(odr.item))}
+                      />
                     </Typography>
                   </td>
                 </tr>
               ))}
-              </tbody>
-            </table>
-            <p className="text-left uppercase">Sub Total: ${totalPrice}</p>
+            </tbody>
+          </table>
+          <p className="text-left uppercase">Sub Total: ${totalPrice}</p>
 
-            <div>
-              IsPaid
-              <span className="px-2"></span>
-              <Checkbox
-                onChange={(e) => setIsPaid(e.checked)}
-                checked={isPaid}
-                defaultValue={isPaid}
-              ></Checkbox>
-            </div>
-
-            <div className="mt-4 flex justify-center">
-              <button
-                type="submit"
-                onClick={submitSaleHandler}
-                className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium uppercase text-white transition hover:bg-transparent hover:text-primary"
-              >
-                Save
-              </button>
-            </div>
+          <div>
+            IsPaid
+            <span className="px-2"></span>
+            <Checkbox
+              onChange={(e) => setIsPaid(e.checked)}
+              checked={isPaid}
+              defaultValue={isPaid}
+            ></Checkbox>
           </div>
+
+          <div className="mt-4 flex justify-center">
+            <button
+              type="submit"
+              onClick={submitSaleHandler}
+              className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium uppercase text-white transition hover:bg-transparent hover:text-primary"
+            >
+              Save
+            </button>
+          </div>
+        </div>
         {/* </form> */}
       </Dialog>
       {/* component to be printed */}
@@ -2048,7 +2058,6 @@ export function Home() {
           ref={(el) => (componentRef2 = el)}
           sales={salesPrint}
           orderItems={ordersSalesPrint}
-          
         />
       </div>
     </div>
@@ -2059,6 +2068,7 @@ export default Home;
 
 import invoice from "@/data/images/invoicebg.png";
 import { IoMdCall } from "react-icons/io";
+import { InputText } from "primereact/inputtext";
 
 class ComponentToPrint extends React.Component {
   render() {
@@ -2320,8 +2330,6 @@ class ComponentToPrint2 extends React.Component {
   render() {
     const { sales } = this.props;
     const { orderItems } = this.props;
-   
-   
 
     return (
       <>
@@ -2367,18 +2375,22 @@ class ComponentToPrint2 extends React.Component {
             <div className="">
               <div className=" flex items-center">
                 <p className=" text-2xl font-normal">Invoice ID:</p>
-                <span className="pl-2 text-xl">#{sales && sales.invoiceId}</span>
+                <span className="pl-2 text-xl">
+                  #{sales && sales.invoiceId}
+                </span>
               </div>
               <div className=" flex items-center">
                 <p className=" text-2xl font-normal">Amount: </p>
-                <span className="pl-2 text-xl">${sales && sales.totalPrice}</span>
+                <span className="pl-2 text-xl">
+                  ${sales && sales.totalPrice}
+                </span>
               </div>
               <div className=" flex items-center">
                 <p p className="text-2xl font-normal">
                   Date:
                 </p>
                 <p className="pl-2 text-xl">
-                {sales && moment( sales.date).toString().substring(0, 15)}
+                  {sales && moment(sales.date).toString().substring(0, 15)}
                 </p>
               </div>
             </div>
@@ -2396,22 +2408,26 @@ class ComponentToPrint2 extends React.Component {
                 </tr>
               </thead>
               <tbody className="border border-blue-500">
-                {orderItems && orderItems.map((item, index)=> 
-                <tr className="">
-                <td className="py-1 px-2 border border-blue-500">{index+1}</td>
-                <td className="py-1 px-2 border border-blue-500">{item.itemName}</td>
-                <td className="py-1 px-2 border border-blue-500">
-                  {item.quantity}
-                </td>
-                <td className="py-1 px-2 border border-blue-500">
-                ${item.price}
-                </td>
-                <td className="py-1 px-2 border border-blue-500">
-                ${item.price * item.quantity} 
-                </td>
-              </tr>
-                )}
-                
+                {orderItems &&
+                  orderItems.map((item, index) => (
+                    <tr className="">
+                      <td className="border border-blue-500 py-1 px-2">
+                        {index + 1}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        {item.itemName}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        {item.quantity}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        ${item.price}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        ${item.price * item.quantity}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>
@@ -2495,18 +2511,22 @@ class ComponentToPrint2 extends React.Component {
             <div className="">
               <div className=" flex items-center">
                 <p className=" text-2xl font-normal">Invoice ID:</p>
-                <span className="pl-2 text-xl">#{sales && sales.invoiceId}</span>
+                <span className="pl-2 text-xl">
+                  #{sales && sales.invoiceId}
+                </span>
               </div>
               <div className=" flex items-center">
                 <p className=" text-2xl font-normal">Amount: </p>
-                <span className="pl-2 text-xl">${sales && sales.totalPrice}</span>
+                <span className="pl-2 text-xl">
+                  ${sales && sales.totalPrice}
+                </span>
               </div>
               <div className=" flex items-center">
                 <p p className="text-2xl font-normal">
                   Date:
                 </p>
                 <p className="pl-2 text-xl">
-                {sales && moment( sales.date).toString().substring(0, 15)}
+                  {sales && moment(sales.date).toString().substring(0, 15)}
                 </p>
               </div>
             </div>
@@ -2524,22 +2544,26 @@ class ComponentToPrint2 extends React.Component {
                 </tr>
               </thead>
               <tbody className="border border-blue-500">
-                {orderItems && orderItems.map((item, index)=> 
-                <tr className="">
-                <td className="py-1 px-2 border border-blue-500">{index+1}</td>
-                <td className="py-1 px-2 border border-blue-500">{item.itemName}</td>
-                <td className="py-1 px-2 border border-blue-500">
-                  {item.quantity}
-                </td>
-                <td className="py-1 px-2 border border-blue-500">
-                ${item.price}
-                </td>
-                <td className="py-1 px-2 border border-blue-500">
-                ${item.price * item.quantity} 
-                </td>
-              </tr>
-                )}
-                
+                {orderItems &&
+                  orderItems.map((item, index) => (
+                    <tr className="">
+                      <td className="border border-blue-500 py-1 px-2">
+                        {index + 1}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        {item.itemName}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        {item.quantity}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        ${item.price}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        ${item.price * item.quantity}
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           </div>

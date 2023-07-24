@@ -12,6 +12,8 @@ import { BsPersonLinesFill } from "react-icons/bs";
 import UsersScreen from "./pages/dashboard/usersScreen";
 import EventsScreen from "./pages/dashboard/EventsScreen";
 import HomeScreen from "./pages/dashboard2/homeScreen";
+import Store2Screen from "./pages/dashboard2/store2Screen";
+import Sales2Screen from "./pages/dashboard2/sales2Screen";
 
 
 
@@ -99,19 +101,19 @@ export const electronicRoutes = [
         icon: <AiTwotoneAppstore {...icon} />,
         name: "Inventory",
         path: "/inventory",
-        element: <></>,
+        element: <Store2Screen/>,
       },
       {
         icon: <FcSalesPerformance  {...icon}/>,
         name: "Sales",
         path: "/sales",
-        element: <></>,
+        element: <Sales2Screen/>,
       },
       {
         icon: <MdOutlineEventRepeat {...icon} />,
         name: "Events",
         path: "/events",
-        element: <></>,
+        element: <EventsScreen/>,
       },
       {
         icon: <HiUserGroup {...icon} />,
@@ -123,7 +125,7 @@ export const electronicRoutes = [
         icon: <BsPersonLinesFill {...icon} />,
         name: "Users",
         path: "/users",
-        element: <></>,
+        element: <UsersScreen/>,
       },
       {
         icon: <MdAccountBalanceWallet {...icon} />,
@@ -138,7 +140,7 @@ export const electronicRoutes = [
         element: <></>,
       },
     ],
-  },
+  }, 
   
   
 ];

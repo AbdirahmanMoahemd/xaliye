@@ -44,6 +44,7 @@ import DatePicker from "react-datepicker";
 import { Button } from "primereact/button";
 import { Paginator } from "primereact/paginator";
 import { Toast } from "primereact/toast";
+import { InputText } from "primereact/inputtext";
 
 export function SalesScreen() {
   const [keyword, setKeyword] = useState("");
@@ -205,8 +206,6 @@ export function SalesScreen() {
     }
   };
 
-
-
   const countInStockHandler = () => {
     for (let index = 0; index < orderItems.length; index++) {
       const element = orderItems[index];
@@ -214,8 +213,6 @@ export function SalesScreen() {
       dispatch(updateStoreItemCountInStock(element.item, element.quantity));
     }
   };
-
-
 
   const updateHandler = (e) => {
     e.preventDefault();
@@ -532,7 +529,7 @@ export function SalesScreen() {
           setPrice("");
           setIsPaid(true);
           setDate(new Date());
-          setCountInStockError(false)
+          setCountInStockError(false);
           dispatch({ type: ORDER_REMOVE_ITEM_ALL });
         }}
         style={{ width: "40vw" }}
@@ -548,7 +545,12 @@ export function SalesScreen() {
           />
         )}
         {errorCreate && <Message severity="error" text={errorCreate} />}
-        {countInStockError && <Message severity="error" text={'This Item Not Available in the store'} />}
+        {countInStockError && (
+          <Message
+            severity="error"
+            text={"This Item Not Available in the store"}
+          />
+        )}
         <div className="mx-auto space-y-4 p-4">
           <Toast ref={toastBottomCenter} position="bottom-center" />
           <Input
@@ -578,11 +580,11 @@ export function SalesScreen() {
             </div>
           </div>
 
-          <div className="w-full gap-2 space-y-4 xl:flex  xl:space-y-0">
+          <div className="w-full grid grid-cols-1 gap-2 xl:grid-cols-12  xl:space-y-0">
             <AutoComplete
               placeholder="item name"
               inputClassName="w-full xl:h-11"
-              className="w-full"
+              className="xl:col-span-6"
               field="name"
               size="lg"
               value={item}
@@ -592,19 +594,21 @@ export function SalesScreen() {
               required
             />
 
-            <Input
+            <InputText
               type="number"
-              inputClassName="w-full"
+              className="p-inputtext-sm xl:col-span-3"
               value={quantity}
-              label="Quantity"
+              placeholder="Quantity"
               size="lg"
               required
               onChange={(e) => setQuantity(e.target.value)}
             />
-            <Input
+
+            <InputText
               type="number"
+              className="p-inputtext-sm xl:col-span-3"
               value={price}
-              label="Price"
+              placeholder="Price"
               size="lg"
               required
               onChange={(e) => setPrice(e.target.value)}
@@ -617,15 +621,14 @@ export function SalesScreen() {
               onClick={() => {
                 if (item != "" && quantity != "" && price != "") {
                   if (item.countInStock > 0) {
-                    setCountInStockError(false)
+                    setCountInStockError(false);
                     dispatch(addToOrderItems(item._id, quantity, price));
                     setItem("");
                     setQuantity("");
                     setPrice("");
-                  }else{
-                    setCountInStockError(true)
+                  } else {
+                    setCountInStockError(true);
                   }
-                 
                 }
               }}
             />
@@ -724,7 +727,10 @@ export function SalesScreen() {
                       variant="small"
                       className="text-[11px] font-medium capitalize text-blue-gray-400"
                     >
-                      <i className="pi pi-delete-left cursor-pointer" onClick={()=> dispatch(removeFromOrder(odr.item))}/>
+                      <i
+                        className="pi pi-delete-left cursor-pointer"
+                        onClick={() => dispatch(removeFromOrder(odr.item))}
+                      />
                     </Typography>
                   </td>
                 </tr>
@@ -762,7 +768,7 @@ export function SalesScreen() {
         {/* </form> */}
       </Dialog>
 
-      {/* Edit Inventory */}
+      {/* Edit sales */}
       <Dialog
         blockScroll="false"
         aria-expanded={edit ? true : false}

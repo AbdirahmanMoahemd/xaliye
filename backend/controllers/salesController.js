@@ -1,6 +1,5 @@
 import expressAsync from "express-async-handler";
 import Sales from "../models/salesModel.js";
-import Store from "../models/storeModel.js";
 
 export const getSalesItems = expressAsync(async (req, res) => {
   let pageSize = 200;
