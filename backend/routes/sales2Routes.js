@@ -1,6 +1,7 @@
 import express from "express";
 import { admin, protect } from "../middlewares/authMiddleware.js";
 import {
+  createExSalesItem,
   createSalesItem,
   deleteSalesItemById,
   getPaidSalesItems,
@@ -17,6 +18,7 @@ import {
 const router = express.Router();
 
 router.route("/").get(protect, getSalesItems).post(protect, createSalesItem);
+router.route('/existing').post(protect, createExSalesItem)
 router.route('/date/range').post(protect, getSalesIByDateRange)
 router.route('/recent/sales').get(protect, getRecentSales)
 router.route('/sale/billing/:id').put(updateSalesBillingItem)

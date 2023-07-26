@@ -19,16 +19,16 @@ import {
   CUSTOMER_DETAILS_RESET,
   CUSTOMER_LIST_RESET,
   CUSTOMER_UPDATE_RESET,
-} from "@/constants/customersConstants";
+} from "@/constants/customers2Constants";
 import {
   createNewCustomer,
   deleteCustomer,
   listCustomerDetails,
   listCustomers,
   listCustomersByDateRange,
-  listMyTasks,
+  listMySales,
   updateCustomer,
-} from "@/actions/cusomerActions";
+} from "@/actions/customer2Actions";
 import { Button } from "primereact/button";
 import { Message } from "primereact/message";
 import { ProgressSpinner } from "primereact/progressspinner";
@@ -39,7 +39,7 @@ import { Paginator } from "primereact/paginator";
 
 
 
-export function CustomersScreen() {
+export function Customers2Screen() {
   const [create, setCreate] = useState(false);
   const [edit, setEdit] = useState(false);
   const [show, setShow] = useState(false);
@@ -62,43 +62,43 @@ export function CustomersScreen() {
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
 
-  const createCustomer = useSelector((state) => state.createCustomer);
+  const createCustomer2 = useSelector((state) => state.createCustomer2);
   const {
     loading: loadingCreate,
     error: errorCreate,
     success: successCreate,
-  } = createCustomer;
+  } = createCustomer2;
 
-  const customersList = useSelector((state) => state.customersList);
-  const { loading, error, customers , customerCount } = customersList;
+  const customersList2 = useSelector((state) => state.customersList2);
+  const { loading, error, customers , customerCount } = customersList2;
 
-  const customerDelete = useSelector((state) => state.customerDelete);
+  const customerDelete2 = useSelector((state) => state.customerDelete2);
   const {
     loading: loadingDelete,
     error: errorDelete,
     success: successDelete,
-  } = customerDelete;
+  } = customerDelete2;
 
-  const customerUpdate = useSelector((state) => state.customerUpdate);
+  const customerUpdate2 = useSelector((state) => state.customerUpdate2);
   const {
     loading: loadingUpdate,
     error: errorUpdate,
     success: successUpdate,
-  } = customerUpdate;
+  } = customerUpdate2;
 
-  const customerDetails = useSelector((state) => state.customerDetails);
+  const customerDetails2 = useSelector((state) => state.customerDetails2);
   const {
     loading: loadingDetails,
     error: errorDetails,
     customer,
-  } = customerDetails;
+  } = customerDetails2;
 
-  const myTasksList = useSelector((state) => state.myTasksList);
+  const mySalesList = useSelector((state) => state.mySalesList);
   const {
     loading: loadingMyTasks,
     error: errorMyTasks,
-    tasks,
-  } = myTasksList;
+    sales,
+  } = mySalesList;
 
 
 
@@ -150,7 +150,7 @@ export function CustomersScreen() {
   };
 
   const getMyTasks = (id) => {
-    dispatch(listMyTasks(id));
+    dispatch(listMySales(id));
     
   };
 
@@ -238,7 +238,7 @@ export function CustomersScreen() {
             <table className="w-full min-w-[640px] table-auto">
               <thead className="sticky top-0 z-40 border-b bg-white">
                 <tr>
-                  {["ID", "Name", "Phone", "Tickets", ""].map((el) => (
+                  {["ID", "Name", "Phone", "Sales", ""].map((el) => (
                     <th
                       key={el}
                       className="border-b border-blue-gray-50 py-3 px-6 text-left"
@@ -271,7 +271,7 @@ export function CustomersScreen() {
                           variant="small"
                           className="text-[11px] font-medium uppercase text-blue-gray-400"
                         >
-                          XRC-{cust.custID}
+                        {cust.custID}
                         </Typography>
                       </td>
                       <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
@@ -532,7 +532,7 @@ export function CustomersScreen() {
       <Dialog
         blockScroll="false"
         aria-expanded={show ? true : false}
-        header={`Ticket For ${custname}`}
+        header={`Sales For ${custname}`}
         visible={show}
         onHide={() => {
           setShow(false);
@@ -556,14 +556,12 @@ export function CustomersScreen() {
               <thead className="sticky top-0 z-40 border-b bg-white">
                 <tr>
                   {[
-                    "ID",
-                    "NAME",
-                    "Phone",
-                    "Item",
-                    "Problem Type",
-                    "Date",
-                    "Amount",
-                    "Status",
+                     "Customer",
+                     "Phone",
+                     "Order Items",
+                     "Total Price",
+                     "Date",
+                     "Billing Status",
                   ].map((el) => (
                     <th className="border-b border-blue-gray-50 py-3 px-4 text-left">
                       <Typography
@@ -587,97 +585,111 @@ export function CustomersScreen() {
                 <Message severity="error" text={error} />
               ) : (
                 <tbody className="overflow-y-auto">
-                  {tasks.map((task) => (
-                    <tr id={task._id}>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          {task.customer ? (
-                            `XRC- ${task.customer.custID}`
-                          ) : (
-                            <p className=" text-red-700">Not Found</p>
-                          )}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          {task.customer ? task.customer.name : "Not Found"}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          {task.phone}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          {task.item}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          {task.problem}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          {task.date && task.date.substring(0, 10)}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          ${task.amount}
-                        </Typography>
-                      </td>
-
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          {task.stage === 0 ? (
-                            <p className="cursor-pointer bg-blue-600 px-1 text-center text-white">
-                              On Process
-                            </p>
-                          ) : task.stage === 1 ? (
-                            <p className="text-whit cursor-pointer bg-yellow-300 px-1 text-center">
-                              Finished
-                            </p>
-                          ) : task.stage === 2 ? (
-                            <p className="cursor-pointer bg-green-500 px-1 text-center text-white">
-                              Delivered
-                            </p>
-                          ) : (
-                            <p className="cursor-pointer bg-red-600 px-1  text-center text-white">
-                              Unfinished
-                            </p>
-                          )}
-                        </Typography>
-                      </td>
-                    
-                    </tr>
-                  ))}
-                </tbody>
+                      {sales.map((item) => (
+                        <tr key={item._id}>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                                {item.customer ? item.customer.name : item.customerName}
+                            </Typography>
+                          </td>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                                {item.customer ? item.customer.phone : item.phone}
+                            </Typography>
+                          </td>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                              <Button
+                                className="z-10 h-8"
+                                label="Show"
+                                icon=""
+                                onClick={() => {
+                                  setMyOrderItems(item.orderItems);
+                                  setCustname(item.customer);
+                                  setShow(true);
+                                }}
+                              />
+                            </Typography>
+                          </td>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                              ${item.totalPrice}
+                            </Typography>
+                          </td>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                              {item.date && item.date.substring(0, 10)}
+                            </Typography>
+                          </td>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                              {item.isPaid ? (
+                                <i
+                                  className="pi pi-check"
+                                  style={{ color: "green" }}
+                                ></i>
+                              ) : (
+                                <i
+                                  className="pi pi-times"
+                                  style={{ color: "red" }}
+                                ></i>
+                              )}
+                            </Typography>
+                          </td>
+                          <td>
+                            <Menu placement="left-start">
+                              <MenuHandler>
+                                <IconButton
+                                  size="sm"
+                                  variant="text"
+                                  color="blue-gray"
+                                >
+                                  <EllipsisVerticalIcon
+                                    strokeWidth={3}
+                                    fill="currenColor"
+                                    className="h-6 w-6"
+                                  />
+                                </IconButton>
+                              </MenuHandler>
+                              <MenuList>
+                                <MenuItem
+                                  onClick={() => {
+                                    setEdit(true);
+                                    setId(item._id);
+                                  }}
+                                >
+                                  Change Billing Status
+                                </MenuItem>
+                                <MenuItem>Move To Bin</MenuItem>
+                                <MenuItem
+                                  onClick={() => deleteSalesItems(item._id)}
+                                >
+                                  Delete Permanently
+                                </MenuItem>
+                              </MenuList>
+                            </Menu>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
               )}
             </table>
           </CardBody>
@@ -690,4 +702,4 @@ export function CustomersScreen() {
   );
 }
 
-export default CustomersScreen;
+export default Customers2Screen;

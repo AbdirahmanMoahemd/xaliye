@@ -190,7 +190,7 @@ export function SalesScreen() {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    console.log(orderItems);
+    
     if (orderItems != null) {
       dispatch(
         createNewSales(

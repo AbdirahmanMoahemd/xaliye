@@ -14,6 +14,7 @@ import EventsScreen from "./pages/dashboard/EventsScreen";
 import HomeScreen from "./pages/dashboard2/homeScreen";
 import Store2Screen from "./pages/dashboard2/store2Screen";
 import Sales2Screen from "./pages/dashboard2/sales2Screen";
+import { Customers2Screen } from "./pages/dashboard2";
 
 
 
@@ -119,7 +120,7 @@ export const electronicRoutes = [
         icon: <HiUserGroup {...icon} />,
         name: "Customers",
         path: "/customers",
-        element: <></>,
+        element: <Customers2Screen/>,
       },
       {
         icon: <BsPersonLinesFill {...icon} />,

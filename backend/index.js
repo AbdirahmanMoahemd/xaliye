@@ -14,6 +14,7 @@ import transactionRoutes from "../backend/routes/transactionRoutes.js";
 import eventsRouets from "../backend/routes/eventsRouets.js";
 import store2Routes from "../backend/routes/store2Routes.js";
 import sales2Routes from "../backend/routes/sales2Routes.js";
+import customer2Routes from "../backend/routes/customer2Routes.js";
 import { errorHandler, notFound } from "./middlewares/errorMidlleware.js";
 
 dotenv.config(); 
@@ -30,6 +31,7 @@ app.use("/api/tasks", tasksRoutes);
 app.use("/api/store", storeRoutes);  
 app.use("/api/store2", store2Routes);  
 app.use("/api/customers", customerRoutes);
+app.use("/api/customers2", customer2Routes);
 app.use("/api/Sales", salesRoute);
 app.use("/api/Sales2", sales2Routes);
 app.use("/api/account", accountRoutes); 

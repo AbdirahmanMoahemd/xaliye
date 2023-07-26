@@ -1,6 +1,7 @@
-import { getCustomerTotal } from "@/actions/cusomerActions";
+import { getCustomerTotal } from "@/actions/customer2Actions";
 import {
   addToOrderItems,
+  createExSales,
   createNewSales,
   deleteSalesItem,
   getSalesTotal,
@@ -49,31 +50,25 @@ import { ProgressSpinner } from "primereact/progressspinner";
 import { Paginator } from "primereact/paginator";
 import { InputText } from "primereact/inputtext";
 import { confirmAlert } from "react-confirm-alert";
+import { listCustomers } from "@/actions/customer2Actions";
 
 const HomeScreen = () => {
   const [id, setId] = useState("");
   const [keyword, setKeyword] = useState("");
+  const [keyword2, setKeyword2] = useState("");
   const [itemsale, setItemSale] = useState("");
   const [customer, setCustomer] = useState("");
   const [customersale, setCustomerSale] = useState();
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
   const [phone, setPhone] = useState();
+  const [name, setName] = useState("");
   const [date, setDate] = useState(new Date());
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
   const [isPaid, setIsPaid] = useState(true);
-  const [nameToPrint, setNameToPrint] = useState("");
-  const [itemnameToPrint, setItemNameToPrint] = useState("");
-  const [isPrinting, setIsPrinting] = useState(false);
   const [isSalesPrinting, setIsSalesPrinting] = useState(false);
-  const [salesPrint, setSalesPrint] = useState(false);
-  const [ordersSalesPrint, setOrdersSalesPrint] = useState(false);
-  const [onPrint, setOnPrint] = useState(false);
-  const [dateRange, setDateRange] = useState(false);
   const [showTotal, setShowTotal] = useState(false);
-  const [status, setStatus] = useState("");
-  const [statusStage, setStatusStage] = useState("");
   const [toltalAmount, setToltalAmount] = useState("");
   const [pageNumber, setPageNumber] = useState(1);
   const [myOrderItems, setMyOrderItems] = useState([]);
@@ -99,12 +94,12 @@ const HomeScreen = () => {
     counter: counterSalesTotal,
   } = totalSales;
 
-  const totalCustomer = useSelector((state) => state.totalCustomer);
+  const totalCustomer2 = useSelector((state) => state.totalCustomer2);
   const {
     loading: loadingCounterCustomer,
     error: errorCounterCustomer,
     counter: counterCustomer,
-  } = totalCustomer;
+  } = totalCustomer2;
 
   const salesRecentList2 = useSelector((state) => state.salesRecentList2);
   const {
@@ -134,6 +129,14 @@ const HomeScreen = () => {
     success: successUpdate,
   } = salesUpdateBilling2;
 
+
+  const customersList = useSelector((state) => state.customersList);
+  const {
+    loading: loadingCustomer,
+    error: errorCustomer,
+    customers,
+  } = customersList;
+
   useEffect(() => {
     if (!userInfo) {
       navigate("/sign-in");
@@ -143,6 +146,7 @@ const HomeScreen = () => {
   useEffect(() => {
     dispatch(getCustomerTotal());
     dispatch(getSalesTotal());
+    dispatch(listCustomers(keyword2))
   }, [dispatch, successSaleCreate]);
 
   useEffect(() => {
@@ -228,23 +232,43 @@ const HomeScreen = () => {
 
   const itemqty = orderItems.reduce((acc, item) => acc + item.quantity, 0);
 
+  
+
   const submitSaleHandler = (e) => {
     e.preventDefault();
-
-    if (orderItems != null) {
-      dispatch(
-        createNewSales(
-          orderItems,
-          customer,
-          phone,
-          date,
-          totalPrice,
-          invoiceId,
-          isPaid
-        )
-      );
+    if (customer === "") {
+      setName(keyword2);
+      if (orderItems != null) {
+        dispatch(
+          createNewSales(
+            orderItems,
+            name,
+            phone,
+            date,
+            totalPrice,
+            invoiceId,
+            isPaid
+          )
+        );
+      }
+    } else {
+      if (orderItems != null) {
+        dispatch(
+          createExSales(
+            orderItems,
+            customer,
+            name,
+            phone,
+            date,
+            totalPrice,
+            invoiceId,
+            isPaid
+          )
+        );
+      }
     }
   };
+
 
   return (
     <div className="mt-12">
@@ -453,7 +477,7 @@ const HomeScreen = () => {
                             variant="small"
                             className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
-                            {item.customer}
+                            {item.customer ? item.customer.name : item.customerName}
                           </Typography>
                         </td>
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
@@ -461,7 +485,7 @@ const HomeScreen = () => {
                             variant="small"
                             className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
-                            {item.phone}
+                            {item.customer ? item.customer.phone : item.phone}
                           </Typography>
                         </td>
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
@@ -618,13 +642,14 @@ const HomeScreen = () => {
         onHide={() => {
           dispatch({ type: SALES_CREATE_RESET });
           setCreateSale(false);
-          setItemSale("");
+          setItem("");
           setCustomer("");
           setPhone("");
           setQuantity("");
           setPrice("");
           setIsPaid(true);
           setDate(new Date());
+          setKeyword2("")
           setCountInStockError(false);
           dispatch({ type: ORDER_REMOVE_ITEM_ALL });
         }}
@@ -648,14 +673,22 @@ const HomeScreen = () => {
           />
         )}
         <div className="mx-auto space-y-4 p-4">
-          <InputText
+        <AutoComplete
             type="text"
-            value={customer}
-            placeholder="Customer Name"
+            field="name"
+            value={keyword2}
             inputClassName="w-full"
-            className="p-inputtext-sm w-full"
+            className="w-full"
             required
-            onChange={(e) => setCustomer(e.target.value)}
+            placeholder="Customer name"
+            suggestions={customers}
+            completeMethod={() => dispatch(listCustomers(keyword2))}
+            onChange={(e) => {
+              setKeyword2(e.target.value);
+              typeof keyword2 == 'object' ? setCustomer(keyword2._id) : setCustomer("");
+              typeof keyword2 == 'object' ? setName(keyword2.name) : setName(keyword2);
+              typeof keyword2 == 'object' ? setPhone(keyword2.phone) : setPhone("");
+            }}
           />
           <div className="w-full gap-2 space-y-4 xl:flex xl:space-y-0 ">
             <InputText

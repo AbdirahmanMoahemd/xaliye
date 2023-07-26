@@ -22,6 +22,10 @@ const sales2Schema = mongoose.Schema(
       },
     ],
     customer: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "customers2",
+    },
+    customerName: {
       type: String,
       required: true,
     },

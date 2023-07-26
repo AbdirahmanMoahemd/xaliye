@@ -1,5 +1,6 @@
 import expressAsync from "express-async-handler";
 import Sales2 from "../models/sales2Model.js";
+import Customers2 from "../models/customers2Model.js";
 
 export const getSalesItems = expressAsync(async (req, res) => {
   let pageSize = 200;
@@ -17,6 +18,7 @@ export const getSalesItems = expressAsync(async (req, res) => {
   const sales = await Sales2.find({ ...keyword })
     .sort({ date: -1 })
     .populate("orderItems.item")
+    .populate("customer")
     .limit(pageSize)
     .skip(pageSize * (page - 1));
 
@@ -40,6 +42,7 @@ export const getRecentSales = expressAsync(async (req, res) => {
   const sales = await Sales2.find({ ...keyword, date: { $gte: start } })
     .sort({ date: -1 })
     .populate("orderItems.item")
+    .populate("customer")
     .limit(pageSize)
     .skip(pageSize * (page - 1));
 
@@ -49,7 +52,8 @@ export const getRecentSales = expressAsync(async (req, res) => {
 export const getUnPaidSalesItems = expressAsync(async (req, res) => {
   const sales = await Sales2.find({ isPaid: false })
     .sort({ date: -1 })
-    .populate("orderItems.item");
+    .populate("orderItems.item")
+    .populate("customer");
 
   res.json({ sales });
 });
@@ -57,7 +61,8 @@ export const getUnPaidSalesItems = expressAsync(async (req, res) => {
 export const getPaidSalesItems = expressAsync(async (req, res) => {
   const sales = await Sales2.find({ isPaid: true })
     .sort({ date: -1 })
-    .populate("orderItems.item");
+    .populate("orderItems.item")
+    .populate("customer");
 
   res.json({ sales });
 });
@@ -73,7 +78,8 @@ export const getSalesIByDateRange = expressAsync(async (req, res) => {
   end.toDateString();
   const sales = await Sales2.find({ date: { $lte: end, $gte: start } })
     .sort({ date: -1 })
-    .populate("orderItems.item");
+    .populate("orderItems.item")
+    .populate("customer");
 
   res.json({ sales });
 });
@@ -90,7 +96,49 @@ export const getSalesById = expressAsync(async (req, res) => {
 });
 
 export const createSalesItem = expressAsync(async (req, res) => {
-  const {  orderItems, customer, phone, date,totalPrice, invoiceId, isPaid } =
+  const {  orderItems,name, phone, date,totalPrice, invoiceId, isPaid } =
+    req.body;
+
+    const excustomers = await Customers2.findOne({ phone });
+  if (!excustomers) {
+    const customers = await Customers2.find().sort({ custID: -1 });
+
+    const newCustomer = new Customers2({
+      custID: customers[0].custID + 1,
+      name,
+      phone,
+    });
+    const createdCustomers = await newCustomer.save();
+    if (createdCustomers) {
+      
+      const sale = new Sales2({
+        orderItems,
+        customer:createdCustomers._id,
+        customerName: name,
+        phone,
+        date,
+        totalPrice,
+        invoiceId,
+        isPaid,
+      });
+      const createdSales = await sale.save();
+  
+      if (createdSales) {
+        
+       
+      }
+      res.status(201).json(orderItems);
+    }
+  }
+  
+   
+  
+});
+
+
+
+export const createExSalesItem = expressAsync(async (req, res) => {
+  const {  orderItems, customer,name, phone, date,totalPrice, invoiceId, isPaid } =
     req.body;
 
   
@@ -98,6 +146,7 @@ export const createSalesItem = expressAsync(async (req, res) => {
     const sale = new Sales2({
       orderItems,
       customer,
+      customerName: name,
       phone,
       date,
       totalPrice,

@@ -237,7 +237,6 @@ export function Home() {
     }
     if (successCreate) {
       setIsPrinting(true);
-      // console.log(true);
       // if (isPrinting) {
       dispatch({ type: TASK_CREATE_RESET });
       setCreate(false);
@@ -372,7 +371,7 @@ export function Home() {
         {
           label: "Yes",
           onClick: () => {
-            console.log(id);
+            
             dispatch(updateTasksToBin(id));
           },
         },
@@ -401,7 +400,7 @@ export function Home() {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    console.log(invoiceId);
+    
 
     if (customer == null) {
       setName(keyword2);

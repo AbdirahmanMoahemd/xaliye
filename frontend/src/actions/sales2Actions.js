@@ -29,7 +29,7 @@ import {
 } from "../constants/sales2Constants";
 
 export const createNewSales =
-  (orderItems, customer,phone, date,totalPrice ,invoiceId, isPaid) =>
+  (orderItems,name, phone, date,totalPrice ,invoiceId, isPaid) =>
   async (dispatch, getState) => {
     try {
       dispatch({
@@ -48,7 +48,47 @@ export const createNewSales =
 
       const { data } = await axios.post(
         "/api/Sales2",
-        { orderItems, customer,phone, date,totalPrice,invoiceId, isPaid },
+        { orderItems,name,phone, date,totalPrice,invoiceId, isPaid },
+        config
+      );
+
+      dispatch({
+        type: SALES_CREATE_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: SALES_CREATE_FAIL,
+        payload:
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message,
+      });
+    }
+  };
+
+
+  export const createExSales =
+  (orderItems, customer,name, phone, date,totalPrice ,invoiceId, isPaid) =>
+  async (dispatch, getState) => {
+    try {
+      dispatch({
+        type: SALES_CREATE_REQUEST,
+      });
+
+      const {
+        userLogin: { userInfo },
+      } = getState();
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+
+      const { data } = await axios.post(
+        "/api/Sales2/existing",
+        { orderItems, customer,name,phone, date,totalPrice,invoiceId, isPaid },
         config
       );
 

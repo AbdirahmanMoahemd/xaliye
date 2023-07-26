@@ -209,7 +209,7 @@ export function AccountsScreen() {
       dispatch({ type: SUBACCOUNT_UPDATE_RESET });
       dispatch({ type: SUBACCOUNT_DETAILS_RESET });
       setSubEdit(false);
-      console.log(subedit);
+      
     } else {
       if (subid !== "") {
         if (!subaccount.accountName || subaccount._id !== subid) {
@@ -219,7 +219,7 @@ export function AccountsScreen() {
           setGeneralAccount(subaccount.generalAccount);
           setKeyword2(subaccount.generalAccount.accountName);
           setDescription(subaccount.description);
-          console.log(subaccount);
+          
         }
       }
     }

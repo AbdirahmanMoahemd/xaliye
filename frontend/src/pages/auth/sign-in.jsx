@@ -48,8 +48,7 @@ export function SignIn() {
     e.preventDefault();
     // // DISPACTH LOGIN
     dispatch(login(email, password));
-    console.log(email);
-    console.log(password);
+   
   };
 
   return (
