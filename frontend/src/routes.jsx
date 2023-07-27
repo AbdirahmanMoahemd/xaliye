@@ -14,7 +14,7 @@ import EventsScreen from "./pages/dashboard/EventsScreen";
 import HomeScreen from "./pages/dashboard2/homeScreen";
 import Store2Screen from "./pages/dashboard2/store2Screen";
 import Sales2Screen from "./pages/dashboard2/sales2Screen";
-import { Customers2Screen } from "./pages/dashboard2";
+import { Accounts2Screen, Customers2Screen, Transactions2Screen } from "./pages/dashboard2";
 
 
 
@@ -132,13 +132,13 @@ export const electronicRoutes = [
         icon: <MdAccountBalanceWallet {...icon} />,
         name: "Accounts",
         path: "/account",
-        element: <></>,
+        element: <Accounts2Screen/>,
       },
       {
         icon: <BiTransfer   {...icon} />,
         name: "Sales Transactions",
         path: "/transactions",
-        element: <></>,
+        element: <Transactions2Screen/>,
       },
     ],
   }, 

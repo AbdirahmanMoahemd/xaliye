@@ -51,13 +51,13 @@ export const getPaidSalesItems = expressAsync(async (req, res) => {
 export const getSalesIByDateRange = expressAsync(async (req, res) => {
   const { startDate, endDate } = req.body;
   var start = new Date(startDate);
-  start.setDate(start.getDate() - 1);
+  start.setDate(start.getDate());
   start.toDateString();
 
   var end = new Date(endDate);
   end.setDate(end.getDate() + 1);
   end.toDateString();
-  const sales = await Sales.find({ date: { $lte: end, $gte: start } })
+  const sales = await Sales.find({ date: { $lte: end, $gt: start } })
     .sort({ date: -1 })
     .populate("orderItems.item");
 

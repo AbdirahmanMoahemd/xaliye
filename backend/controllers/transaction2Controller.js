@@ -1,9 +1,9 @@
 import expressAsync from "express-async-handler";
-import Transactions from "../models/transactions.js";
+import Transactions2 from "../models/transactions2.js";
 
 export const getTransactions = expressAsync(async (req, res) => {
   try {
-    const transactions = await Transactions.find()
+    const transactions = await Transactions2.find()
       .sort({ createdAt: -1 })
       .populate("Account")
       .populate("subAccount");
@@ -24,7 +24,7 @@ export const getTransactionsByDateRage = expressAsync(async (req, res) => {
   end.setDate(end.getDate() +1);
   end.toDateString();
 
-  const transactions = await Transactions.find({
+  const transactions = await Transactions2.find({
     date: { $lte: end, $gt: start },
   })
     .sort({ createdAt: -1 })
@@ -36,7 +36,7 @@ export const getTransactionsByDateRage = expressAsync(async (req, res) => {
 
 export const getTransactionById = expressAsync(async (req, res) => {
   try {
-    const transaction = await Transactions.findById(req.params.id)
+    const transaction = await Transactions2.findById(req.params.id)
       .populate("Account")
       .populate("SubAccount");
     if (transaction) {
@@ -50,7 +50,7 @@ export const getTransactionById = expressAsync(async (req, res) => {
 export const createTransaction = expressAsync(async (req, res) => {
   const { Account, subAccount, Amount, date, ref } = req.body;
 
-  const transaction = new Transactions({
+  const transaction = new Transactions2({
     Account: Account._id,
     subAccount: subAccount._id,
     Amount,
@@ -64,7 +64,7 @@ export const createTransaction = expressAsync(async (req, res) => {
 export const updateTransactions = expressAsync(async (req, res) => {
   const { Account, subAccount, Amount, date, ref } = req.body;
 
-  const transaction = await Transactions.findById(req.params.id);
+  const transaction = await Transactions2.findById(req.params.id);
 
   if (transaction) {
     transaction.Account = Account;
@@ -84,7 +84,7 @@ export const updateTransactions = expressAsync(async (req, res) => {
 });
 
 export const deleteTransactionsById = expressAsync(async (req, res) => {
-  const transaction = await Transactions.findByIdAndDelete(req.params.id);
+  const transaction = await Transactions2.findByIdAndDelete(req.params.id);
 
   res.json({ message: "transaction removed" });
 });

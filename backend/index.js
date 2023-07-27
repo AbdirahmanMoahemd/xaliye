@@ -9,8 +9,11 @@ import storeRoutes from "../backend/routes/storeRoutes.js";
 import customerRoutes from "../backend/routes/customerRoutes.js";
 import salesRoute from "../backend/routes/salesRoute.js";
 import accountRoutes from "../backend/routes/accountRoutes.js";
+import account2Routes from "../backend/routes/account2Routes.js";
 import subAccountRoutes from "../backend/routes/subAccountRoutes.js";
+import subAccount2Routes from "../backend/routes/subAccount2Routes.js";
 import transactionRoutes from "../backend/routes/transactionRoutes.js";
+import transaction2Routes from "../backend/routes/transaction2Routes.js";
 import eventsRouets from "../backend/routes/eventsRouets.js";
 import store2Routes from "../backend/routes/store2Routes.js";
 import sales2Routes from "../backend/routes/sales2Routes.js";
@@ -35,8 +38,11 @@ app.use("/api/customers2", customer2Routes);
 app.use("/api/Sales", salesRoute);
 app.use("/api/Sales2", sales2Routes);
 app.use("/api/account", accountRoutes); 
+app.use("/api/account2", account2Routes); 
 app.use("/api/subaccount", subAccountRoutes);
+app.use("/api/subaccount2", subAccount2Routes);
 app.use("/api/transaction", transactionRoutes);
+app.use("/api/transaction2", transaction2Routes);
 app.use("/api/events", eventsRouets);
 // app.use('/api/upload', uploadRoutes)
 

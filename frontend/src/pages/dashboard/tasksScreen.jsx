@@ -363,7 +363,7 @@ export function TasksScreen() {
           >
             <div>
               <Typography variant="h6" color="blue-gray" className="mb-1">
-                Tasks
+                Tasks({tasks && tasks.length})
               </Typography>
             </div>
             <div className="mr-auto md:mr-4 md:w-56">
@@ -808,7 +808,9 @@ export function TasksScreen() {
         <div className="flex justify-center">
           <Button
             onClick={() =>
-              dispatch(listTasksByRangeDate("", startDate, endDate))
+             { 
+              setDateRange(false)
+              dispatch(listTasksByRangeDate("", startDate, endDate))}
             }
           >
             Search

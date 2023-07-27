@@ -112,7 +112,36 @@ import {
   transactionsListReducer,
 } from "./reducers/transactionReducers";
 import { eventsListReducer } from "./reducers/eventReducers";
-import { createCustomerReducer2, customerDeleteReducer2, customerDetailsReducer2, customerUpdateReducer2, customersListReducer2, mySalesListReducer2, totalCustomerReducer2Count } from "./reducers/customer2Reducers";
+import {
+  createCustomerReducer2,
+  customerDeleteReducer2,
+  customerDetailsReducer2,
+  customerUpdateReducer2,
+  customersListReducer2,
+  mySalesListReducer2,
+  totalCustomerReducer2Count,
+} from "./reducers/customer2Reducers";
+import {
+  accountDeleteReducer2,
+  accountDetailsReducer2,
+  accountUpdateReducer2,
+  accountsListReducer2,
+  createAccountReducer2,
+} from "./reducers/account2Reducers";
+import {
+  createSubAccountReducer2,
+  subAccountDeleteReducer2,
+  subAccountDetailsReducer2,
+  subAccountUpdateReducer2,
+  subAccountsListReducer2,
+} from "./reducers/subAccount2Reducers";
+import {
+  createTransactionReducer2,
+  transactionDeleteReducer2,
+  transactionDetailsReducer2,
+  transactionUpdateReducer2,
+  transactionsListReducer2,
+} from "./reducers/transactions2Reducers";
 
 const reducer = combineReducers({
   userLogin: userLoginReducer,
@@ -146,7 +175,6 @@ const reducer = combineReducers({
   storeItemUpdate: storeItemUpdateReducer,
   storeItemDetails: storeItemDetailsReducer,
 
-
   createStoreItem2: createStoreItemReducer2,
   storeItemList2: storeItemListReducer2,
   storeItemDelete2: storeItemDeleteReducer2,
@@ -175,15 +203,12 @@ const reducer = combineReducers({
   customerDelete: customerDeleteReducer,
   totalCustomer: totalCustomerReducerCount,
 
-
   createCustomer2: createCustomerReducer2,
   customersList2: customersListReducer2,
   customerDetails2: customerDetailsReducer2,
   customerUpdate2: customerUpdateReducer2,
   customerDelete2: customerDeleteReducer2,
   totalCustomer2: totalCustomerReducer2Count,
-
-
 
   createSales: createSalesReducer,
   salesList: salesListReducer,
@@ -193,10 +218,7 @@ const reducer = combineReducers({
   salesUpdateBilling: salesUpdateBillingReducer,
   salesRecentList: salesRecentListReducer,
   order: orderReducer,
-  totalSales:totalSalesReducerCount,
-
-
-
+  totalSales: totalSalesReducerCount,
 
   createSales2: createSalesReducer2,
   salesList2: salesListReducer2,
@@ -206,8 +228,7 @@ const reducer = combineReducers({
   salesUpdateBilling2: salesUpdateBillingReducer2,
   salesRecentList2: salesRecentListReducer2,
   order2: orderReducer2,
-  mySalesList:mySalesListReducer2,
-  
+  mySalesList: mySalesListReducer2,
 
   createAccount: createAccountReducer,
   accountsList: accountsListReducer,
@@ -215,17 +236,35 @@ const reducer = combineReducers({
   accountUpdate: accountUpdateReducer,
   accountDelete: accountDeleteReducer,
 
+  createAccount2: createAccountReducer2,
+  accountsList2: accountsListReducer2,
+  accountDetails2: accountDetailsReducer2,
+  accountUpdate2: accountUpdateReducer2,
+  accountDelete2: accountDeleteReducer2,
+
   createSubAccount: createSubAccountReducer,
   subaccountsList: subAccountsListReducer,
   subaccountDetails: subAccountDetailsReducer,
   subaccountUpdate: subAccountUpdateReducer,
   subaccountDelete: subAccountDeleteReducer,
 
+  createSubAccount2: createSubAccountReducer2,
+  subaccountsList2: subAccountsListReducer2,
+  subaccountDetails2: subAccountDetailsReducer2,
+  subaccountUpdate2: subAccountUpdateReducer2,
+  subaccountDelete2: subAccountDeleteReducer2,
+
   createTransaction: createTransactionReducer,
   transactionsList: transactionsListReducer,
   transactionDetails: transactionDetailsReducer,
   transactionUpdate: transactionUpdateReducer,
   transactionDelete: transactionDeleteReducer,
+
+  createTransaction2: createTransactionReducer2,
+  transactionsList2: transactionsListReducer2,
+  transactionDetails2: transactionDetailsReducer2,
+  transactionUpdate2: transactionUpdateReducer2,
+  transactionDelete2: transactionDeleteReducer2,
 
   eventsList: eventsListReducer,
 });

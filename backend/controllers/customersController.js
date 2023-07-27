@@ -45,7 +45,7 @@ export const getCustomersBYDateRage = expressAsync(async (req, res) => {
       : {};
 
       var start = new Date(startDate);
-      start.setDate(start.getDate() - 1);
+      start.setDate(start.getDate());
       start.toDateString();
     
       var end = new Date(endDate);
@@ -53,7 +53,7 @@ export const getCustomersBYDateRage = expressAsync(async (req, res) => {
       end.toDateString();
 
       
-    const customers = await Customers.find({ ...keyword2, createdAt: { $lte: end, $gte: start } }).sort({
+    const customers = await Customers.find({ ...keyword2, createdAt: { $lte: end, $gt: start } }).sort({
       createdAt: -1,
     });
 

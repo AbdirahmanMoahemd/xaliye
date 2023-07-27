@@ -225,7 +225,7 @@ export const getTasksByRange = expressAsync(async (req, res) => {
     // var test = yesterday.toDateString();
 
     var start = new Date(startDate);
-    start.setDate(start.getDate() - 1);
+    start.setDate(start.getDate());
     start.toDateString();
 
     var end = new Date(endDate);
@@ -235,7 +235,7 @@ export const getTasksByRange = expressAsync(async (req, res) => {
     const tasks = await Tasks.find({
       ...keyword,
       bin: false,
-      date: { $lte: end, $gte: start },
+      date: { $lte: end, $gt: start },
     })
       .sort({ date: -1 })
       .populate("user")
