@@ -11,7 +11,7 @@ const subAccount2Schema = mongoose.Schema(
     },
     generalAccount: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "account",
+      ref: "account2",
       required: true
     },
     description: {

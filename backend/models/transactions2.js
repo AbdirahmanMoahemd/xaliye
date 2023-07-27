@@ -4,12 +4,12 @@ const transactions2Schema = mongoose.Schema(
   {
     Account: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "account",
+      ref: "account2",
       required: true
     },
     subAccount: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "subAccount",
+      ref: "subAccount2",
       required: true
     },
     Amount: {
