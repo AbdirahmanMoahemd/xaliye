@@ -46,6 +46,7 @@ import { Button } from "primereact/button";
 import { Paginator } from "primereact/paginator";
 import { Toast } from "primereact/toast";
 import { InputText } from "primereact/inputtext";
+import { FaFilter } from "react-icons/fa";
 
 export function Sales2Screen() {
   const [keyword, setKeyword] = useState("");
@@ -73,6 +74,8 @@ export function Sales2Screen() {
   const [show, setShow] = useState(false);
   const [custname, setCustname] = useState("");
   const [countInStockError, setCountInStockError] = useState(false);
+  const [paidSales, setPaidSales] = useState(false);
+  const [unPaidSales, setUnPaidSales] = useState(false);
   const toastBottomCenter = useRef(null);
 
   const dispatch = useDispatch();
@@ -169,7 +172,7 @@ export function Sales2Screen() {
     if (successCreate) {
       dispatch({ type: SALES_CREATE_RESET });
       setCreate(false);
-      setKeyword2("")
+      setKeyword2("");
       setItem("");
       setCustomer("");
       setPhone("");
@@ -287,49 +290,64 @@ export function Sales2Screen() {
                 onChange={(e) => setKeyword(e.target.value)}
               />
             </div>
-            <Menu placement="left-start">
-              <MenuHandler>
-                <IconButton size="sm" variant="text" color="blue-gray">
-                  <EllipsisVerticalIcon
-                    strokeWidth={3}
-                    fill="currenColor"
-                    className="h-6 w-6"
-                  />
-                </IconButton>
-              </MenuHandler>
-              <MenuList>
-                <MenuItem
-                  onClick={() => setCreate(true)}
-                  className=" capitalize"
-                >
-                  New Sale
-                </MenuItem>
-                <MenuItem
-                  onClick={() => dispatch(listUnPaidSalesItems)}
-                  className=" capitalize"
-                >
-                  UnPaid Orders
-                </MenuItem>
-                <MenuItem
-                  onClick={() => dispatch(listPaidSalesItems)}
-                  className=" capitalize"
-                >
-                  Paid Orders
-                </MenuItem>
-                <MenuItem
-                  onClick={() => setDateRange(true)}
-                  className=" capitalize"
-                >
-                  Search By Date Range
-                </MenuItem>
-                <MenuItem
-                  onClick={() => dispatch(listSalesItems(keyword))}
-                  className=" capitalize"
-                >
-                  Get All Sales
-                </MenuItem>
-              </MenuList>
-            </Menu>
+            <div>
+              <Menu placement="left-start">
+                <MenuHandler>
+                  <IconButton size="sm" variant="text" color="blue-gray">
+                    <FaFilter title="Filter" />
+                  </IconButton>
+                </MenuHandler>
+                <MenuList>
+                  <MenuItem onClick={() => {
+                    setUnPaidSales(false)
+                    setPaidSales(true)
+                    }} className=" capitalize">
+                    Paid Sales
+                  </MenuItem>
+                  <MenuItem onClick={() => {
+                    setPaidSales(false)
+                    setUnPaidSales(true)}} className=" capitalize">
+                    UnPaid Sales
+                  </MenuItem>
+                  <MenuItem onClick={() => {
+                    setPaidSales(false)
+                    setUnPaidSales(false)}} className=" capitalize">
+                    clear filter
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+              <Menu placement="left-start">
+                <MenuHandler>
+                  <IconButton size="sm" variant="text" color="blue-gray">
+                    <EllipsisVerticalIcon
+                      strokeWidth={3}
+                      fill="currenColor"
+                      className="h-6 w-6"
+                    />
+                  </IconButton>
+                </MenuHandler>
+                <MenuList>
+                  <MenuItem
+                    onClick={() => setCreate(true)}
+                    className=" capitalize"
+                  >
+                    New Sale
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => setDateRange(true)}
+                    className=" capitalize"
+                  >
+                    Search By Date Range
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => dispatch(listSalesItems(keyword))}
+                    className=" capitalize"
+                  >
+                    Get All Sales
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </div>
           </CardHeader>
           {loadingDelete && (
             <ProgressSpinner
@@ -379,14 +397,16 @@ export function Sales2Screen() {
               ) : (
                 <>
                   <tbody className="overflow-y-auto">
-                    {sales.map((item) => (
+                    {sales.filter(filtered=>paidSales ? filtered.isPaid == true : unPaidSales ? filtered.isPaid == false:filtered.isPaid == true || false).map((item) => (
                       <tr key={item._id}>
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Typography
                             variant="small"
                             className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
-                            {item.customer ? item.customer.name : item.customerName}
+                            {item.customer
+                              ? item.customer.name
+                              : item.customerName}
                           </Typography>
                         </td>
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
@@ -551,7 +571,7 @@ export function Sales2Screen() {
           setPrice("");
           setIsPaid(true);
           setDate(new Date());
-          setKeyword2("")
+          setKeyword2("");
           setCountInStockError(false);
           dispatch({ type: ORDER_REMOVE_ITEM_ALL });
         }}
@@ -588,9 +608,15 @@ export function Sales2Screen() {
             completeMethod={() => dispatch(listCustomers(keyword2))}
             onChange={(e) => {
               setKeyword2(e.target.value);
-              typeof keyword2 == 'object' ? setCustomer(keyword2._id) : setCustomer("");
-              typeof keyword2 == 'object' ? setName(keyword2.name) : setName(keyword2);
-              typeof keyword2 == 'object' ? setPhone(keyword2.phone) : setPhone("");
+              typeof keyword2 == "object"
+                ? setCustomer(keyword2._id)
+                : setCustomer("");
+              typeof keyword2 == "object"
+                ? setName(keyword2.name)
+                : setName(keyword2);
+              typeof keyword2 == "object"
+                ? setPhone(keyword2.phone)
+                : setPhone("");
             }}
           />
           <div className="w-full gap-2 space-y-4 xl:flex xl:space-y-0 ">
@@ -778,7 +804,7 @@ export function Sales2Screen() {
             ></Checkbox>
           </div>
 
-          <div className="mt-4 flex justify-center">
+          <div className="mt-4 xl:flex justify-center gap-4">
             <button
               type="submit"
               onClick={(e) => {
@@ -792,6 +818,7 @@ export function Sales2Screen() {
             >
               Save
             </button>
+            <Button>Save & Print</Button>
           </div>
         </div>
         {/* </form> */}

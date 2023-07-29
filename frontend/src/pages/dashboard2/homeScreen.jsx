@@ -29,7 +29,7 @@ import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
 import React, { useEffect, useState } from "react";
 import { AiFillDollarCircle } from "react-icons/ai";
-import { FaUsers } from "react-icons/fa";
+import { FaFilter, FaUsers } from "react-icons/fa";
 import { FcSalesPerformance } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
@@ -80,6 +80,8 @@ const HomeScreen = () => {
   const [countInStockError, setCountInStockError] = useState(false);
   const [edit, setEdit] = useState(false);
   const [isPaidBilling, setIsPaidBilling] = useState(false);
+  const [paidSales, setPaidSales] = useState(false);
+  const [unPaidSales, setUnPaidSales] = useState(false);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -129,7 +131,6 @@ const HomeScreen = () => {
     success: successUpdate,
   } = salesUpdateBilling2;
 
-
   const customersList = useSelector((state) => state.customersList);
   const {
     loading: loadingCustomer,
@@ -146,7 +147,7 @@ const HomeScreen = () => {
   useEffect(() => {
     dispatch(getCustomerTotal());
     dispatch(getSalesTotal());
-    dispatch(listCustomers(keyword2))
+    dispatch(listCustomers(keyword2));
   }, [dispatch, successSaleCreate]);
 
   useEffect(() => {
@@ -219,9 +220,9 @@ const HomeScreen = () => {
     };
 
     let totalIncome = addDecimals(
-      (toltal = tasks.reduce((acc, item) => acc + item.amount, 0))
+      (toltal = sales.reduce((acc, item) => acc + item.totalPrice, 0))
     );
-    setToltalAmount(toltal);
+    setToltalAmount(totalIncome);
     setShowTotal(true);
   };
 
@@ -231,8 +232,6 @@ const HomeScreen = () => {
   );
 
   const itemqty = orderItems.reduce((acc, item) => acc + item.quantity, 0);
-
-  
 
   const submitSaleHandler = (e) => {
     e.preventDefault();
@@ -269,6 +268,9 @@ const HomeScreen = () => {
     }
   };
 
+
+
+  
 
   return (
     <div className="mt-12">
@@ -414,23 +416,54 @@ const HomeScreen = () => {
               />
             </div>
 
-            <Menu placement="left-start">
-              <MenuHandler>
-                <IconButton size="sm" variant="text" color="blue-gray">
-                  <EllipsisVerticalIcon
-                    strokeWidth={3}
-                    fill="currenColor"
-                    className="h-6 w-6"
-                  />
-                </IconButton>
-              </MenuHandler>
-              <MenuList>
-                <MenuItem onClick={() => setCreateSale(true)}>
-                  {" "}
-                  New Sale
-                </MenuItem>
-              </MenuList>
-            </Menu>
+            <div>
+              <Menu placement="left-start">
+                <MenuHandler>
+                  <IconButton size="sm" variant="text" color="blue-gray">
+                    <FaFilter title="Filter" />
+                  </IconButton>
+                </MenuHandler>
+                <MenuList>
+                  <MenuItem onClick={() => {
+                    setUnPaidSales(false)
+                    setPaidSales(true)
+                    }} className=" capitalize">
+                    Paid Sales
+                  </MenuItem>
+                  <MenuItem onClick={() => {
+                    setPaidSales(false)
+                    setUnPaidSales(true)}} className=" capitalize">
+                    UnPaid Sales
+                  </MenuItem>
+                  <MenuItem onClick={() => {
+                    setPaidSales(false)
+                    setUnPaidSales(false)}} className=" capitalize">
+                    clear filter
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+              <Menu placement="left-start">
+                <MenuHandler>
+                  <IconButton size="sm" variant="text" color="blue-gray">
+                    <EllipsisVerticalIcon
+                      strokeWidth={3}
+                      fill="currenColor"
+                      className="h-6 w-6"
+                    />
+                  </IconButton>
+                </MenuHandler>
+                <MenuList>
+                  <MenuItem onClick={() => setCreateSale(true)}>
+                   
+                    New Sale
+                  </MenuItem>
+                  <MenuItem onClick={getTotal}>
+                    
+                    Get Total
+                  </MenuItem>
+                </MenuList>
+              </Menu>
+            </div>
           </CardHeader>
           <CardBody className="table-wrp block max-h-screen  overflow-x-scroll px-0 pt-0 pb-2">
             <table className="w-full table-auto">
@@ -470,14 +503,16 @@ const HomeScreen = () => {
               ) : (
                 <>
                   <tbody className="overflow-y-auto">
-                    {sales.map((item) => (
+                    {sales.filter(filtered=>paidSales ? filtered.isPaid == true : unPaidSales ? filtered.isPaid == false:filtered.isPaid == true || false).map((item) => (
                       <tr key={item._id}>
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
                           <Typography
                             variant="small"
                             className="text-[11px] font-medium capitalize text-blue-gray-400"
                           >
-                            {item.customer ? item.customer.name : item.customerName}
+                            {item.customer
+                              ? item.customer.name
+                              : item.customerName}
                           </Typography>
                         </td>
                         <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
@@ -589,6 +624,24 @@ const HomeScreen = () => {
         </Card>
       </div>
 
+
+
+      <Dialog
+        blockScroll="false"
+        aria-expanded={showTotal ? true : false}
+        header="Sales Total Amount"
+        visible={showTotal}
+        onHide={() => {
+          setShowTotal(false);
+        }}
+        style={{ width: "40vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <div className="flex justify-center">
+          <p>Total Amount: ${toltalAmount}</p>
+        </div>
+      </Dialog>
+
       {/* Edit sales */}
       <Dialog
         blockScroll="false"
@@ -649,7 +702,7 @@ const HomeScreen = () => {
           setPrice("");
           setIsPaid(true);
           setDate(new Date());
-          setKeyword2("")
+          setKeyword2("");
           setCountInStockError(false);
           dispatch({ type: ORDER_REMOVE_ITEM_ALL });
         }}
@@ -673,7 +726,7 @@ const HomeScreen = () => {
           />
         )}
         <div className="mx-auto space-y-4 p-4">
-        <AutoComplete
+          <AutoComplete
             type="text"
             field="name"
             value={keyword2}
@@ -685,9 +738,15 @@ const HomeScreen = () => {
             completeMethod={() => dispatch(listCustomers(keyword2))}
             onChange={(e) => {
               setKeyword2(e.target.value);
-              typeof keyword2 == 'object' ? setCustomer(keyword2._id) : setCustomer("");
-              typeof keyword2 == 'object' ? setName(keyword2.name) : setName(keyword2);
-              typeof keyword2 == 'object' ? setPhone(keyword2.phone) : setPhone("");
+              typeof keyword2 == "object"
+                ? setCustomer(keyword2._id)
+                : setCustomer("");
+              typeof keyword2 == "object"
+                ? setName(keyword2.name)
+                : setName(keyword2);
+              typeof keyword2 == "object"
+                ? setPhone(keyword2.phone)
+                : setPhone("");
             }}
           />
           <div className="w-full gap-2 space-y-4 xl:flex xl:space-y-0 ">
@@ -888,7 +947,7 @@ const HomeScreen = () => {
             ></Checkbox>
           </div>
 
-          <div className="mt-4 flex justify-center">
+          <div className="mt-4 xl:flex justify-center gap-4">
             <button
               type="submit"
               onClick={submitSaleHandler}
@@ -896,6 +955,8 @@ const HomeScreen = () => {
             >
               Save
             </button>
+
+            <Button>Save & Print</Button>
           </div>
         </div>
         {/* </form> */}

@@ -43,6 +43,7 @@ export function Customers2Screen() {
   const [create, setCreate] = useState(false);
   const [edit, setEdit] = useState(false);
   const [show, setShow] = useState(false);
+  const [show2, setShow2] = useState(false);
   const [custID, setCustID] = useState("");
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
@@ -55,6 +56,7 @@ export function Customers2Screen() {
   const [first, setFirst] = useState(1);
   const [rows, setRows] = useState(200);
   const [pageNumber, setPageNumber] = useState(1);
+  const [myOrderItems, setMyOrderItems] = useState([]);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -532,7 +534,7 @@ export function Customers2Screen() {
       <Dialog
         blockScroll="false"
         aria-expanded={show ? true : false}
-        header={`Sales For ${custname}`}
+        header={`Sales For ${custname.name}`}
         visible={show}
         onHide={() => {
           setShow(false);
@@ -615,7 +617,7 @@ export function Customers2Screen() {
                                 onClick={() => {
                                   setMyOrderItems(item.orderItems);
                                   setCustname(item.customer);
-                                  setShow(true);
+                                  setShow2(true);
                                 }}
                               />
                             </Typography>
@@ -695,6 +697,79 @@ export function Customers2Screen() {
           </CardBody>
         </Card>
 
+      </Dialog>
+
+
+      <Dialog
+        blockScroll="false"
+        aria-expanded={show2 ? true : false}
+        header={`Order Items For ${custname.name}`}
+        visible={show2}
+        onHide={() => {
+          setShow2(false);
+        }}
+        style={{ width: "60vw" }}
+        breakpoints={{ "960px": "75vw", "641px": "100vw" }}
+      >
+        <Card>
+          <CardBody className="table-wrp block max-h-screen overflow-x-scroll px-0 pt-0 pb-2">
+            <table className="w-full min-w-[640px] table-auto">
+              <thead className="sticky top-0 z-40 border-b bg-white">
+                <tr>
+                  {["Item NAME", "Quantity", "Price", "Total"].map((el) => (
+                    <th className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium uppercase text-blue-gray-600"
+                      >
+                        {el}
+                      </Typography>
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+
+              <tbody className="overflow-y-auto">
+                {myOrderItems.map((order) => (
+                  <tr id={order._id}>
+                    <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                      >
+                        {order.itemName}
+                      </Typography>
+                    </td>
+                    <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                      >
+                        {order.quantity}
+                      </Typography>
+                    </td>
+                    <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium uppercase text-blue-gray-400"
+                      >
+                        {order.price}
+                      </Typography>
+                    </td>
+                    <td className="border-b border-blue-gray-50 py-3 px-2 text-left">
+                      <Typography
+                        variant="small"
+                        className="text-[11px] font-medium capitalize text-blue-gray-400"
+                      >
+                        ${order.price * order.quantity}
+                      </Typography>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </CardBody>
+        </Card>
       </Dialog>
 
 

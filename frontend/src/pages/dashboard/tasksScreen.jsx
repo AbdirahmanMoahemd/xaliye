@@ -51,7 +51,7 @@ import { listCustomers } from "@/actions/cusomerActions";
 import { RadioButton } from "primereact/radiobutton";
 import moment from "moment";
 import { Paginator } from "primereact/paginator";
-import ReactHTMLTableToExcel from 'react-html-table-to-excel';
+import ReactHTMLTableToExcel from "react-html-table-to-excel";
 import { FaFilter } from "react-icons/fa";
 import { Button } from "primereact/button";
 
@@ -83,6 +83,9 @@ export function TasksScreen() {
   const [dateRange, setDateRange] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [endDate, setEndDate] = useState(new Date());
+  const [onprocessTasks, setOnprocessTasks] = useState(new Date());
+  const [finishedTasks, setFinishedTasks] = useState(new Date());
+  const [unFinishedTasks, setUnFinishedTasks] = useState(new Date());
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
@@ -243,32 +246,33 @@ export function TasksScreen() {
 
   const items = [
     {
-        label: 'Update',
-        icon: 'pi pi-refresh'
+      label: "Update",
+      icon: "pi pi-refresh",
     },
     {
-        label: 'Delete',
-        icon: 'pi pi-times'
+      label: "Delete",
+      icon: "pi pi-times",
     },
     {
-        label: 'React Website',
-        icon: 'pi pi-external-link',
-        command: () => {
-            window.location.href = 'https://reactjs.org/'
-        }
+      label: "React Website",
+      icon: "pi pi-external-link",
+      command: () => {
+        window.location.href = "https://reactjs.org/";
+      },
     },
-    {   label: 'Upload',
-        icon: 'pi pi-upload',
-        command: () => {
-            //router.push('/fileupload');
-        }
-    }
-];
+    {
+      label: "Upload",
+      icon: "pi pi-upload",
+      command: () => {
+        //router.push('/fileupload');
+      },
+    },
+  ];
 
   const onPageChange = (event) => {
     setFirst(event.first);
     setRows(event.rows);
-    setPageNumber(event.page +1)
+    setPageNumber(event.page + 1);
   };
 
   const updateTaskStage = () => {
@@ -349,8 +353,6 @@ export function TasksScreen() {
     setTaskId("");
   };
 
- 
-
   return (
     <>
       <div className="mt-12 mb-8 flex flex-col gap-12">
@@ -373,95 +375,114 @@ export function TasksScreen() {
               />
             </div>
             <div>
-            <Menu placement="left-start">
-              <MenuHandler>
-                <IconButton size="sm" variant="text" color="blue-gray" >
-                  <FaFilter title="Filter"/>
-                </IconButton>
-              </MenuHandler>
-              <MenuList>
-              <MenuItem
-                  onClick={()=> dispatch(onprecessTasksList(keyword, pageNumber))}
-                  className=" capitalize"
-                >
-                  On Process
-                </MenuItem>
-                <MenuItem
-                  onClick={()=> dispatch(finishedTasksList(keyword, pageNumber))}
-                  className=" capitalize"
-                >
-                  Finished
-                </MenuItem>
-                <MenuItem
-                  onClick={()=> dispatch(unfinishedTasksList(keyword, pageNumber))}
-                  className=" capitalize"
-                >
-                  UnFinished
-                </MenuItem>
-                {/* <MenuItem
+              <Menu placement="left-start">
+                <MenuHandler>
+                  <IconButton size="sm" variant="text" color="blue-gray">
+                    <FaFilter title="Filter" />
+                  </IconButton>
+                </MenuHandler>
+                <MenuList>
+                  <MenuItem
+                    onClick={() => {
+                      setOnprocessTasks(true);
+                      setFinishedTasks(false);
+                      setUnFinishedTasks(false);
+                    }}
+                    className=" capitalize"
+                  >
+                    On Process
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setOnprocessTasks(false);
+                      setFinishedTasks(true);
+                      setUnFinishedTasks(false);
+                    }}
+                    className=" capitalize"
+                  >
+                    Finished
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setOnprocessTasks(false);
+                      setFinishedTasks(false);
+                      setUnFinishedTasks(true);
+                    }}
+                    className=" capitalize"
+                  >
+                    UnFinished
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => {
+                      setOnprocessTasks(false);
+                      setFinishedTasks(false);
+                      setUnFinishedTasks(false);
+                    }}
+                    className=" capitalize"
+                  >
+                    clear Filter
+                  </MenuItem>
+                  {/* <MenuItem
                   onClick={()=> {}}
                   className=" capitalize"
                 >
                   Delivered
                 </MenuItem> */}
-                
-              </MenuList>
-              
+                </MenuList>
               </Menu>
-            <Menu placement="left-start">
-              <MenuHandler>
-                <IconButton size="sm" variant="text" color="blue-gray">
-                  <EllipsisVerticalIcon
-                    strokeWidth={3}
-                    fill="currenColor"
-                    className="h-6 w-6"
-                  />
-                </IconButton>
-              </MenuHandler>
-              <MenuList>
-                <MenuItem
-                  onClick={() => setCreate(true)}
-                  className=" capitalize"
-                >
-                  Add New Ticket
-                </MenuItem>
-                <MenuItem
-                  onClick={() => dispatch(listTasksByThisWeek(keyword))}
-                  className=" capitalize"
-                >
-                  Tasks of this Week
-                </MenuItem>
-                <MenuItem
-                  onClick={() => setDateRange(true)}
-                  className=" capitalize"
-                >
-                  Tasks By Date Range
-                </MenuItem>
-                <MenuItem
-                  onClick={() => navigate("/dashboard/bin")}
-                  className=" capitalize"
-                >
-                  Tasks In Recycle Bin
-                </MenuItem>
-                <MenuItem
-                  onClick={() => dispatch(listTasksByphone(keyword))}
-                  className=" capitalize"
-                >
-                  All Tasks
-                </MenuItem>
-                <MenuItem
-                  className=" capitalize"
-                >
-                  <ReactHTMLTableToExcel
-                    id="test-table-xls-button"
-                    className="download-table-xls-button"
-                    table="table-to-xls"
-                    filename="tasks"
-                    sheet="tablexls"
-                    buttonText="Download as XLS"/>
-                </MenuItem>
-              </MenuList>
-            </Menu>
+              <Menu placement="left-start">
+                <MenuHandler>
+                  <IconButton size="sm" variant="text" color="blue-gray">
+                    <EllipsisVerticalIcon
+                      strokeWidth={3}
+                      fill="currenColor"
+                      className="h-6 w-6"
+                    />
+                  </IconButton>
+                </MenuHandler>
+                <MenuList>
+                  <MenuItem
+                    onClick={() => setCreate(true)}
+                    className=" capitalize"
+                  >
+                    Add New Ticket
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => dispatch(listTasksByThisWeek(keyword))}
+                    className=" capitalize"
+                  >
+                    Tasks of this Week
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => setDateRange(true)}
+                    className=" capitalize"
+                  >
+                    Tasks By Date Range
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => navigate("/dashboard/bin")}
+                    className=" capitalize"
+                  >
+                    Tasks In Recycle Bin
+                  </MenuItem>
+                  <MenuItem
+                    onClick={() => dispatch(listTasksByphone(keyword))}
+                    className=" capitalize"
+                  >
+                    All Tasks
+                  </MenuItem>
+                  <MenuItem className=" capitalize">
+                    <ReactHTMLTableToExcel
+                      id="test-table-xls-button"
+                      className="download-table-xls-button"
+                      table="table-to-xls"
+                      filename="tasks"
+                      sheet="tablexls"
+                      buttonText="Download as XLS"
+                    />
+                  </MenuItem>
+                </MenuList>
+              </Menu>
             </div>
           </CardHeader>
 
@@ -475,7 +496,10 @@ export function TasksScreen() {
               />
             )}
             {errorDelete && <Message severity="error" text={errorDelete} />}
-            <table id="table-to-xls" className="w-full min-w-[640px] table-auto">
+            <table
+              id="table-to-xls"
+              className="w-full min-w-[640px] table-auto"
+            >
               <thead className="sticky top-0 z-40 border-b bg-white">
                 <tr>
                   {[
@@ -515,175 +539,185 @@ export function TasksScreen() {
                 <Message severity="error" text={error} />
               ) : (
                 <tbody className="overflow-y-auto">
-                  {tasks.map((task) => (
-                    <tr id={task._id}>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium uppercase text-blue-gray-400"
-                        >
-                          {task.customer ? (
-                            `XRC- ${task.customer.custID}`
-                          ) : (
-                            <p className=" text-red-700">Not Found</p>
-                          )}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium capitalize text-blue-gray-400"
-                        >
-                          {task.customer ? task.customer.name : task.name}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium capitalize text-blue-gray-400"
-                        >
-                          {task.customer ? task.customer.phone : task.phone}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium capitalize text-blue-gray-400"
-                        >
-                          {task.item}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium capitalize text-blue-gray-400"
-                        >
-                          {task.problem}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium capitalize text-blue-gray-400"
-                        >
-                          {task.date && task.date.substring(0, 10)}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium capitalize text-blue-gray-400"
-                        >
-                          ${task.amount}
-                        </Typography>
-                      </td>
+                  {tasks
+                    .filter((filtered) =>
+                      onprocessTasks
+                        ? filtered.stage === 0
+                        : finishedTasks
+                        ? filtered.stage === 1
+                        : unFinishedTasks
+                        ? filtered.stage === 2
+                        : filtered.stage === 0 || 1 || 2
+                    )
+                    .map((task) => (
+                      <tr id={task._id}>
+                        <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                          <Typography
+                            variant="small"
+                            className="text-[11px] font-medium uppercase text-blue-gray-400"
+                          >
+                            {task.customer ? (
+                              `${task.customer.custID}`
+                            ) : (
+                              <p className=" text-red-700">Not Found</p>
+                            )}
+                          </Typography>
+                        </td>
+                        <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                          <Typography
+                            variant="small"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
+                          >
+                            {task.customer ? task.customer.name : task.name}
+                          </Typography>
+                        </td>
+                        <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                          <Typography
+                            variant="small"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
+                          >
+                            {task.customer ? task.customer.phone : task.phone}
+                          </Typography>
+                        </td>
+                        <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                          <Typography
+                            variant="small"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
+                          >
+                            {task.item}
+                          </Typography>
+                        </td>
+                        <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                          <Typography
+                            variant="small"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
+                          >
+                            {task.problem}
+                          </Typography>
+                        </td>
+                        <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                          <Typography
+                            variant="small"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
+                          >
+                            {task.date && task.date.substring(0, 10)}
+                          </Typography>
+                        </td>
+                        <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                          <Typography
+                            variant="small"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
+                          >
+                            ${task.amount}
+                          </Typography>
+                        </td>
 
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium capitalize text-blue-gray-400"
-                        >
-                          {task.stage === 0 ? (
-                            <p className="cursor-pointer bg-blue-600 px-1 text-center text-white">
-                              On Process
-                            </p>
-                          ) : task.stage === 1 ? (
-                            <p className="text-whit cursor-pointer bg-yellow-300 px-1 text-center">
-                              Finished
-                            </p>
-                          ) : (
-                            <p className="cursor-pointer bg-red-600 px-1  text-center text-white">
-                              Unfinished
-                            </p>
-                          )}
-                        </Typography>
-                      </td>
+                        <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                          <Typography
+                            variant="small"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
+                          >
+                            {task.stage === 0 ? (
+                              <p className="cursor-pointer bg-blue-600 px-1 text-center text-white">
+                                On Process
+                              </p>
+                            ) : task.stage === 1 ? (
+                              <p className="text-whit cursor-pointer bg-yellow-300 px-1 text-center">
+                                Finished
+                              </p>
+                            ) : (
+                              <p className="cursor-pointer bg-red-600 px-1  text-center text-white">
+                                Unfinished
+                              </p>
+                            )}
+                          </Typography>
+                        </td>
 
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium capitalize text-blue-gray-400"
-                        >
-                          {task.status === 0 ? (
-                            <p className="cursor-pointer bg-blue-600 px-1 text-center text-white">
-                              In Store
-                            </p>
-                          ) : (
-                            <p className="cursor-pointer bg-green-500 px-1 text-center text-white">
-                              Delivered
-                            </p>
-                          )}
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Typography
-                          variant="small"
-                          className="text-[11px] font-medium capitalize text-blue-gray-400"
-                        >
-                          <icon
-                            className="pi pi-comment cursor-pointer text-blue-700"
-                            onClick={() => {
-                              setMessage(true);
-                              setText(task.comment);
-                            }}
-                          />
-                        </Typography>
-                      </td>
-                      <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
-                        <Menu placement="left-start">
-                          <MenuHandler>
-                            <IconButton
-                              size="sm"
-                              variant="text"
-                              color="blue-gray"
-                            >
-                              <EllipsisVerticalIcon
-                                strokeWidth={3}
-                                fill="currenColor"
-                                className="h-6 w-6"
-                              />
-                            </IconButton>
-                          </MenuHandler>
-                          <MenuList>
-                            <MenuItem
+                        <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                          <Typography
+                            variant="small"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
+                          >
+                            {task.status === 0 ? (
+                              <p className="cursor-pointer bg-blue-600 px-1 text-center text-white">
+                                In Store
+                              </p>
+                            ) : (
+                              <p className="cursor-pointer bg-green-500 px-1 text-center text-white">
+                                Delivered
+                              </p>
+                            )}
+                          </Typography>
+                        </td>
+                        <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                          <Typography
+                            variant="small"
+                            className="text-[11px] font-medium capitalize text-blue-gray-400"
+                          >
+                            <icon
+                              className="pi pi-comment cursor-pointer text-blue-700"
                               onClick={() => {
-                                setVisible(true);
-                                setStage(task.stage);
-                                setId(task._id);
+                                setMessage(true);
+                                setText(task.comment);
                               }}
-                            >
-                              Change Repairing Stage
-                            </MenuItem>
-                            <MenuItem
-                              onClick={() => {
-                                setStatus(true);
-                                setStatusStage(task.status);
-                                setId(task._id);
-                              }}
-                            >
-                              Change Item Status
-                            </MenuItem>
+                            />
+                          </Typography>
+                        </td>
+                        <td className="border-b border-blue-gray-50 py-3 px-4 text-left">
+                          <Menu placement="left-start">
+                            <MenuHandler>
+                              <IconButton
+                                size="sm"
+                                variant="text"
+                                color="blue-gray"
+                              >
+                                <EllipsisVerticalIcon
+                                  strokeWidth={3}
+                                  fill="currenColor"
+                                  className="h-6 w-6"
+                                />
+                              </IconButton>
+                            </MenuHandler>
+                            <MenuList>
+                              <MenuItem
+                                onClick={() => {
+                                  setVisible(true);
+                                  setStage(task.stage);
+                                  setId(task._id);
+                                }}
+                              >
+                                Change Repairing Stage
+                              </MenuItem>
+                              <MenuItem
+                                onClick={() => {
+                                  setStatus(true);
+                                  setStatusStage(task.status);
+                                  setId(task._id);
+                                }}
+                              >
+                                Change Item Status
+                              </MenuItem>
 
-                            <MenuItem
-                              onClick={() => {
-                                setTaskId("");
-                                setTaskId(task._id);
-                                setEdit(true);
-                              }}
-                            >
-                              Update
-                            </MenuItem>
-                            <MenuItem onClick={() => binTask(task._id)}>
-                              Move To Bin
-                            </MenuItem>
-                            <MenuItem onClick={() => deleteTask(task._id)}>
-                              Delete Permanently
-                            </MenuItem>
-                          </MenuList>
-                        </Menu>
-                      </td>
-                    </tr>
-                  ))}
+                              <MenuItem
+                                onClick={() => {
+                                  setTaskId("");
+                                  setTaskId(task._id);
+                                  setEdit(true);
+                                }}
+                              >
+                                Update
+                              </MenuItem>
+                              <MenuItem onClick={() => binTask(task._id)}>
+                                Move To Bin
+                              </MenuItem>
+                              <MenuItem onClick={() => deleteTask(task._id)}>
+                                Delete Permanently
+                              </MenuItem>
+                            </MenuList>
+                          </Menu>
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               )}
             </table>
@@ -775,11 +809,9 @@ export function TasksScreen() {
           </div>
         </>
       </Dialog>
-    
 
-
-    {/* date rage  */}
-    <Dialog
+      {/* date rage  */}
+      <Dialog
         blockScroll="false"
         aria-expanded={dateRange ? true : false}
         header="Select Date"
@@ -807,11 +839,10 @@ export function TasksScreen() {
         <br />
         <div className="flex justify-center">
           <Button
-            onClick={() =>
-             { 
-              setDateRange(false)
-              dispatch(listTasksByRangeDate("", startDate, endDate))}
-            }
+            onClick={() => {
+              setDateRange(false);
+              dispatch(listTasksByRangeDate("", startDate, endDate));
+            }}
           >
             Search
           </Button>

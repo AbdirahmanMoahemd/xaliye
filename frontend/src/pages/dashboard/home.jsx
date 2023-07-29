@@ -769,7 +769,7 @@ export function Home() {
               <thead className="sticky top-0 z-40 border-b bg-white">
                 <tr>
                   {[
-                    "ID",
+                    "ID", 
                     "NAME",
                     "Phone",
                     "Item",
