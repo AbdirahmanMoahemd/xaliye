@@ -29,6 +29,16 @@ const sales2Schema = mongoose.Schema(
       type: String,
       required: true,
     },
+    subTotalPrice: {
+      type: Number,
+      required: true,
+      default: 0.0,
+    },
+    discountAmount: {
+      type: Number,
+      required: true,
+      default: 0.0,
+    },
     totalPrice: {
       type: Number,
       required: true,

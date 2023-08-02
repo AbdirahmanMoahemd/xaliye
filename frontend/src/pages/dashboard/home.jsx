@@ -45,7 +45,6 @@ import {
 import { Message } from "primereact/message";
 import { ProgressSpinner } from "primereact/progressspinner";
 import {
-  AiFillBell,
   AiFillDollarCircle,
   AiOutlineWarning,
 } from "react-icons/ai";

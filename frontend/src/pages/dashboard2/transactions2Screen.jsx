@@ -401,7 +401,7 @@ export function Transactions2Screen() {
               <Input
                 type="Number"
                 value={Amount}
-                label="Debit Amount"
+                label="Amount"
                 size="lg"
                 required
                 onChange={(e) => setAmount(e.target.value)}

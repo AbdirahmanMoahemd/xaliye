@@ -6,6 +6,10 @@ import {
     RECENT_SALES_LIST_REQUEST,
     RECENT_SALES_LIST_RESET,
     RECENT_SALES_LIST_SUCCESS,
+    SALES2_CREATE_FAIL,
+    SALES2_CREATE_REQUEST,
+    SALES2_CREATE_RESET,
+    SALES2_CREATE_SUCCESS,
     SALES_CREATE_FAIL,
     SALES_CREATE_REQUEST,
     SALES_CREATE_RESET,
@@ -42,6 +46,21 @@ import {
       case SALES_CREATE_FAIL:
         return { loading: false, error: action.payload };
       case SALES_CREATE_RESET:
+        return {};
+      default:
+        return state;
+    }
+  };
+
+  export const createSales2Reducer2 = (state = {}, action) => {
+    switch (action.type) {
+      case SALES2_CREATE_REQUEST:
+        return { loading: true };
+      case SALES2_CREATE_SUCCESS:
+        return { loading: false, success: true, sales: action.payload };
+      case SALES2_CREATE_FAIL:
+        return { loading: false, error: action.payload };
+      case SALES2_CREATE_RESET:
         return {};
       default:
         return state;

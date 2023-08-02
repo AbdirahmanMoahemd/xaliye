@@ -32,14 +32,14 @@ export const createSubAccount = expressAsync(async (req, res) => {
   const exSubAccount = await SubAccount2.findOne({ accountName });
   if (!exSubAccount) {
     const subacc = await SubAccount2.find().sort({ createdAt: -1 });
-    if (subacc) {
+    if (subacc.length !==0) {
       const subaccount = new SubAccount2({
         accountNo: subacc.accountNo + 1,
         accountName,
         generalAccount: generalAccount._id,
         description,
       });
-      const createdSubAccount = await SubAccount2.save();
+      const createdSubAccount = await subaccount.save();
       res.status(201).json(createdSubAccount);
     } else {
       const subaccount = new SubAccount2({
@@ -48,7 +48,7 @@ export const createSubAccount = expressAsync(async (req, res) => {
         generalAccount: generalAccount._id,
         description,
       });
-      const createdSubAccount = await SubAccount2.save();
+      const createdSubAccount = await subaccount.save();
       res.status(201).json(createdSubAccount);
     }
   } else {
@@ -66,7 +66,7 @@ export const updateSubAccount = expressAsync(async (req, res) => {
     SubAccount2.generalAccount = generalAccount._id;
     SubAccount2.description = description;
 
-    const updatedSubAccount = await SubAccount2.save();
+    const updatedSubAccount = await subaccount.save();
     res.json({
       updatedSubAccount,
     });

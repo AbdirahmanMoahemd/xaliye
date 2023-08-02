@@ -717,7 +717,7 @@ export function AccountsScreen() {
             <Input
               type="text"
               value={accountName}
-              label="Account Name"
+              label="SubAccount Name"
               size="lg"
               required
               onChange={(e) => setAccountName(e.target.value)}

@@ -96,7 +96,7 @@ export const getSalesById = expressAsync(async (req, res) => {
 });
 
 export const createSalesItem = expressAsync(async (req, res) => {
-  const {  orderItems,name, phone, date,totalPrice, invoiceId, isPaid } =
+  const {  orderItems,name, phone, date,subTotalPrice,discountAmount, totalPrice, invoiceId, isPaid } =
     req.body;
 
     const excustomers = await Customers2.findOne({ phone });
@@ -117,6 +117,8 @@ export const createSalesItem = expressAsync(async (req, res) => {
         customerName: name,
         phone,
         date,
+        subTotalPrice,
+        discountAmount,
         totalPrice,
         invoiceId,
         isPaid,
@@ -138,7 +140,7 @@ export const createSalesItem = expressAsync(async (req, res) => {
 
 
 export const createExSalesItem = expressAsync(async (req, res) => {
-  const {  orderItems, customer,name, phone, date,totalPrice, invoiceId, isPaid } =
+  const {  orderItems, customer,name, phone, date, subTotalPrice,discountAmount,totalPrice, invoiceId, isPaid } =
     req.body;
 
   
@@ -149,6 +151,8 @@ export const createExSalesItem = expressAsync(async (req, res) => {
       customerName: name,
       phone,
       date,
+      subTotalPrice,
+      discountAmount,
       totalPrice,
       invoiceId,
       isPaid,

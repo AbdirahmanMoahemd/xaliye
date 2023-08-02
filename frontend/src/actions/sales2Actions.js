@@ -5,6 +5,9 @@ import {
   RECENT_SALES_LIST_FAIL,
   RECENT_SALES_LIST_REQUEST,
   RECENT_SALES_LIST_SUCCESS,
+  SALES2_CREATE_FAIL,
+  SALES2_CREATE_REQUEST,
+  SALES2_CREATE_SUCCESS,
   SALES_CREATE_FAIL,
   SALES_CREATE_REQUEST,
   SALES_CREATE_SUCCESS,
@@ -29,7 +32,7 @@ import {
 } from "../constants/sales2Constants";
 
 export const createNewSales =
-  (orderItems,name, phone, date,totalPrice ,invoiceId, isPaid) =>
+  (orderItems,name, phone, date,subTotalPrice,discountAmount, totalPrice ,invoiceId, isPaid) =>
   async (dispatch, getState) => {
     try {
       dispatch({
@@ -48,7 +51,7 @@ export const createNewSales =
 
       const { data } = await axios.post(
         "/api/Sales2",
-        { orderItems,name,phone, date,totalPrice,invoiceId, isPaid },
+        { orderItems,name,phone, date,subTotalPrice,discountAmount, totalPrice,invoiceId, isPaid },
         config
       );
 
@@ -69,7 +72,7 @@ export const createNewSales =
 
 
   export const createExSales =
-  (orderItems, customer,name, phone, date,totalPrice ,invoiceId, isPaid) =>
+  (orderItems, customer,name, phone, date,subTotalPrice,discountAmount,totalPrice ,invoiceId, isPaid) =>
   async (dispatch, getState) => {
     try {
       dispatch({
@@ -88,7 +91,7 @@ export const createNewSales =
 
       const { data } = await axios.post(
         "/api/Sales2/existing",
-        { orderItems, customer,name,phone, date,totalPrice,invoiceId, isPaid },
+        { orderItems, customer,name,phone, date,subTotalPrice,discountAmount,totalPrice,invoiceId, isPaid },
         config
       );
 
@@ -99,6 +102,88 @@ export const createNewSales =
     } catch (error) {
       dispatch({
         type: SALES_CREATE_FAIL,
+        payload:
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message,
+      });
+    }
+  };
+
+
+
+
+  export const createNewSalesAndPrint =
+  (orderItems,name, phone, date,subTotalPrice,discountAmount,totalPrice ,invoiceId, isPaid) =>
+  async (dispatch, getState) => {
+    try {
+      dispatch({
+        type: SALES2_CREATE_REQUEST,
+      });
+
+      const {
+        userLogin: { userInfo },
+      } = getState();
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+
+      const { data } = await axios.post(
+        "/api/Sales2",
+        { orderItems,name,phone, date,subTotalPrice,discountAmount,totalPrice,invoiceId, isPaid },
+        config
+      );
+
+      dispatch({
+        type: SALES2_CREATE_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: SALES2_CREATE_FAIL,
+        payload:
+          error.response && error.response.data.message
+            ? error.response.data.message
+            : error.message,
+      });
+    }
+  };
+
+
+  export const createExSalesAndPrint =
+  (orderItems, customer,name, phone, date,subTotalPrice,discountAmount,totalPrice ,invoiceId, isPaid) =>
+  async (dispatch, getState) => {
+    try {
+      dispatch({
+        type: SALES2_CREATE_REQUEST,
+      });
+
+      const {
+        userLogin: { userInfo },
+      } = getState();
+
+      const config = {
+        headers: {
+          Authorization: `Bearer ${userInfo.token}`,
+        },
+      };
+
+      const { data } = await axios.post(
+        "/api/Sales2/existing",
+        { orderItems, customer,name,phone, date,subTotalPrice,discountAmount,totalPrice,invoiceId, isPaid },
+        config
+      );
+
+      dispatch({
+        type: SALES2_CREATE_SUCCESS,
+        payload: data,
+      });
+    } catch (error) {
+      dispatch({
+        type: SALES2_CREATE_FAIL,
         payload:
           error.response && error.response.data.message
             ? error.response.data.message

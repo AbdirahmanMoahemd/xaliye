@@ -80,6 +80,7 @@ import {
 } from "./reducers/salesReducers";
 
 import {
+  createSales2Reducer2,
   createSalesReducer2,
   orderReducer2,
   salesDeleteReducer2,
@@ -221,6 +222,7 @@ const reducer = combineReducers({
   totalSales: totalSalesReducerCount,
 
   createSales2: createSalesReducer2,
+  createSalesAndPrint:createSales2Reducer2,
   salesList2: salesListReducer2,
   salesDetails2: salesDetailsReducer2,
   salesUpdate2: salesUpdateReducer2,

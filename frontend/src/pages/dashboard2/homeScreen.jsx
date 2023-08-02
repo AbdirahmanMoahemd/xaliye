@@ -2,7 +2,9 @@ import { getCustomerTotal } from "@/actions/customer2Actions";
 import {
   addToOrderItems,
   createExSales,
+  createExSalesAndPrint,
   createNewSales,
+  createNewSalesAndPrint,
   deleteSalesItem,
   getSalesTotal,
   listRecentSales,
@@ -27,8 +29,8 @@ import {
 import { AutoComplete } from "primereact/autocomplete";
 import { Button } from "primereact/button";
 import { Checkbox } from "primereact/checkbox";
-import React, { useEffect, useState } from "react";
-import { AiFillDollarCircle } from "react-icons/ai";
+import React, { useEffect, useRef, useState } from "react";
+import { AiFillDollarCircle, AiOutlineWarning } from "react-icons/ai";
 import { FaFilter, FaUsers } from "react-icons/fa";
 import { FcSalesPerformance } from "react-icons/fc";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,6 +39,7 @@ import DatePicker from "react-datepicker";
 import moment from "moment";
 import {
   ORDER_REMOVE_ITEM_ALL,
+  SALES2_CREATE_RESET,
   SALES_CREATE_RESET,
   SALES_UPDATE_BILLING_RESET,
 } from "@/constants/sales2Constants";
@@ -51,6 +54,7 @@ import { Paginator } from "primereact/paginator";
 import { InputText } from "primereact/inputtext";
 import { confirmAlert } from "react-confirm-alert";
 import { listCustomers } from "@/actions/customer2Actions";
+import ReactToPrint from "react-to-print";
 
 const HomeScreen = () => {
   const [id, setId] = useState("");
@@ -61,6 +65,7 @@ const HomeScreen = () => {
   const [customersale, setCustomerSale] = useState();
   const [quantity, setQuantity] = useState("");
   const [price, setPrice] = useState("");
+  const [discount, setDiscount] = useState(0);
   const [phone, setPhone] = useState();
   const [name, setName] = useState("");
   const [date, setDate] = useState(new Date());
@@ -82,9 +87,13 @@ const HomeScreen = () => {
   const [isPaidBilling, setIsPaidBilling] = useState(false);
   const [paidSales, setPaidSales] = useState(false);
   const [unPaidSales, setUnPaidSales] = useState(false);
+  const [totalAmount, setTotalAmount] = useState(0);
+  const toastBottomCenter = useRef(null);
 
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
+  let componentRef = useRef();
 
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin;
@@ -117,6 +126,20 @@ const HomeScreen = () => {
     error: errorSaleCreate,
     success: successSaleCreate,
   } = createSales2;
+
+  const salesDelete2 = useSelector((state) => state.salesDelete2);
+  const {
+    loading: loadingDelete,
+    error: errorDelete,
+    success: successDelete,
+  } = salesDelete2;
+
+  const createSalesAndPrint = useSelector((state) => state.createSalesAndPrint);
+  const {
+    loading: loadingSaleCreateAndPrint,
+    error: errorSaleCreateAndPrint,
+    success: successSaleCreateAndPrint,
+  } = createSalesAndPrint;
 
   const order2 = useSelector((state) => state.order2);
   const { orderItems } = order2;
@@ -151,9 +174,17 @@ const HomeScreen = () => {
   }, [dispatch, successSaleCreate]);
 
   useEffect(() => {
+    if (successSaleCreateAndPrint) {
+      setCreateSale(false);
+     
+    }
+  }, [dispatch]);
+  useEffect(() => {
+    setIsSalesPrinting(true);
     if (successSaleCreate) {
       setIsSalesPrinting(true);
       dispatch({ type: SALES_CREATE_RESET });
+      dispatch({ type: SALES2_CREATE_RESET });
       setCreateSale(false);
       setItemSale("");
       setCustomerSale("");
@@ -170,7 +201,15 @@ const HomeScreen = () => {
       setEdit(false);
     }
     dispatch(listRecentSales(keyword, pageNumber));
-  }, [dispatch, successSaleCreate, keyword, pageNumber, successUpdate]);
+  }, [
+    dispatch,
+    successSaleCreate,
+    keyword,
+    pageNumber,
+    successUpdate,
+    successSaleCreateAndPrint,
+    successDelete,
+  ]);
 
   const countInStockHandler = () => {
     for (let index = 0; index < orderItems.length; index++) {
@@ -226,6 +265,11 @@ const HomeScreen = () => {
     setShowTotal(true);
   };
 
+  let subTotalPrice = orderItems.reduce(
+    (acc, item) => acc + item.quantity * item.price,
+    0
+  );
+
   let totalPrice = orderItems.reduce(
     (acc, item) => acc + item.quantity * item.price,
     0
@@ -244,7 +288,9 @@ const HomeScreen = () => {
             name,
             phone,
             date,
-            totalPrice,
+            subTotalPrice,
+            discount,
+            totalPrice - discount,
             invoiceId,
             isPaid
           )
@@ -259,7 +305,9 @@ const HomeScreen = () => {
             name,
             phone,
             date,
-            totalPrice,
+            subTotalPrice,
+            discount,
+            totalPrice - discount,
             invoiceId,
             isPaid
           )
@@ -268,9 +316,44 @@ const HomeScreen = () => {
     }
   };
 
-
-
-  
+  const submitSaleHandler2 = () => {
+   
+    if (customer === "") {
+      setName(keyword2);
+      if (orderItems != null) {
+        dispatch(
+          createNewSalesAndPrint(
+            orderItems,
+            name,
+            phone,
+            date,
+            subTotalPrice,
+            discount,
+            totalPrice - discount,
+            invoiceId,
+            isPaid
+          )
+        );
+      }
+    } else {
+      if (orderItems != null) {
+        dispatch(
+          createExSalesAndPrint(
+            orderItems,
+            customer,
+            name,
+            phone,
+            date,
+            subTotalPrice,
+            discount,
+            totalPrice - discount,
+            invoiceId,
+            isPaid
+          )
+        );
+      }
+    }
+  };
 
   return (
     <div className="mt-12">
@@ -424,20 +507,31 @@ const HomeScreen = () => {
                   </IconButton>
                 </MenuHandler>
                 <MenuList>
-                  <MenuItem onClick={() => {
-                    setUnPaidSales(false)
-                    setPaidSales(true)
-                    }} className=" capitalize">
+                  <MenuItem
+                    onClick={() => {
+                      setUnPaidSales(false);
+                      setPaidSales(true);
+                    }}
+                    className=" capitalize"
+                  >
                     Paid Sales
                   </MenuItem>
-                  <MenuItem onClick={() => {
-                    setPaidSales(false)
-                    setUnPaidSales(true)}} className=" capitalize">
+                  <MenuItem
+                    onClick={() => {
+                      setPaidSales(false);
+                      setUnPaidSales(true);
+                    }}
+                    className=" capitalize"
+                  >
                     UnPaid Sales
                   </MenuItem>
-                  <MenuItem onClick={() => {
-                    setPaidSales(false)
-                    setUnPaidSales(false)}} className=" capitalize">
+                  <MenuItem
+                    onClick={() => {
+                      setPaidSales(false);
+                      setUnPaidSales(false);
+                    }}
+                    className=" capitalize"
+                  >
                     clear filter
                   </MenuItem>
                 </MenuList>
@@ -454,13 +548,9 @@ const HomeScreen = () => {
                 </MenuHandler>
                 <MenuList>
                   <MenuItem onClick={() => setCreateSale(true)}>
-                   
                     New Sale
                   </MenuItem>
-                  <MenuItem onClick={getTotal}>
-                    
-                    Get Total
-                  </MenuItem>
+                  <MenuItem onClick={getTotal}>Get Total</MenuItem>
                 </MenuList>
               </Menu>
             </div>
@@ -473,6 +563,8 @@ const HomeScreen = () => {
                     "Customer",
                     "Phone",
                     "Order Items",
+                    "SubTotal",
+                    "Discount Amount",
                     "Total Price",
                     "Date",
                     "Billing Status",
@@ -503,113 +595,137 @@ const HomeScreen = () => {
               ) : (
                 <>
                   <tbody className="overflow-y-auto">
-                    {sales.filter(filtered=>paidSales ? filtered.isPaid == true : unPaidSales ? filtered.isPaid == false:filtered.isPaid == true || false).map((item) => (
-                      <tr key={item._id}>
-                        <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
-                          <Typography
-                            variant="small"
-                            className="text-[11px] font-medium capitalize text-blue-gray-400"
-                          >
-                            {item.customer
-                              ? item.customer.name
-                              : item.customerName}
-                          </Typography>
-                        </td>
-                        <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
-                          <Typography
-                            variant="small"
-                            className="text-[11px] font-medium capitalize text-blue-gray-400"
-                          >
-                            {item.customer ? item.customer.phone : item.phone}
-                          </Typography>
-                        </td>
-                        <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
-                          <Typography
-                            variant="small"
-                            className="text-[11px] font-medium capitalize text-blue-gray-400"
-                          >
-                            <Button
-                              className="z-10 h-8"
-                              label="Show"
-                              icon=""
-                              onClick={() => {
-                                setMyOrderItems(item.orderItems);
-                                setCustname(item.customer);
-                                setShow(true);
-                              }}
-                            />
-                          </Typography>
-                        </td>
-                        <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
-                          <Typography
-                            variant="small"
-                            className="text-[11px] font-medium capitalize text-blue-gray-400"
-                          >
-                            ${item.totalPrice}
-                          </Typography>
-                        </td>
-                        <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
-                          <Typography
-                            variant="small"
-                            className="text-[11px] font-medium capitalize text-blue-gray-400"
-                          >
-                            {item.date && item.date.substring(0, 10)}
-                          </Typography>
-                        </td>
-                        <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
-                          <Typography
-                            variant="small"
-                            className="text-[11px] font-medium capitalize text-blue-gray-400"
-                          >
-                            {item.isPaid ? (
-                              <i
-                                className="pi pi-check"
-                                style={{ color: "green" }}
-                              ></i>
-                            ) : (
-                              <i
-                                className="pi pi-times"
-                                style={{ color: "red" }}
-                              ></i>
-                            )}
-                          </Typography>
-                        </td>
-                        <td>
-                          <Menu placement="left-start">
-                            <MenuHandler>
-                              <IconButton
-                                size="sm"
-                                variant="text"
-                                color="blue-gray"
-                              >
-                                <EllipsisVerticalIcon
-                                  strokeWidth={3}
-                                  fill="currenColor"
-                                  className="h-6 w-6"
-                                />
-                              </IconButton>
-                            </MenuHandler>
-                            <MenuList>
-                              <MenuItem
+                    {sales
+                      .filter((filtered) =>
+                        paidSales
+                          ? filtered.isPaid == true
+                          : unPaidSales
+                          ? filtered.isPaid == false
+                          : filtered.isPaid == true || false
+                      )
+                      .map((item) => (
+                        <tr key={item._id}>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                              {item.customer
+                                ? item.customer.name
+                                : item.customerName}
+                            </Typography>
+                          </td>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                              {item.customer ? item.customer.phone : item.phone}
+                            </Typography>
+                          </td>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                              <Button
+                                className="z-10 h-8"
+                                label="Show"
+                                icon=""
                                 onClick={() => {
-                                  setEdit(true);
-                                  setId(item._id);
-                                  setIsPaidBilling(item.isPaid);
+                                  setMyOrderItems(item.orderItems);
+                                  setCustname(item.customer);
+                                  setShow(true);
                                 }}
-                              >
-                                Change Billing Status
-                              </MenuItem>
-                              <MenuItem>Move To Bin</MenuItem>
-                              <MenuItem
-                                onClick={() => deleteSalesItems(item._id)}
-                              >
-                                Delete Permanently
-                              </MenuItem>
-                            </MenuList>
-                          </Menu>
-                        </td>
-                      </tr>
-                    ))}
+                              />
+                            </Typography>
+                          </td>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                              ${item.subTotalPrice}
+                            </Typography>
+                          </td>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                              ${item.discountAmount}
+                            </Typography>
+                          </td>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                              ${item.totalPrice}
+                            </Typography>
+                          </td>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                              {item.date && item.date.substring(0, 10)}
+                            </Typography>
+                          </td>
+                          <td className="border-b border-blue-gray-50 py-3 px-6 text-left">
+                            <Typography
+                              variant="small"
+                              className="text-[11px] font-medium capitalize text-blue-gray-400"
+                            >
+                              {item.isPaid ? (
+                                <i
+                                  className="pi pi-check"
+                                  style={{ color: "green" }}
+                                ></i>
+                              ) : (
+                                <i
+                                  className="pi pi-times"
+                                  style={{ color: "red" }}
+                                ></i>
+                              )}
+                            </Typography>
+                          </td>
+                          <td>
+                            <Menu placement="left-start">
+                              <MenuHandler>
+                                <IconButton
+                                  size="sm"
+                                  variant="text"
+                                  color="blue-gray"
+                                >
+                                  <EllipsisVerticalIcon
+                                    strokeWidth={3}
+                                    fill="currenColor"
+                                    className="h-6 w-6"
+                                  />
+                                </IconButton>
+                              </MenuHandler>
+                              <MenuList>
+                                <MenuItem
+                                  onClick={() => {
+                                    setEdit(true);
+                                    setId(item._id);
+                                    setIsPaidBilling(item.isPaid);
+                                  }}
+                                >
+                                  Change Billing Status
+                                </MenuItem>
+                                <MenuItem>Move To Bin</MenuItem>
+                                <MenuItem
+                                  onClick={() => deleteSalesItems(item._id)}
+                                >
+                                  Delete Permanently
+                                </MenuItem>
+                              </MenuList>
+                            </Menu>
+                          </td>
+                        </tr>
+                      ))}
                   </tbody>
                 </>
               )}
@@ -623,8 +739,6 @@ const HomeScreen = () => {
           </CardBody>
         </Card>
       </div>
-
-
 
       <Dialog
         blockScroll="false"
@@ -694,8 +808,8 @@ const HomeScreen = () => {
         visible={createSale}
         onHide={() => {
           dispatch({ type: SALES_CREATE_RESET });
+          dispatch({ type: SALES2_CREATE_RESET });
           setCreateSale(false);
-          setItem("");
           setCustomer("");
           setPhone("");
           setQuantity("");
@@ -704,6 +818,7 @@ const HomeScreen = () => {
           setDate(new Date());
           setKeyword2("");
           setCountInStockError(false);
+          setIsSalesPrinting(false);
           dispatch({ type: ORDER_REMOVE_ITEM_ALL });
         }}
         style={{ width: "40vw" }}
@@ -726,6 +841,7 @@ const HomeScreen = () => {
           />
         )}
         <div className="mx-auto space-y-4 p-4">
+        <Toast ref={toastBottomCenter} position="bottom-center" />
           <AutoComplete
             type="text"
             field="name"
@@ -935,28 +1051,76 @@ const HomeScreen = () => {
               ))}
             </tbody>
           </table>
-          <p className="text-left uppercase">Sub Total: ${totalPrice}</p>
+          <div className="flex justify-between">
+            <div>
+              
+            </div>
+            <div>
+              <p className="text-left uppercase">Sub Total: ${subTotalPrice}</p>
+              <spn className='flex gap-2 items-center'>
+                <p>Discount:</p>
+                
+              <InputText
+              type="number"
+              className="p-inputtext-sm"
+              value={discount}
+              placeholder="amount"
+              required
+              onChange={(e) => setDiscount(e.target.value)}
+            />
+              </spn>
+              <p className="text-left uppercase">Total: ${subTotalPrice == 0 ? subTotalPrice : subTotalPrice - discount}</p>
+              
 
-          <div>
-            IsPaid
-            <span className="px-2"></span>
-            <Checkbox
-              onChange={(e) => setIsPaid(e.checked)}
-              checked={isPaid}
-              defaultValue={isPaid}
-            ></Checkbox>
+              <div>
+                IsPaid
+                <span className="px-2"></span>
+                <Checkbox
+                  onChange={(e) => setIsPaid(e.checked)}
+                  checked={isPaid}
+                  defaultValue={isPaid}
+                ></Checkbox>
+              </div> 
+            </div>
           </div>
+          <br></br>
+          <br></br>
 
-          <div className="mt-4 xl:flex justify-center gap-4">
+          <div className="mt-4 justify-center gap-4 xl:flex">
             <button
               type="submit"
-              onClick={submitSaleHandler}
+              onClick={(e) => {
+                if (orderItems.length != 0) {
+                  submitSaleHandler(e);
+                } else {
+                  showMessage(toastBottomCenter, "error");
+                }
+              }}
               className="font-roboto rounded border border-primary bg-primary py-2 px-10 text-center font-medium uppercase text-white transition hover:bg-transparent hover:text-primary"
             >
               Save
             </button>
 
-            <Button>Save & Print</Button>
+            <ReactToPrint
+              trigger={() => <Button>Save & Print</Button>}
+              content={() => componentRef}
+              onBeforePrint={submitSaleHandler2}
+              onAfterPrint={() => {
+                dispatch({ type: SALES_CREATE_RESET });
+                dispatch({ type: SALES2_CREATE_RESET });
+                setCreateSale(false);
+                setCustomer("");
+                setPhone("");
+                setQuantity("");
+                setPrice("");
+                setIsPaid(true);
+                setDate(new Date());
+                setKeyword2("");
+                setCountInStockError(false);
+                setIsSalesPrinting(false);
+                dispatch({ type: ORDER_REMOVE_ITEM_ALL });
+              }}
+            />
           </div>
         </div>
         {/* </form> */}
@@ -1033,8 +1197,293 @@ const HomeScreen = () => {
           </CardBody>
         </Card>
       </Dialog>
+
+      <div style={{ display: "none" }}>
+        <ComponentToPrint
+          ref={(el) => (componentRef = el)}
+          customer={keyword2.name ? keyword2.name : keyword2}
+          phone={phone}
+          invoiceid={invoiceId}
+          date={date}
+          totalPrice={totalPrice}
+          orderItems={orderItems}
+        />
+      </div>
     </div>
   );
 };
 
 export default HomeScreen;
+
+import invoice from "@/data/images/invoicebg.png";
+import { IoMdCall } from "react-icons/io";
+import { Toast } from "primereact/toast";
+
+class ComponentToPrint extends React.Component {
+  render() {
+    const { customer } = this.props;
+    const { phone } = this.props;
+    const { totalPrice } = this.props;
+    const { invoiceid } = this.props;
+    const { date } = this.props;
+    const { orderItems } = this.props;
+
+    return (
+      <>
+        <div className="">
+          <div className="mx-12 flex items-center">
+            <div className=" w-24">
+              <img src={invoice} />
+            </div>
+            <div className="flex-1">
+              <div>
+                <p className="text-2xl  font-semibold uppercase">
+                  XALIYE COMPUTER & MOBILE REPAIR
+                </p>
+              </div>
+              <div className="flex justify-between">
+                <p className="rounded border border-blue-500 bg-blue-500 px-1 text-center font-normal uppercase  text-white">
+                  HEl xal fudud waqti gaaban
+                </p>
+                <div className="flex items-center">
+                  <span className=" rounded-full border border-blue-500">
+                    <IoMdCall
+                      color="#2196F3"
+                      className="p-[0.1rem] "
+                      size={20}
+                    />
+                  </span>
+
+                  <span className="p-1 text-blue-600" color="blue"></span>
+                  <p>0613951588</p>
+                  <p>/ 0614128728</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mx-14 border border-blue-500 bg-blue-500"></div>
+
+          <div className=" mx-14 mt-4 grid grid-cols-3 gap-4">
+            <div className="col-span-2">
+              <p className="text-2xl font-normal">Invoice to:</p>
+              <p className="text-xl">
+                Name:
+                {customer}
+              </p>
+              <p className="text-xl">
+                Phone:
+                {phone}
+              </p>
+            </div>
+            <div className="">
+              <div className=" flex items-center">
+                <p className=" text-2xl font-normal">Invoice ID:</p>
+                <span className="pl-2 text-xl">{invoiceid}</span>
+              </div>
+              <div className=" flex items-center">
+                <p className=" text-2xl font-normal">Amount: </p>
+                <span className="pl-2 text-xl">{totalPrice}</span>
+              </div>
+              <div className=" flex items-center">
+                <p p className="text-2xl font-normal">
+                  Date:
+                </p>
+                <p className="pl-2 text-xl">
+                  {moment(date).toString().substring(0, 15)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mx-14 mt-4">
+            <table className="w-full table-auto ">
+              <thead className="border border-blue-500 bg-blue-500 text-white">
+                <tr className="text-xl font-normal">
+                  <td>No</td>
+                  <td>Item</td>
+                  <td>Quantity</td>
+                  <td>Price</td>
+                  <td>Total Price</td>
+                </tr>
+              </thead>
+              <tbody className="border border-blue-500">
+                {orderItems &&
+                  orderItems.map((item, index) => (
+                    <tr className="">
+                      <td className="border border-blue-500 py-1 px-2">
+                        {index + 1}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        {item.itemName}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        {item.quantity}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        ${item.price}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        ${item.price * item.quantity}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mx-14 mt-6 grid grid-cols-2 gap-x-80 ">
+            <div className=" flex justify-center">
+              <p className=" col-span-2">Saxiixa Customer-ka</p>
+            </div>
+            <div className="flex justify-center">
+              <p className=" ">Saxiixa Maamulaha</p>
+            </div>
+          </div>
+          <div className="mx-14 mt-6 flex justify-between">
+            <div className="w-[35%] border border-blue-500"></div>
+            <div className="w-[35%] border border-blue-500"></div>
+          </div>
+          <br />
+
+          <div className="mx-14 mt-3 flex">
+            <i>
+              <AiOutlineWarning className=" text-5xl text-blue-500" />
+            </i>
+            <p className=" pl-2 text-xl capitalize ">
+              Digniin hadii aad alaabtaada aad ku qaadan wadid mudo 4 cisho ah
+              shirkadda masuul kama ahan, silamid ah shaqo laqabtay lacagteeda
+              labixiyay dib looma celin karo
+            </p>
+          </div>
+          <br />
+
+          <p className="mx-14 border border-blue-500 bg-blue-500 text-center uppercase  text-white">
+            Waa kuma mahadsantahay latacaa mulkaaga
+          </p>
+          <br />
+
+          {/* <div className=" mr-14 flex items-center  justify-between">
+            <div className=" h-1 flex-1 border border-blue-500 bg-blue-500"></div>
+            <div className=" w-10"></div>
+            <div className=" flex-non">
+              <p className=" text-3xl font-medium">INVOICE</p>
+            </div>
+          </div> */}
+
+          <div className="mx-12 flex items-center">
+            <div className=" w-24">
+              <img src={invoice} />
+            </div>
+            <div className="flex-1">
+              <div>
+                <p className="text-2xl  font-semibold uppercase">
+                  XALIYE COMPUTER & MOBILE REPAIR
+                </p>
+              </div>
+              <div className="flex justify-between">
+                <p className="rounded border border-blue-500 bg-blue-500 px-1 text-center font-normal uppercase  text-white">
+                  HEl xal fudud waqti gaaban
+                </p>
+                <div className="flex items-center">
+                  <span className=" rounded-full border border-blue-500">
+                    <IoMdCall
+                      color="#2196F3"
+                      className="p-[0.1rem] "
+                      size={20}
+                    />
+                  </span>
+                  <span className="p-1 text-blue-600" color="blue"></span>
+                  <p>0613951588</p>
+                  <p>/ 0614128728</p>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div className="mx-14 border border-blue-500 bg-blue-500"></div>
+
+          <div className=" mx-14 mt-4 grid grid-cols-3 gap-4">
+            <div className="col-span-2">
+              <p className="text-2xl font-normal">Invoice to:</p>
+              <p className="text-xl">
+                Name:
+                {customer}
+              </p>
+              <p className="text-xl">
+                Phone:
+                {phone}
+              </p>
+            </div>
+            <div className="">
+              <div className=" flex items-center">
+                <p className=" text-2xl font-normal">Invoice ID:</p>
+                <span className="pl-2 text-xl">{invoiceid}</span>
+              </div>
+              <div className=" flex items-center">
+                <p className=" text-2xl font-normal">Amount: </p>
+                <span className="pl-2 text-xl">{totalPrice}</span>
+              </div>
+              <div className=" flex items-center">
+                <p p className="text-2xl font-normal">
+                  Date:
+                </p>
+                <p className="pl-2 text-xl">
+                  {moment(date).toString().substring(0, 15)}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="mx-14 mt-4">
+            <table className="w-full table-auto ">
+              <thead className="border border-blue-500 bg-blue-500 text-white">
+                <tr className="text-xl font-normal">
+                  <td>No</td>
+                  <td>Item</td>
+                  <td>Quantity</td>
+                  <td>Price</td>
+                  <td>Total Price</td>
+                </tr>
+              </thead>
+              <tbody className="border border-blue-500">
+                {orderItems &&
+                  orderItems.map((item, index) => (
+                    <tr className="">
+                      <td className="border border-blue-500 py-1 px-2">
+                        {index + 1}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        {item.itemName}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        {item.quantity}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        ${item.price}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        ${item.price * item.quantity}
+                      </td>
+                    </tr>
+                  ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mx-14 mt-6 grid grid-cols-2 gap-x-80 ">
+            <div className=" flex justify-center">
+              <p className=" col-span-2">Saxiixa Customer-ka</p>
+            </div>
+            <div className="flex justify-center">
+              <p className=" ">Saxiixa Maamulaha</p>
+            </div>
+          </div>
+          <div className="mx-14 mt-6 flex justify-between">
+            <div className="w-[35%] border border-blue-500"></div>
+            <div className="w-[35%] border border-blue-500"></div>
+          </div>
+          <br />
+        </div>
+      </>
+    );
+  }
+}

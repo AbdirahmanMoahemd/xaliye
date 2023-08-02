@@ -32,7 +32,7 @@ export const createSubAccount = expressAsync(async (req, res) => {
   const exSubAccount = await SubAccount.findOne({ accountName });
   if (!exSubAccount) {
     const subacc = await SubAccount.find().sort({ createdAt: -1 });
-    if (subacc) {
+    if (subacc.length !==0) {
       const subaccount = new SubAccount({
         accountNo: subacc.accountNo + 1,
         accountName,

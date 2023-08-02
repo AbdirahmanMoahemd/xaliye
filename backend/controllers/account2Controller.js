@@ -37,13 +37,13 @@ export const createAccount = expressAsync(async (req, res) => {
   if (!exAccount) {
     const acc = await Account2.find().sort({ createdAt: -1 });
 
-    if (acc) {
+    if (acc.length !==0) {
       const account = new Account2({
         accountNo: acc[0].accountNo + 1,
         accountName,
         description,
       });
-      const createdAccount = await Account2.save();
+      const createdAccount = await account.save();
       res.status(201).json(createdAccount);
     } else {
       const account = new Account2({
@@ -51,7 +51,7 @@ export const createAccount = expressAsync(async (req, res) => {
         accountName,
         description,
       });
-      const createdAccount = await Account2.save();
+      const createdAccount = await account.save();
       res.status(201).json(createdAccount);
     }
   } else {

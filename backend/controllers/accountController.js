@@ -37,7 +37,7 @@ export const createAccount = expressAsync(async (req, res) => {
   if (!exAccount) {
     const acc = await Account.find().sort({ createdAt: -1 });
 
-    if (acc) {
+    if (acc.length !==0) {
       const account = new Account({
         accountNo: acc[0].accountNo + 1,
         accountName,
