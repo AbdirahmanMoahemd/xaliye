@@ -71,7 +71,7 @@ export function SignIn() {
           </CardHeader>
           <form onSubmit={submitHandler}>
             <CardBody className="flex flex-col gap-4">
-              {/* {message != "" && <Message severity="error" text={message} />} */}
+              {message != "" && <Message severity="error" text={message} />}
               {error && <Message severity="error" text={error} />}
               {loading && (
                 <ProgressSpinner
