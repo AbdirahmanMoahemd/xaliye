@@ -37,10 +37,10 @@ export function SignIn() {
 
   useEffect(() => {
     if (userInfo) {
-      // navigate(redirect);
-      setMessage(
-        "Your system is in maintenance mode, please contact our support team"
-      );
+      navigate(redirect);
+      // setMessage(
+      //   "Your system is in maintenance mode, please contact our support team"
+      // );
     }
   }, [navigate, userInfo, redirect]);
 
