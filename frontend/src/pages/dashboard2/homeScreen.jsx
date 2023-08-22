@@ -1309,6 +1309,7 @@ class ComponentToPrint extends React.Component {
               <tbody className="border border-blue-500">
                 {orderItems &&
                   orderItems.map((item, index) => (
+                    <>
                     <tr className="">
                       <td className="border border-blue-500 py-1 px-2">
                         {index + 1}
@@ -1326,6 +1327,43 @@ class ComponentToPrint extends React.Component {
                         ${item.price * item.quantity}
                       </td>
                     </tr>
+
+                    <tr className="">
+                      <td className="border border-blue-500 py-1 px-2">
+                        {index + 1}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        {item.itemName}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        {item.quantity}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        ${item.price}
+                      </td>
+                      <td className="border border-blue-500 py-1 px-2">
+                        ${item.price * item.quantity}
+                      </td>
+                    </tr>
+                    <tr className="">
+                    <td className="border border-blue-500 py-1 px-2">
+                      {index + 1}
+                    </td>
+                    <td className="border border-blue-500 py-1 px-2">
+                      {item.itemName}
+                    </td>
+                    <td className="border border-blue-500 py-1 px-2">
+                      {item.quantity}
+                    </td>
+                    <td className="border border-blue-500 py-1 px-2">
+                      ${item.price}
+                    </td>
+                    <td className="border border-blue-500 py-1 px-2">
+                      ${item.price * item.quantity}
+                    </td>
+                  </tr>
+                  
+                  </>
                   ))}
               </tbody>
             </table>
@@ -1369,6 +1407,7 @@ class ComponentToPrint extends React.Component {
               <p className=" text-3xl font-medium">INVOICE</p>
             </div>
           </div> */}
+        
 
           <div className="mx-12 flex items-center">
             <div className=" w-24">

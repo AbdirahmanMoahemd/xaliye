@@ -180,6 +180,8 @@ export function Sales2Screen() {
   useEffect(() => {
     if (successSaleCreateAndPrint) {
       setCreate(false);
+      dispatch({ type: SALES_CREATE_RESET });
+      dispatch({ type: SALES_CREATE_RESET2 });
     }
   }, [dispatch]);
 

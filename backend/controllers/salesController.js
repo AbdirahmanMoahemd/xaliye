@@ -87,6 +87,7 @@ export const createSalesItem = expressAsync(async (req, res) => {
       phone,
       date,
       totalPrice,
+      totalAmoun: 
       invoiceId,
       isPaid,
     });

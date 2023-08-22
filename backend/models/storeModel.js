@@ -23,6 +23,11 @@ const storeSchema = mongoose.Schema(
       require: true,
       default: 0
     },
+    totalAmount: {
+      type: Number,
+      require: true,
+      default: 0
+    },
   },
   {
     timestamps: true,

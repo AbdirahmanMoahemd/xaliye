@@ -38,6 +38,7 @@ export const createStoreItem = expressAsync(async (req, res) => {
     selling,
     cost,
     countInStock,
+    totalAmount: cost * countInStock
   });
   const createdStoreItem = await items.save();
 
